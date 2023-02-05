@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "219503670135",
+    "project_id": "cardgamesproject-6d467",
+    "storage_bucket": "cardgamesproject-6d467.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:219503670135:android:b3a4f3e5ac280ecfcf6772",
+        "android_client_info": {
+          "package_name": "com.example.cardgamesproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "219503670135-qa0ktg4mo4i48nbd5sgtn8a2btvoj8c6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCm8w1ZyjbRs5khAh7Bm-BdwDHBesYQRE0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "219503670135-qa0ktg4mo4i48nbd5sgtn8a2btvoj8c6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

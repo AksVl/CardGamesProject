@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/backgroundGreen"
+    android:padding="8dp"
+    android:gravity="center"
+    tools:context=".StartActivity">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="CardGamesApp"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textSize="36sp"
+        />
+    <EditText
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="78sp"
+        android:hint="Enter Nickname"
+        android:gravity="center"
+        android:textSize="24sp">
+
+    </EditText>
+    <Button
+        android:id="@+id/btn_login"
+        android:layout_width="match_parent"
+        android:layout_height="78sp"
+        android:text="Log in"
+        android:textSize="24sp"
+        android:layout_marginBottom="12sp"
+        android:textColor="@color/black"
+        />
+
+</LinearLayout>
