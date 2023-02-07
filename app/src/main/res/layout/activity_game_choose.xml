@@ -8,5 +8,56 @@
     android:background="@color/backgroundGreen"
     android:padding="8dp"
     tools:context=".StartActivity">
-    
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose a game to play"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textSize="36sp"
+        />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_margin="1sp"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/Fool"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="78sp"
+            android:text="fool"
+            android:textSize="24sp"
+            android:textColor="@color/black"
+            android:layout_margin="2sp"
+            />
+        <Button
+            android:id="@+id/TwentyOne"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="78sp"
+            android:text="21"
+            android:layout_margin="2sp"
+            android:textSize="24sp"
+            android:textColor="@color/black"
+            />
+        <Button
+            android:id="@+id/Liar"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="78sp"
+            android:text="Liar"
+            android:layout_margin="2sp"
+            android:textSize="24sp"
+            android:textColor="@color/black"
+            />
+    </LinearLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/FragmentsContainer">
+    </FrameLayout>
 </LinearLayout>

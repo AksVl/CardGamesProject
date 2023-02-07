@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="11"
-        android:text="Create twenty one room"
+        android:text="Create fool room"
         android:textSize="24sp"
         android:textColor="@color/black"
         android:gravity="center">

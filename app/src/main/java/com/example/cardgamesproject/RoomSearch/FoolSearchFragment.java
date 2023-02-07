@@ -10,9 +10,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.cardgamesproject.R;
+import com.example.cardgamesproject.databinding.FragmentFoolSearchBinding;
 
-class FoolSearchFragment extends Fragment {
-
+public class FoolSearchFragment extends Fragment {
+    private FragmentFoolSearchBinding binding;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,

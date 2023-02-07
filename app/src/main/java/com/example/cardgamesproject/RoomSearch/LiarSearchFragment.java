@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 
 import com.example.cardgamesproject.R;
 
-class LiarSearchFragment extends Fragment {
+public class LiarSearchFragment extends Fragment {
 
     @Nullable
     @Override
