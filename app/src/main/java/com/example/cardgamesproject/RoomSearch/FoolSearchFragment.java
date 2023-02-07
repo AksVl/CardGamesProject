@@ -19,6 +19,8 @@ public class FoolSearchFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_fool_search, container, false);
+        binding = FragmentFoolSearchBinding.inflate(getLayoutInflater());
+        //return inflater.inflate(R.layout.fragment_fool_search, container, false);
+        return binding.getRoot();
     }
 }

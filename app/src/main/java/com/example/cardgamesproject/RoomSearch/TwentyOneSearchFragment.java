@@ -10,14 +10,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.cardgamesproject.R;
+import com.example.cardgamesproject.databinding.FragmentTwentyOneSearchBinding;
 
 public class TwentyOneSearchFragment extends Fragment {
-
+    FragmentTwentyOneSearchBinding binding;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_twenty_one_search, container, false);
+        binding = FragmentTwentyOneSearchBinding.inflate(getLayoutInflater());
+        //return inflater.inflate(R.layout.fragment_twenty_one_search, container, false);
+        return binding.getRoot();
     }
 }
