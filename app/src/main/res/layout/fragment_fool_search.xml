@@ -15,8 +15,7 @@
     <Button
         android:id="@+id/create"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="11"
+        android:layout_height="63sp"
         android:text="Create fool room"
         android:textSize="24sp"
         android:textColor="@color/black"

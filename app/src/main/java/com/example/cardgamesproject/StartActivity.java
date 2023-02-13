@@ -34,7 +34,7 @@ public class StartActivity extends AppCompatActivity {
         playerName = prefs.getString("name","");
         binding.name.setText(playerName);
         if(!playerName.equals("")){
-            playerRef = database.getReference("players/" + playerName);
+            playerRef = database.getReference("playerList/" + playerName);
             AddEventListener();
             playerRef.setValue("");
         }
@@ -45,7 +45,7 @@ public class StartActivity extends AppCompatActivity {
                 prefs.edit().putString("name",playerName).apply();
                 binding.btnLogin.setEnabled(false);
                 binding.btnLogin.setText("Please Wait...");
-                playerRef = database.getReference("players/" + playerName);
+                playerRef = database.getReference("playerList/" + playerName);
                 AddEventListener();
                 playerRef.setValue("");
             }

@@ -1,0 +1,16 @@
+package com.example.cardgamesproject.GameActivities;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+
+import com.example.cardgamesproject.R;
+
+public class TwentyOneGame extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_twenty_one_game);
+    }
+}
