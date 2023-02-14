@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -55,6 +56,27 @@ public class LiarSearchFragment extends Fragment {
         RoomName = playerName;
         ShowAvailable();
         binding.create.setOnClickListener(v -> CreateNewRoom());
+        binding.list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                RoomName = AvailableRooms.get(i);
+                RoomRef = database.getReference("LiarRooms/" + RoomName + "/" + playerName);
+                RoomRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        Intent intent = new Intent(getContext(), LiarGame.class);
+                        intent.putExtra("RoomName/",RoomName);
+                        startActivity(intent);
+                        RoomRef.setValue("joined");
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        //idk what to do here
+                    }
+                });
+            }
+        });
     }
 
     private void CreateNewRoom() {

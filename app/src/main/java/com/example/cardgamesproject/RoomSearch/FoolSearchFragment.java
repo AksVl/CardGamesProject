@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -52,22 +53,44 @@ public class FoolSearchFragment extends Fragment {
         binding.create.setEnabled(true);
         SharedPreferences prefs = Objects.requireNonNull(getActivity()).getSharedPreferences("PREFS", 0);
         playerName = prefs.getString("name","");
-        RoomName = playerName;
+        RoomName = playerName+"_Room";
         ShowAvailable();
         binding.create.setOnClickListener(v -> CreateNewRoom());
+        binding.list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                RoomName = AvailableRooms.get(i);
+                RoomRef = database.getReference("FoolRooms/" + RoomName + "/" + playerName);
+                RoomRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        Intent intent = new Intent(getContext(), FoolGame.class);
+                        intent.putExtra("RoomName/",RoomName);
+                        startActivity(intent);
+                        RoomRef.setValue("joined");
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        //idk what to do here
+                    }
+                });
+            }
+        });
     }
 
     private void CreateNewRoom() {
-        //it crashes here
         binding.create.setEnabled(false);
-        RoomRef = database.getReference("FoolRooms/"+RoomName);
+        RoomRef = database.getReference("FoolRooms/" + RoomName + "/" + playerName);
         RoomRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                //it crashes here
                 binding.create.setEnabled(false);
-                Intent intent = new Intent(getContext(), FoolGame.class);
-                intent.putExtra("RoomName",RoomName);
+                Intent intent = new Intent(getActivity(), FoolGame.class);
+                intent.putExtra("RoomName/",RoomName);
                 startActivity(intent);
+                RoomRef.setValue("joined");
             }
 
             @Override

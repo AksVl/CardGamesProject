@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -13,7 +14,9 @@ import androidx.fragment.app.Fragment;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.cardgamesproject.GameActivities.FoolGame;
 import com.example.cardgamesproject.GameActivities.LiarGame;
+import com.example.cardgamesproject.GameActivities.TwentyOneGame;
 import com.example.cardgamesproject.R;
 import com.example.cardgamesproject.databinding.FragmentLiarSearchBinding;
 import com.example.cardgamesproject.databinding.FragmentTwentyOneSearchBinding;
@@ -57,6 +60,27 @@ public class TwentyOneSearchFragment extends Fragment {
         RoomName = playerName;
         ShowAvailable();
         binding.create.setOnClickListener(v -> CreateNewRoom());
+        binding.list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                RoomName = AvailableRooms.get(i);
+                RoomRef = database.getReference("TwentyOneRooms/" + RoomName + "/" + playerName);
+                RoomRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        Intent intent = new Intent(getContext(), TwentyOneGame.class);
+                        intent.putExtra("RoomName/",RoomName);
+                        startActivity(intent);
+                        RoomRef.setValue("joined");
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        //idk what to do here
+                    }
+                });
+            }
+        });
     }
 
     private void CreateNewRoom() {
@@ -67,7 +91,7 @@ public class TwentyOneSearchFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 binding.create.setEnabled(false);
-                Intent intent = new Intent(getContext(), LiarGame.class);
+                Intent intent = new Intent(getContext(), TwentyOneGame.class);
                 intent.putExtra("RoomName",RoomName);
                 startActivity(intent);
             }

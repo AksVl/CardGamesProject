@@ -12,16 +12,13 @@
         android:theme="@style/Theme.CardGamesProject"
         tools:targetApi="31">
         <activity
-            android:name=".TwentyOneGame"
+            android:name=".GameActivities.TwentyOneGame"
             android:exported="false" />
         <activity
-            android:name=".LiarGame"
+            android:name=".GameActivities.LiarGame"
             android:exported="false" />
         <activity
-            android:name=".FoolGame"
-            android:exported="false" />
-        <activity
-            android:name=".FoolActivity"
+            android:name=".GameActivities.FoolGame"
             android:exported="false" />
         <activity
             android:name=".GameChooseActivity"
