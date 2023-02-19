@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.annotation.NonNull;
@@ -57,21 +58,43 @@ public class TwentyOneSearchFragment extends Fragment {
         binding.create.setEnabled(true);
         SharedPreferences prefs = Objects.requireNonNull(getActivity()).getSharedPreferences("PREFS", 0);
         playerName = prefs.getString("name","");
-        RoomName = playerName;
+        RoomName = playerName+"_Room";
         ShowAvailable();
+        binding.sizePicker.setMinValue(2);
+        binding.sizePicker.setMaxValue(4);
         binding.create.setOnClickListener(v -> CreateNewRoom());
         binding.list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 RoomName = AvailableRooms.get(i);
+                final int[] size = new int[1];
+                final int[] count = {0};
+                RoomRef = database.getReference("TwentyOneRooms/" + RoomName);
+                RoomRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        size[0] = Integer.parseInt(snapshot.child("_size").getValue().toString());
+                        count[0] = (int) snapshot.getChildrenCount();
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        //nothing
+                    }
+                });
                 RoomRef = database.getReference("TwentyOneRooms/" + RoomName + "/" + playerName);
                 RoomRef.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        Intent intent = new Intent(getContext(), TwentyOneGame.class);
-                        intent.putExtra("RoomName/",RoomName);
-                        startActivity(intent);
-                        RoomRef.setValue("joined");
+                        if(count[0] - 1 < size[0]){
+                            Intent intent = new Intent(getContext(), FoolGame.class);
+                            intent.putExtra("RoomName", RoomName);
+                            intent.putExtra("playerName", playerName);
+                            startActivity(intent);
+                            RoomRef.setValue("joined");
+                        }
+                        else{
+                            Toast.makeText(getContext(),"Room is full", Toast.LENGTH_SHORT).show();
+                        }
                     }
 
                     @Override
@@ -84,15 +107,17 @@ public class TwentyOneSearchFragment extends Fragment {
     }
 
     private void CreateNewRoom() {
-        //it crashes here
+        RoomRef = database.getReference("TwentyOneRooms/" + RoomName + "/_size");
+        RoomRef.setValue(binding.sizePicker.getValue());
         binding.create.setEnabled(false);
-        RoomRef = database.getReference("TwentyOneRooms/"+RoomName);
+        RoomRef = database.getReference("TwentyOneRooms/"+RoomName + "/" + playerName);
         RoomRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 binding.create.setEnabled(false);
                 Intent intent = new Intent(getContext(), TwentyOneGame.class);
                 intent.putExtra("RoomName",RoomName);
+                intent.putExtra("playerName",playerName);
                 startActivity(intent);
             }
 

@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.annotation.NonNull;
@@ -25,6 +26,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class FoolSearchFragment extends Fragment {
     FirebaseDatabase database = FirebaseDatabase.getInstance("https://cardgamesproject-6d467-default-rtdb.europe-west1.firebasedatabase.app/");
@@ -35,6 +37,7 @@ public class FoolSearchFragment extends Fragment {
     ArrayList<String> AvailableRooms = new ArrayList<String>();
     ListView listView;
     private FragmentFoolSearchBinding binding;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -43,13 +46,14 @@ public class FoolSearchFragment extends Fragment {
         binding = FragmentFoolSearchBinding.inflate(getLayoutInflater());
         //return inflater.inflate(R.layout.fragment_fool_search, container, false);
         return binding.getRoot();
-        //
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         listView = requireView().findViewById(R.id.list);
+        binding.sizePicker.setMinValue(2);
+        binding.sizePicker.setMaxValue(6);
         binding.create.setEnabled(true);
         SharedPreferences prefs = Objects.requireNonNull(getActivity()).getSharedPreferences("PREFS", 0);
         playerName = prefs.getString("name","");
@@ -60,14 +64,34 @@ public class FoolSearchFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 RoomName = AvailableRooms.get(i);
+                final int[] size = new int[1];
+                final int[] count = {0};
+                RoomRef = database.getReference("FoolRooms/" + RoomName);
+                RoomRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        size[0] = Integer.parseInt(snapshot.child("_size").getValue().toString());
+                        count[0] = (int) snapshot.getChildrenCount();
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        //nothing
+                    }
+                });
                 RoomRef = database.getReference("FoolRooms/" + RoomName + "/" + playerName);
                 RoomRef.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        Intent intent = new Intent(getContext(), FoolGame.class);
-                        intent.putExtra("RoomName/",RoomName);
-                        startActivity(intent);
-                        RoomRef.setValue("joined");
+                        if(count[0] - 1 < size[0]){
+                            Intent intent = new Intent(getContext(), FoolGame.class);
+                            intent.putExtra("RoomName", RoomName);
+                            intent.putExtra("playerName", playerName);
+                            startActivity(intent);
+                            RoomRef.setValue("joined");
+                        }
+                        else{
+                            Toast.makeText(getContext(),"Room is full", Toast.LENGTH_SHORT).show();
+                        }
                     }
 
                     @Override
@@ -78,17 +102,18 @@ public class FoolSearchFragment extends Fragment {
             }
         });
     }
-
     private void CreateNewRoom() {
+        RoomRef = database.getReference("FoolRooms/" + RoomName + "/_size");
+        RoomRef.setValue(binding.sizePicker.getValue());
         binding.create.setEnabled(false);
         RoomRef = database.getReference("FoolRooms/" + RoomName + "/" + playerName);
         RoomRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                //it crashes here
                 binding.create.setEnabled(false);
                 Intent intent = new Intent(getActivity(), FoolGame.class);
-                intent.putExtra("RoomName/",RoomName);
+                intent.putExtra("RoomName",RoomName);
+                intent.putExtra("playerName",playerName);
                 startActivity(intent);
                 RoomRef.setValue("joined");
             }
