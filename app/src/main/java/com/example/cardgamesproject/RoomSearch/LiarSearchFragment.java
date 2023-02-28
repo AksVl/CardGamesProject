@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 
 import com.example.cardgamesproject.GameActivities.FoolGame;
 import com.example.cardgamesproject.GameActivities.LiarGame;
+import com.example.cardgamesproject.GameActivities.TwentyOneGame;
 import com.example.cardgamesproject.R;
 import com.example.cardgamesproject.databinding.FragmentFoolSearchBinding;
 import com.example.cardgamesproject.databinding.FragmentLiarSearchBinding;
@@ -66,7 +67,7 @@ public class LiarSearchFragment extends Fragment {
                 final int[] size = new int[1];
                 final int[] count = {0};
                 RoomRef = database.getReference("LiarRooms/" + RoomName);
-                RoomRef.addValueEventListener(new ValueEventListener() {
+                RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         size[0] = Integer.parseInt(snapshot.child("_size").getValue().toString());
@@ -78,15 +79,16 @@ public class LiarSearchFragment extends Fragment {
                     }
                 });
                 RoomRef = database.getReference("LiarRooms/" + RoomName + "/" + playerName);
-                RoomRef.addValueEventListener(new ValueEventListener() {
+                RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if(count[0] - 1 < size[0]){
-                            Intent intent = new Intent(getContext(), FoolGame.class);
+                            Intent intent = new Intent(getContext(), LiarGame.class);
                             intent.putExtra("RoomName", RoomName);
                             intent.putExtra("playerName", playerName);
                             startActivity(intent);
-                            RoomRef.setValue("joined");
+                            RoomRef.child("status").setValue("joined");
+                            RoomRef.child("position").setValue(count[0]);
                         }
                         else{
                             Toast.makeText(getContext(),"Room is full", Toast.LENGTH_SHORT).show();
@@ -106,8 +108,8 @@ public class LiarSearchFragment extends Fragment {
         RoomRef = database.getReference("LiarRooms/" + RoomName + "/_size");
         RoomRef.setValue(binding.sizePicker.getValue());
         binding.create.setEnabled(false);
-        RoomRef = database.getReference("LiarRooms/"+RoomName + "/" + playerName);
-        RoomRef.addValueEventListener(new ValueEventListener() {
+        RoomRef = database.getReference("LiarRooms/"+RoomName +"/" + playerName);
+        RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 binding.create.setEnabled(false);
@@ -115,6 +117,8 @@ public class LiarSearchFragment extends Fragment {
                 intent.putExtra("RoomName",RoomName);
                 intent.putExtra("playerName",playerName);
                 startActivity(intent);
+                RoomRef.child("status").setValue("joined");
+                RoomRef.child("position").setValue(1);
             }
 
             @Override
@@ -122,7 +126,6 @@ public class LiarSearchFragment extends Fragment {
                 //idk what to do here
             }
         });
-        RoomRef.setValue(playerName);
     }
 
     private void ShowAvailable(){
@@ -143,5 +146,10 @@ public class LiarSearchFragment extends Fragment {
                 //idk what to do here
             }
         });
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        binding.create.setEnabled(true);
     }
 }

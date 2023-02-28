@@ -67,7 +67,7 @@ public class FoolSearchFragment extends Fragment {
                 final int[] size = new int[1];
                 final int[] count = {0};
                 RoomRef = database.getReference("FoolRooms/" + RoomName);
-                RoomRef.addValueEventListener(new ValueEventListener() {
+                RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         size[0] = Integer.parseInt(snapshot.child("_size").getValue().toString());
@@ -79,7 +79,7 @@ public class FoolSearchFragment extends Fragment {
                     }
                 });
                 RoomRef = database.getReference("FoolRooms/" + RoomName + "/" + playerName);
-                RoomRef.addValueEventListener(new ValueEventListener() {
+                RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if(count[0] - 1 < size[0]){
@@ -87,7 +87,8 @@ public class FoolSearchFragment extends Fragment {
                             intent.putExtra("RoomName", RoomName);
                             intent.putExtra("playerName", playerName);
                             startActivity(intent);
-                            RoomRef.setValue("joined");
+                            RoomRef.child("status").setValue("joined");
+                            RoomRef.child("position").setValue(count[0]);
                         }
                         else{
                             Toast.makeText(getContext(),"Room is full", Toast.LENGTH_SHORT).show();
@@ -107,7 +108,7 @@ public class FoolSearchFragment extends Fragment {
         RoomRef.setValue(binding.sizePicker.getValue());
         binding.create.setEnabled(false);
         RoomRef = database.getReference("FoolRooms/" + RoomName + "/" + playerName);
-        RoomRef.addValueEventListener(new ValueEventListener() {
+        RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 binding.create.setEnabled(false);
@@ -115,7 +116,8 @@ public class FoolSearchFragment extends Fragment {
                 intent.putExtra("RoomName",RoomName);
                 intent.putExtra("playerName",playerName);
                 startActivity(intent);
-                RoomRef.setValue("joined");
+                RoomRef.child("status").setValue("joined");
+                RoomRef.child("position").setValue(1);
             }
 
             @Override
@@ -123,7 +125,6 @@ public class FoolSearchFragment extends Fragment {
                 //idk what to do here
             }
         });
-        RoomRef.setValue(playerName);
     }
 
     private void ShowAvailable(){
@@ -144,5 +145,10 @@ public class FoolSearchFragment extends Fragment {
                 //idk what to do here
             }
         });
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        binding.create.setEnabled(true);
     }
 }
