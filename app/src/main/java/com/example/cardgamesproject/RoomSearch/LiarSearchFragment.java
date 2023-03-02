@@ -96,6 +96,9 @@ public class LiarSearchFragment extends Fragment {
                             if(RoomPositions.get(j) == PlayersPositions[element]){
                                 RoomPositions.remove(j);
                                 element++;
+                                if(element == PlayersPositions.length){
+                                    break;
+                                }
                             }
                         }
                         AvailablePosition[0] = RoomPositions.get(0);
