@@ -3,6 +3,7 @@ package com.example.cardgamesproject.RoomSearch;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.ArraySet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Objects;
 
 public class TwentyOneSearchFragment extends Fragment {
@@ -77,7 +79,7 @@ public class TwentyOneSearchFragment extends Fragment {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         size[0] = Integer.parseInt(snapshot.child("_size").getValue().toString());
                         count[0] = (int) snapshot.getChildrenCount();
-                        int[] PlayersPositions = new int[count[0]-1];
+                        ArrayList<Integer> PlayersPositions = new ArrayList<>();
                         ArrayList<Integer> RoomPositions = new ArrayList<>();
                         for (int j = 0; j < size[0]; j++) {
                              RoomPositions.add(j+1);
@@ -88,23 +90,15 @@ public class TwentyOneSearchFragment extends Fragment {
                         }
                         for (String player : InRoomPlayers) {
                             if(!player.equals("_size")){
-                                int count = 0;
-                                PlayersPositions[count] = Integer.parseInt(snapshot.child(player).child("position").getValue().toString());
-                                count++;
+                                PlayersPositions.add(Integer.parseInt(snapshot.child(player).child("position").getValue().toString()));
                             }
                         }
-                        Arrays.sort(PlayersPositions);
-                        int element = 0;
                         for (int j = 0; j < RoomPositions.size(); j++) {
-                            if(RoomPositions.get(j) == PlayersPositions[element]){
-                                RoomPositions.remove(j);
-                                element++;
-                                if(element == PlayersPositions.length){
-                                    break;
-                                }
+                            if(!PlayersPositions.contains(RoomPositions.get(j))){
+                                AvailablePosition[0] = RoomPositions.get(j);
+                                break;
                             }
                         }
-                        AvailablePosition[0] = RoomPositions.get(0);
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
