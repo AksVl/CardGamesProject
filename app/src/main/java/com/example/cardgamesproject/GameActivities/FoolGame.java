@@ -1,17 +1,22 @@
 package com.example.cardgamesproject.GameActivities;
 
+import static java.lang.Integer.parseInt;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.ThemedSpinnerAdapter;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.cardgamesproject.R;
 import com.example.cardgamesproject.StartActivity;
@@ -23,10 +28,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+
 public class FoolGame extends AppCompatActivity {
     ActivityFoolGameBinding binding;
     FirebaseDatabase database = FirebaseDatabase.getInstance("https://cardgamesproject-6d467-default-rtdb.europe-west1.firebasedatabase.app/");
     DatabaseReference PlayerRef;
+    DatabaseReference RoomRef;
+    ValueEventListener listener;
     String RoomName;
     String playerName;
     @Override
@@ -39,7 +48,9 @@ public class FoolGame extends AppCompatActivity {
         RoomName = inputIntent.getStringExtra("RoomName");
         playerName = inputIntent.getStringExtra("playerName");
         PlayerRef = database.getReference("FoolRooms/" + RoomName + "/" + playerName);
-        database.getReference("FoolRooms/"+RoomName).addListenerForSingleValueEvent(new ValueEventListener() {
+        RoomRef = database.getReference("FoolRooms/"+RoomName);
+        ArrayList<String> InRoomPlayers = new ArrayList<>();
+        RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 ViewGroup.LayoutParams params = new LinearLayout.
@@ -56,6 +67,54 @@ public class FoolGame extends AppCompatActivity {
                 //nothing
             }
         });
+        listener = RoomRef.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("ResourceAsColor")
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                InRoomPlayers.clear();
+                for (DataSnapshot d : snapshot.getChildren()) {
+                    InRoomPlayers.add(d.getKey());
+                }
+                int my_pos;
+                int pos;
+                my_pos = parseInt(snapshot.child(playerName).child("position").getValue().toString());
+                for (String player : InRoomPlayers) {
+                    if (!player.equals(playerName) && !player.equals("_size")) {
+                        if(snapshot.child(player).child("position").exists()) {
+                            pos = parseInt(snapshot.child(player).child("position").getValue().toString());
+                            TextView name = binding.playersContainer.getChildAt(getUiPosition(my_pos, pos)).findViewById(R.id.name);
+                            TextView status = binding.playersContainer.getChildAt(getUiPosition(my_pos, pos)).findViewById(R.id.status);
+                            String gotStatus = snapshot.child(player).child("status").getValue().toString();
+                            name.setText(player);
+                            status.setText(gotStatus);
+                            if(gotStatus.equals("ready")){
+                                status.setTextColor(Color.GREEN);
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        binding.ready.setOnClickListener(view -> SetStatusToReady());
+    }
+    private void SetStatusToReady() {
+        PlayerRef.child("status").setValue("ready");
+        binding.buttonBar.getChildAt(0).setEnabled(false);
+    }
+    private int getUiPosition(int my_position, int position) {
+        int uiPosition;
+        if(position>my_position){
+            uiPosition = position-my_position-1;
+        }
+        else{
+            uiPosition = my_position- position - 1;
+        }
+        return uiPosition;
     }
 
     @Override
@@ -71,7 +130,8 @@ public class FoolGame extends AppCompatActivity {
     }
 
     private void Disconnect() {
-        database.getReference("FoolRooms/"+RoomName).addValueEventListener(new ValueEventListener() {
+        RoomRef.removeEventListener(listener);
+        RoomRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 snapshot.child(playerName).getRef().removeValue();

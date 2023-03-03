@@ -6,12 +6,16 @@ import static java.lang.Integer.parseInt;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.cardgamesproject.R;
 import com.example.cardgamesproject.databinding.ActivityFoolGameBinding;
@@ -23,6 +27,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class TwentyOneGame extends AppCompatActivity {
@@ -30,8 +35,10 @@ public class TwentyOneGame extends AppCompatActivity {
     ActivityTwentyOneGameBinding binding;
     FirebaseDatabase database = FirebaseDatabase.getInstance("https://cardgamesproject-6d467-default-rtdb.europe-west1.firebasedatabase.app/");
     DatabaseReference PlayerRef;
+    DatabaseReference RoomRef;
     String RoomName;
     String playerName;
+    ValueEventListener listener;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,13 +48,16 @@ public class TwentyOneGame extends AppCompatActivity {
         RoomName = inputIntent.getStringExtra("RoomName");
         playerName = inputIntent.getStringExtra("playerName");
         PlayerRef = database.getReference("TwentyOneRooms/"+RoomName+"/"+playerName);
+        RoomRef = database.getReference("TwentyOneRooms/"+RoomName);
         //adding players's windows to room layout
-        database.getReference("TwentyOneRooms/"+RoomName).addListenerForSingleValueEvent(new ValueEventListener() {
+        ArrayList<String> InRoomPlayers = new ArrayList<>();
+        RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                binding.playersContainer.removeAllViews();
                 ViewGroup.LayoutParams params = new LinearLayout.
                         LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT,1.0f);
-                int size = Integer.parseInt(snapshot.child("_size").getValue().toString());
+                int size = parseInt(snapshot.child("_size").getValue().toString());
                 for (int i = 0; size - 1 > i; i++) {
                     PlayerItemBinding playerItem = PlayerItemBinding.inflate(getLayoutInflater());
                     binding.playersContainer.addView(playerItem.getRoot(),params);
@@ -59,16 +69,58 @@ public class TwentyOneGame extends AppCompatActivity {
                 //nothing
             }
         });
-        /*Button im_ready = new Button(this);
-        im_ready.setText("I'm ready");
-        binding.buttonBar.addView(im_ready);
-        im_ready.setOnClickListener(view -> SetStatusToReady());*/
+        listener = RoomRef.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("ResourceAsColor")
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                InRoomPlayers.clear();
+                for (DataSnapshot d : snapshot.getChildren()) {
+                    InRoomPlayers.add(d.getKey());
+                }
+                int my_pos;
+                int pos;
+                my_pos = parseInt(snapshot.child(playerName).child("position").getValue().toString());
+                for (String player : InRoomPlayers) {
+                    if (!player.equals(playerName) && !player.equals("_size")) {
+                        if(snapshot.child(player).child("position").exists()) {
+                            pos = parseInt(snapshot.child(player).child("position").getValue().toString());
+                            TextView name = binding.playersContainer.getChildAt(getUiPosition(my_pos, pos)).findViewById(R.id.name);
+                            TextView status = binding.playersContainer.getChildAt(getUiPosition(my_pos, pos)).findViewById(R.id.status);
+                            String gotStatus = snapshot.child(player).child("status").getValue().toString();
+                            name.setText(player);
+                            status.setText(gotStatus);
+                            if(gotStatus.equals("ready")){
+                                status.setTextColor(Color.GREEN);
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        binding.ready.setOnClickListener(view -> SetStatusToReady());
+    }
+    private void SetStatusToReady() {
+            PlayerRef.child("status").setValue("ready");
+            binding.buttonBar.getChildAt(0).setEnabled(false);
+        }
+    private int getUiPosition(int my_position, int position) {
+        int uiPosition;
+        if(position>my_position){
+            uiPosition = position-my_position-1;
+        }
+         else{
+            uiPosition = my_position- position - 1;
+        }
+        return uiPosition;
     }
 
-    /*private void SetStatusToReady() {
-        PlayerRef.child("status").setValue("ready");
-        binding.buttonBar.getChildAt(0).setEnabled(false);
-    }*/
+
 
     @Override
     protected void onPause() {
@@ -82,6 +134,7 @@ public class TwentyOneGame extends AppCompatActivity {
         Disconnect();
     }
     private void Disconnect() {
+        RoomRef.removeEventListener(listener);
         database.getReference("TwentyOneRooms/"+RoomName).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
