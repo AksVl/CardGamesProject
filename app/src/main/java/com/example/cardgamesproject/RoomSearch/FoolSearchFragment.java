@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.cardgamesproject.AppMethods;
 import com.example.cardgamesproject.GameActivities.FoolGame;
 import com.example.cardgamesproject.R;
 import com.example.cardgamesproject.databinding.FragmentFoolSearchBinding;
@@ -74,26 +75,7 @@ public class FoolSearchFragment extends Fragment {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         size[0] = Integer.parseInt(snapshot.child("_size").getValue().toString());
                         count[0] = (int) snapshot.getChildrenCount();
-                        ArrayList<Integer> PlayersPositions = new ArrayList<>();
-                        ArrayList<Integer> RoomPositions = new ArrayList<>();
-                        for (int j = 0; j < size[0]; j++) {
-                            RoomPositions.add(j+1);
-                        }
-                        ArrayList<String> InRoomPlayers = new ArrayList<>();
-                        for (DataSnapshot d: snapshot.getChildren()) {
-                            InRoomPlayers.add(d.getKey());
-                        }
-                        for (String player : InRoomPlayers) {
-                            if(!player.equals("_size")){
-                                PlayersPositions.add(Integer.parseInt(snapshot.child(player).child("position").getValue().toString()));
-                            }
-                        }
-                        for (int j = 0; j < RoomPositions.size(); j++) {
-                            if(!PlayersPositions.contains(RoomPositions.get(j))){
-                                AvailablePosition[0] = RoomPositions.get(j);
-                                break;
-                            }
-                        }
+                        AvailablePosition[0] = AppMethods.getPosition(snapshot,size[0]);
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {

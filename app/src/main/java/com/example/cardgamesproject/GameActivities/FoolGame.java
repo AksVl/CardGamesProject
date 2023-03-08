@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.cardgamesproject.AppMethods;
 import com.example.cardgamesproject.R;
 import com.example.cardgamesproject.StartActivity;
 import com.example.cardgamesproject.databinding.ActivityFoolGameBinding;
@@ -49,14 +50,15 @@ public class FoolGame extends AppCompatActivity {
         playerName = inputIntent.getStringExtra("playerName");
         PlayerRef = database.getReference("FoolRooms/" + RoomName + "/" + playerName);
         RoomRef = database.getReference("FoolRooms/"+RoomName);
+        final int[] size = new int[1];
         ArrayList<String> InRoomPlayers = new ArrayList<>();
         RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 ViewGroup.LayoutParams params = new LinearLayout.
                         LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT,1.0f);
-                int size = Integer.parseInt(snapshot.child("_size").getValue().toString());
-                for (int i = 0; size - 1 > i; i++) {
+                size[0] = Integer.parseInt(snapshot.child("_size").getValue().toString());
+                for (int i = 0; size[0] - 1 > i; i++) {
                     PlayerItemBinding playerItem = PlayerItemBinding.inflate(getLayoutInflater());
                     binding.playersContainer.addView(playerItem.getRoot(),params);
                     binding.playersContainer.invalidate();
@@ -82,13 +84,16 @@ public class FoolGame extends AppCompatActivity {
                     if (!player.equals(playerName) && !player.equals("_size")) {
                         if(snapshot.child(player).child("position").exists()) {
                             pos = parseInt(snapshot.child(player).child("position").getValue().toString());
-                            TextView name = binding.playersContainer.getChildAt(getUiPosition(my_pos, pos)).findViewById(R.id.name);
-                            TextView status = binding.playersContainer.getChildAt(getUiPosition(my_pos, pos)).findViewById(R.id.status);
+                            TextView name = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])).findViewById(R.id.name);
+                            TextView status = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])).findViewById(R.id.status);
                             String gotStatus = snapshot.child(player).child("status").getValue().toString();
                             name.setText(player);
                             status.setText(gotStatus);
                             if(gotStatus.equals("ready")){
                                 status.setTextColor(Color.GREEN);
+                            }
+                            else{
+                                status.setTextColor(R.color.buttonGrey);
                             }
                         }
                     }
@@ -106,45 +111,17 @@ public class FoolGame extends AppCompatActivity {
         PlayerRef.child("status").setValue("ready");
         binding.buttonBar.getChildAt(0).setEnabled(false);
     }
-    private int getUiPosition(int my_position, int position) {
-        int uiPosition;
-        if(position>my_position){
-            uiPosition = position-my_position-1;
-        }
-        else{
-            uiPosition = my_position- position - 1;
-        }
-        return uiPosition;
-    }
-
     @Override
     protected void onPause() {
         super.onPause();
-        Disconnect();
+        AppMethods.Disconnect(RoomRef,playerName,listener);
+        finish();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Disconnect();
-    }
-
-    private void Disconnect() {
-        RoomRef.removeEventListener(listener);
-        RoomRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                snapshot.child(playerName).getRef().removeValue();
-                if(snapshot.getChildrenCount()==1){
-                    snapshot.getRef().removeValue();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+        AppMethods.Disconnect(RoomRef,playerName,listener);
         finish();
     }
 }

@@ -21,7 +21,7 @@
             android:id="@+id/name"
             android:text="none"
             android:gravity="center"
-            android:textColor="@color/buttonGrey"
+            android:textColor="@color/white"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
         <TextView
@@ -30,7 +30,7 @@
             android:text="-"
             android:textSize="24dp"
             android:gravity="center"
-            android:textColor="@color/buttonGrey"
+            android:textColor="@color/white"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
         <TextView
@@ -38,7 +38,7 @@
             android:id="@+id/status"
             android:text="empty"
             android:gravity="center"
-            android:textColor="@color/buttonGrey"
+            android:textColor="@color/white"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
     </LinearLayout>
