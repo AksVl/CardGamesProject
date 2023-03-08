@@ -59,10 +59,9 @@ public class TwentyOneGame extends AppCompatActivity {
         int IntentSize = inputIntent.getIntExtra("size", 0);
         PlayerRef = database.getReference("TwentyOneRooms/" + RoomName + "/" + playerName);
         RoomRef = database.getReference("TwentyOneRooms/" + RoomName);
-        //binding.ready.setEnabled(false);
+        binding.ready.setEnabled(false);
         final int[] readyCount = {0};
         final int[] size = new int[1];
-        //adding players's windows to room layout
         final ArrayList<String>[] InRoomPlayers = new ArrayList[]{new ArrayList<>()};
         RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
@@ -88,7 +87,7 @@ public class TwentyOneGame extends AppCompatActivity {
         listener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.child(playerName).child("status").toString().equals("InGame")){
+                if (snapshot.child(playerName).child("status").toString().equals("InGame")) {
                     Start(TwentyOneGame.this, binding);
                     RoomRef.removeEventListener(listener);
                     RoomRef.addValueEventListener(InGameListener);
@@ -99,22 +98,19 @@ public class TwentyOneGame extends AppCompatActivity {
                 }
                 int my_pos;
                 int pos;
-                /*if (snapshot.getChildrenCount() - 1 == size[0] &&
+                if (snapshot.getChildrenCount() - 1 == size[0] &&
                         !snapshot.child(playerName).child("status").getValue().toString().equals("ready")) {
                     binding.ready.setEnabled(true);
-                    ReadyPermissionFlag[0] = true;
-                }
-                else{
+                } else {
                     binding.ready.setEnabled(false);
-                    ReadyPermissionFlag[0] = false;
-                }*/
+                    if(snapshot.child(playerName).child("status").getValue().toString().equals("ready") && snapshot.getChildrenCount() - 1 != size[0]){
+                        PlayerRef.child("status").setValue("joined");
+                    }
+                }
                 if (snapshot.child(playerName).child("position").exists()) {
                     my_pos = parseInt(snapshot.child(playerName).child("position").getValue().toString());
                     for (String player : InRoomPlayers[0]) {
                         if (!player.equals(playerName) && !player.equals("_size") && snapshot.child(player).child("position").exists()) {
-                            /*if(!ReadyPermissionFlag[0]){
-                                RoomRef.child(player).child("status").setValue("joined");
-                            }*/
                             pos = parseInt(snapshot.child(player).child("position").getValue().toString());
                             TextView name = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])).findViewById(R.id.name);
                             TextView status = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])).findViewById(R.id.status);
