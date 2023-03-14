@@ -1,0 +1,21 @@
+package com.example.cardgamesproject.GameActivities;
+
+import androidx.annotation.NonNull;
+
+public class Card {
+    public int value;
+    public char suit;
+    public int img_res;
+
+    public Card(int value, char suit, int img_res) {
+        this.value = value;
+        this.suit = suit;
+        this.img_res = img_res;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return String.valueOf(suit) + String.valueOf(value);
+    }
+}
