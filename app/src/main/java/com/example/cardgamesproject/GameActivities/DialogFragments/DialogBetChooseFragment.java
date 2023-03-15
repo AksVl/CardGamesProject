@@ -10,7 +10,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.cardgamesproject.GameActivities.TwentyOneGame;
 import com.example.cardgamesproject.databinding.FragmentDialogBetChooseBinding;
+import com.example.cardgamesproject.databinding.FragmentDialogSetBankBinding;
 
 public class DialogBetChooseFragment extends DialogFragment {
     private FragmentDialogBetChooseBinding binding;
@@ -24,6 +26,7 @@ public class DialogBetChooseFragment extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //return super.onCreateView(inflater, container, savedInstanceState);
         binding = FragmentDialogBetChooseBinding.inflate(getLayoutInflater());
+        binding.bet.setOnClickListener(view -> TwentyOneGame.SetBetSize(binding.size.getText().toString()));
         return binding.getRoot();
     }
 

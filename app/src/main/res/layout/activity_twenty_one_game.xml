@@ -25,6 +25,7 @@
             android:layout_weight="1"
             android:layout_height="200dp" />
         <TextView
+            android:gravity="center"
             android:id="@+id/game_status"
             android:layout_width="match_parent"
             android:layout_weight="1"
