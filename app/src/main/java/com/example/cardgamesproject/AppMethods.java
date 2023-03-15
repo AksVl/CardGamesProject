@@ -65,8 +65,9 @@ public class AppMethods {
         int uiPosition;
         if (position > my_position) {
             uiPosition = position - my_position - 1;
-        } else {
-            uiPosition = size - my_position;
+        }
+        else {
+            uiPosition = size - my_position + position - 1;
         }
         return uiPosition;
     }

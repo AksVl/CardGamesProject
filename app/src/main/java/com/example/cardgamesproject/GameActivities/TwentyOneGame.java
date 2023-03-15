@@ -61,7 +61,6 @@ public class TwentyOneGame extends AppCompatActivity {
     private final static int[] size = new int[1];
     private static int my_pos;
     private final static ArrayList<String>[] InRoomPlayers = new ArrayList[]{new ArrayList<>()};
-    private final static int[] readyCount = {0};
     private static DialogSetBankSize Banker_dialog;
     private static DialogBetChooseFragment dialog;
 
@@ -77,7 +76,6 @@ public class TwentyOneGame extends AppCompatActivity {
         Intent inputIntent = getIntent();
         RoomName = inputIntent.getStringExtra("RoomName");
         playerName = inputIntent.getStringExtra("playerName");
-        int IntentSize = inputIntent.getIntExtra("size", 0);
         PlayerRef = database.getReference("TwentyOneRooms/" + RoomName + "/" + playerName);
         RoomRef = database.getReference("TwentyOneRooms/" + RoomName);
         binding.ready.setEnabled(false);
@@ -93,6 +91,7 @@ public class TwentyOneGame extends AppCompatActivity {
                     binding.playersContainer.addView(playerItem.getRoot(), params);
                     binding.playersContainer.invalidate();
                 }
+                RoomRef.addValueEventListener(listener);
             }
 
             @Override
@@ -103,11 +102,7 @@ public class TwentyOneGame extends AppCompatActivity {
         listener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.child(playerName).child("status").toString().equals("InGame")) {
-                    onGameStart(TwentyOneGame.this, binding);
-                    RoomRef.removeEventListener(listener);
-                    RoomRef.addValueEventListener(InGameListener);
-                }
+                int readyCount = 0;
                 InRoomPlayers[0].clear();
                 for (DataSnapshot d : snapshot.getChildren()) {
                     InRoomPlayers[0].add(d.getKey());
@@ -116,36 +111,38 @@ public class TwentyOneGame extends AppCompatActivity {
                 if (snapshot.getChildrenCount() - 1 == size[0] &&
                         !snapshot.child(playerName).child("status").getValue().toString().equals("ready")) {
                     binding.ready.setEnabled(true);
-                } else {
+                }
+                else {
                     binding.ready.setEnabled(false);
                     if (snapshot.child(playerName).child("status").getValue().toString().equals("ready") && snapshot.getChildrenCount() - 1 != size[0]) {
                         PlayerRef.child("status").setValue("joined");
-                        readyCount[0] = 0;
                     }
                 }
                 if (snapshot.child(playerName).child("position").exists()) {
                     my_pos = parseInt(snapshot.child(playerName).child("position").getValue().toString());
                     for (String player : InRoomPlayers[0]) {
-                        if (!player.equals(playerName) && !player.equals("_size") && snapshot.child(player).child("position").exists()) {
-                            pos = parseInt(snapshot.child(player).child("position").getValue().toString());
-                            TextView name = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])).findViewById(R.id.name);
-                            TextView status = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])).findViewById(R.id.status);
+                        if (!player.equals("_size") && snapshot.child(player).child("position").exists()) {
                             String gotStatus = snapshot.child(player).child("status").getValue().toString();
-                            name.setText(player);
-                            status.setText(gotStatus);
-                            status.setTextColor(Color.WHITE);
-                            if (gotStatus.equals("ready")) {
-                                readyCount[0]++;
-                                status.setTextColor(Color.GREEN);
+                            if (!player.equals(playerName)){
+                                pos = parseInt(snapshot.child(player).child("position").getValue().toString());
+                                TextView name = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])).findViewById(R.id.name);
+                                TextView status = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])).findViewById(R.id.status);
+                                name.setText(player);
+                                status.setText(gotStatus);
+                                status.setTextColor(Color.WHITE);
+                                if (gotStatus.equals("ready")) status.setTextColor(Color.GREEN);
+                                if (gotStatus.equals("empty")) {
+                                    name.setText("none");
+                                    binding.ready.setEnabled(false);
+                                }
                             }
-                            if (gotStatus.equals("empty")) {
-                                name.setText("none");
-                                binding.ready.setEnabled(false);
+                            if (gotStatus.equals("ready")) {
+                                readyCount++;
                             }
                         }
                     }
                 }
-                AppMethods.readyCheck(listener, InGameListener, InRoomPlayers[0], RoomRef, readyCount[0], IntentSize, binding, TwentyOneGame.this);
+                AppMethods.readyCheck(listener, InGameListener, InRoomPlayers[0], RoomRef, readyCount, size[0], binding, TwentyOneGame.this);
             }
 
             @Override
@@ -184,6 +181,7 @@ public class TwentyOneGame extends AppCompatActivity {
                                     //GameStatus += "bank : " + Bank + "\n";
                                     if (bet_flag && player.equals(playerName)) {
                                         dialog.show(fm.beginTransaction().addToBackStack("dialog"), "dialog");
+                                        RoomRef.child(playerName).child("status").setValue("betting");
                                         bet_flag = false;
                                     }
                                 } else {
@@ -223,7 +221,6 @@ public class TwentyOneGame extends AppCompatActivity {
 
             }
         };
-        RoomRef.addValueEventListener(listener);
         binding.ready.setOnClickListener(view -> SetStatusToReady());
     }
 
@@ -284,7 +281,6 @@ public class TwentyOneGame extends AppCompatActivity {
                                 bankerName = player;
                                 if (playerName.equals(adminName)) {
                                     RoomRef.child(player).child("role").setValue("banker");
-                                    RoomRef.child(player).child("status").setValue("sets a bank");
                                 }
                                 ImageView my_crown = new ImageView(context);
                                 ViewGroup.LayoutParams params = new LinearLayout.
@@ -309,6 +305,7 @@ public class TwentyOneGame extends AppCompatActivity {
                     public void run() {
                         if (playerName.equals(bankerName)) {
                             Banker_dialog.show(fm.beginTransaction().addToBackStack("dialog"), "dialog");
+                            RoomRef.child(playerName).child("status").setValue("sets bank");
                         }
                     }
                 }, 800);
@@ -370,10 +367,11 @@ public class TwentyOneGame extends AppCompatActivity {
     }
 
     public static void SetBetSize(String gotBet) {
-        if (!gotBet.equals("") && parseInt(gotBet) > 10 && parseInt(gotBet) < Bank) {
+        if (!gotBet.equals("") && parseInt(gotBet) > 10 && parseInt(gotBet) <= Bank) {
             bet = parseInt(gotBet);
             fm.beginTransaction().remove(dialog).commit();
             RoomRef.child(playerName).child("currentBet").setValue(TwentyOneGame.bet);
+            RoomRef.child(playerName).child("status").setValue("waiting");
         } else {
             Toast.makeText(dialog.getContext(), "incorrect input", Toast.LENGTH_SHORT).show();
         }
@@ -408,7 +406,6 @@ public class TwentyOneGame extends AppCompatActivity {
     private void SetStatusToReady() {
         PlayerRef.child("status").setValue("ready");
         binding.ready.setEnabled(false);
-        readyCount[0]++;
     }
 
     @Override
