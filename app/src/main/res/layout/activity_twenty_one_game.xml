@@ -14,23 +14,47 @@
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="8dp"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="200dp"
+        android:gravity="center"
         app:layout_constraintTop_toBottomOf="@+id/playersContainer">
-        <ImageView
-            android:id="@+id/shownCard"
+
+        <LinearLayout
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_height="200dp" />
+            android:gravity="center">
+            <LinearLayout
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:gravity="center"
+                    android:id="@+id/textBankersFirstCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:text="banker's first card :"
+                    android:textSize="16dp"/>
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/shownCard"
+                    android:layout_width="120dp"
+                    android:layout_height="160dp"
+                    app:shapeAppearanceOverlay="@style/roundedImageView" />
+            </LinearLayout>
+
+        </LinearLayout>
+
         <TextView
-            android:gravity="center"
             android:id="@+id/game_status"
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="20dp"
-            android:layout_height="match_parent"/>
+            android:gravity="center"
+            android:textSize="20dp" />
     </LinearLayout>
 
 
@@ -54,8 +78,8 @@
         <LinearLayout
             android:id="@+id/hand"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:orientation="horizontal"></LinearLayout>
+            android:layout_height="176dp"
+            android:orientation="horizontal" />
     </HorizontalScrollView>
 
     <LinearLayout
@@ -76,7 +100,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="available:"
+                android:text=" available:"
                 android:textColor="@color/white"
                 android:textSize="20dp" />
 

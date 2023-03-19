@@ -15,45 +15,45 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 public class AppMethods {
-    static Card h6 = new Card(6, 'h', R.drawable.h6);
-    static Card h7 = new Card(7, 'h', R.drawable.h7);
-    static Card h8 = new Card(8, 'h', R.drawable.h8);
-    static Card h9 = new Card(9, 'h', R.drawable.h9);
-    static Card h10 = new Card(10, 'h', R.drawable.h10);
-    static Card hj = new Card(8, 'h', R.drawable.hj);
-    static Card hd = new Card(9, 'h', R.drawable.hd);
-    static Card hk = new Card(10, 'h', R.drawable.hk);
-    static Card ha = new Card(11, 'h', R.drawable.ha);
+    static Card h6 = new Card("6", 'h', R.drawable.h6);
+    static Card h7 = new Card("7", 'h', R.drawable.h7);
+    static Card h8 = new Card("8", 'h', R.drawable.h8);
+    static Card h9 = new Card("9", 'h', R.drawable.h9);
+    static Card h10 = new Card("10", 'h', R.drawable.h10);
+    static Card hj = new Card("j", 'h', R.drawable.hj);
+    static Card hd = new Card("d", 'h', R.drawable.hd);
+    static Card hk = new Card("k", 'h', R.drawable.hk);
+    static Card ha = new Card("a", 'h', R.drawable.ha);
 
-    static Card s6 = new Card(6, 's', R.drawable.s6);
-    static Card s7 = new Card(7, 's', R.drawable.s7);
-    static Card s8 = new Card(8, 's', R.drawable.s8);
-    static Card s9 = new Card(9, 's', R.drawable.s9);
-    static Card s10 = new Card(10, 's', R.drawable.s10);
-    static Card sj = new Card(8, 's', R.drawable.sj);
-    static Card sd = new Card(9, 's', R.drawable.sd);
-    static Card sk = new Card(10, 's', R.drawable.sk);
-    static Card sa = new Card(11, 's', R.drawable.sa);
+    static Card s6 = new Card("6", 's', R.drawable.s6);
+    static Card s7 = new Card("7", 's', R.drawable.s7);
+    static Card s8 = new Card("8", 's', R.drawable.s8);
+    static Card s9 = new Card("9", 's', R.drawable.s9);
+    static Card s10 = new Card("10", 's', R.drawable.s10);
+    static Card sj = new Card("j", 's', R.drawable.sj);
+    static Card sd = new Card("d", 's', R.drawable.sd);
+    static Card sk = new Card("k", 's', R.drawable.sk);
+    static Card sa = new Card("a", 's', R.drawable.sa);
 
-    static Card d6 = new Card(6, 'd', R.drawable.d6);
-    static Card d7 = new Card(7, 'd', R.drawable.d7);
-    static Card d8 = new Card(8, 'd', R.drawable.d8);
-    static Card d9 = new Card(9, 'd', R.drawable.d9);
-    static Card d10 = new Card(10, 'd', R.drawable.d10);
-    static Card dj = new Card(8, 'd', R.drawable.dj);
-    static Card dd = new Card(9, 'd', R.drawable.dd);
-    static Card dk = new Card(10, 'd', R.drawable.dk);
-    static Card da = new Card(11, 'd', R.drawable.da);
+    static Card d6 = new Card("6", 'd', R.drawable.d6);
+    static Card d7 = new Card("7", 'd', R.drawable.d7);
+    static Card d8 = new Card("8", 'd', R.drawable.d8);
+    static Card d9 = new Card("9", 'd', R.drawable.d9);
+    static Card d10 = new Card("10", 'd', R.drawable.d10);
+    static Card dj = new Card("j", 'd', R.drawable.dj);
+    static Card dd = new Card("d", 'd', R.drawable.dd);
+    static Card dk = new Card("k", 'd', R.drawable.dk);
+    static Card da = new Card("a", 'd', R.drawable.da);
 
-    static Card c6 = new Card(6, 'c', R.drawable.c_six);
-    static Card c7 = new Card(7, 'c', R.drawable.c_seven);
-    static Card c8 = new Card(8, 'c', R.drawable.c_eight);
-    static Card c9 = new Card(9, 'c', R.drawable.c_nine);
-    static Card c10 = new Card(10, 'c', R.drawable.c_ten);
-    static Card cj = new Card(8, 'c', R.drawable.cj);
-    static Card cd = new Card(9, 'c', R.drawable.cd);
-    static Card ck = new Card(10, 'c', R.drawable.ck);
-    static Card ca = new Card(11, 'c', R.drawable.ca);
+    static Card c6 = new Card("6", 'c', R.drawable.c_six);
+    static Card c7 = new Card("7", 'c', R.drawable.c_seven);
+    static Card c8 = new Card("8", 'c', R.drawable.c_eight);
+    static Card c9 = new Card("9", 'c', R.drawable.c_nine);
+    static Card c10 = new Card("10", 'c', R.drawable.c_ten);
+    static Card cj = new Card("j", 'c', R.drawable.cj);
+    static Card cd = new Card("d", 'c', R.drawable.cd);
+    static Card ck = new Card("k", 'c', R.drawable.ck);
+    static Card ca = new Card("a", 'c', R.drawable.ca);
 
     public static Card[] TwentyOne_raw_deck = {
             c6, c7, c8, c9, c10, cj, cd, ck, ca,
@@ -92,7 +92,6 @@ public class AppMethods {
     }
 
     public static int getPosition(DataSnapshot snapshot, int size) {
-        int AvailablePosition;
         ArrayList<Integer> PlayersPositions = new ArrayList<>();
         ArrayList<Integer> RoomPositions = new ArrayList<>();
         for (int j = 0; j < size; j++) {
@@ -103,20 +102,20 @@ public class AppMethods {
             InRoomPlayers.add(d.getKey());
         }
         for (String player : InRoomPlayers) {
-            if (!player.equals("_size")) {
+            if (!player.equals("_size") && snapshot.child(player).child("position").exists()) {
                 PlayersPositions.add(Integer.parseInt(snapshot.child(player).child("position").getValue().toString()));
             }
         }
 
         for (int j = 0; j < RoomPositions.size(); j++) {
             if (!PlayersPositions.contains(RoomPositions.get(j))) {
-                return AvailablePosition = RoomPositions.get(j);
+                return RoomPositions.get(j);
             }
         }
         return -1;
     }
 
-    public static void readyCheck(ValueEventListener listener,
+    public static void readyCheck(String game, ValueEventListener listener,
                                   ValueEventListener InGameListener,
                                   ArrayList<String> InRoomPlayers,
                                   DatabaseReference RoomRef, int readyCount, int IntentSize,
@@ -131,7 +130,14 @@ public class AppMethods {
             RoomRef.removeEventListener(listener);
             RoomRef.addValueEventListener(InGameListener);
             binding.gameStatus.setText("");
-            TwentyOneGame.onGameStart(context, binding);
+            switch (game) {
+                case "TwentyOne":
+                    TwentyOneGame.onGameStart(context, binding);
+                case "Fool":
+                    //Fool.onGameStart(context, binding);
+                case "Liar":
+                    //Liar.onGameStart(context, binding);
+            }
         }
     }
 
@@ -176,5 +182,15 @@ public class AppMethods {
             default:
                 return null;
         }
+    }
+
+    public static int nextPlayer(int size, int PlayerPos) {
+        if(PlayerPos < size){
+            PlayerPos++;
+        }
+        else{
+            PlayerPos = 1;
+        }
+        return PlayerPos;
     }
 }

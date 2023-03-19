@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="backgroundGreen">#4CAF70</color>
+    <color name="backgroundGreen">#328E65</color>
     <color name="buttonGrey">#CDCDCD</color>
     <color name="DarkGrey">#323232</color>
     <color name="purple_200">#FFBB86FC</color>
