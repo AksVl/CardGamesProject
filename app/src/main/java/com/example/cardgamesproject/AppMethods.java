@@ -55,7 +55,7 @@ public class AppMethods {
     static Card ck = new Card("k", 'c', R.drawable.ck);
     static Card ca = new Card("a", 'c', R.drawable.ca);
 
-    public static Card[] TwentyOne_raw_deck = {
+    public static Card[] raw_deck = {
             c6, c7, c8, c9, c10, cj, cd, ck, ca,
             d6, d7, d8, d9, d10, dj, dd, dk, da,
             s6, s7, s8, s9, s10, sj, sd, sk, sa,
@@ -143,42 +143,42 @@ public class AppMethods {
 
     public static Card CardLink(String name) {
         switch (name) {
-            case "c6": return TwentyOne_raw_deck[0];
-            case "c7": return TwentyOne_raw_deck[1];
-            case "c8": return TwentyOne_raw_deck[2];
-            case "c9": return TwentyOne_raw_deck[3];
-            case "c10": return TwentyOne_raw_deck[4];
-            case "cj": return TwentyOne_raw_deck[5];
-            case "cd": return TwentyOne_raw_deck[6];
-            case "ck": return TwentyOne_raw_deck[7];
-            case "ca": return TwentyOne_raw_deck[8];
-            case "d6": return TwentyOne_raw_deck[9];
-            case "d7": return TwentyOne_raw_deck[10];
-            case "d8": return TwentyOne_raw_deck[11];
-            case "d9": return TwentyOne_raw_deck[12];
-            case "d10": return TwentyOne_raw_deck[13];
-            case "dj": return TwentyOne_raw_deck[14];
-            case "dd": return TwentyOne_raw_deck[15];
-            case "dk": return TwentyOne_raw_deck[16];
-            case "da": return TwentyOne_raw_deck[17];
-            case "s6": return TwentyOne_raw_deck[18];
-            case "s7": return TwentyOne_raw_deck[19];
-            case "s8": return TwentyOne_raw_deck[20];
-            case "s9": return TwentyOne_raw_deck[21];
-            case "s10": return TwentyOne_raw_deck[22];
-            case "sj": return TwentyOne_raw_deck[23];
-            case "sd": return TwentyOne_raw_deck[24];
-            case "sk": return TwentyOne_raw_deck[25];
-            case "sa": return TwentyOne_raw_deck[26];
-            case "h6": return TwentyOne_raw_deck[27];
-            case "h7": return TwentyOne_raw_deck[28];
-            case "h8": return TwentyOne_raw_deck[29];
-            case "h9": return TwentyOne_raw_deck[30];
-            case "h10": return TwentyOne_raw_deck[31];
-            case "hj": return TwentyOne_raw_deck[32];
-            case "hd": return TwentyOne_raw_deck[33];
-            case "hk": return TwentyOne_raw_deck[34];
-            case "ha": return TwentyOne_raw_deck[35];
+            case "c6": return raw_deck[0];
+            case "c7": return raw_deck[1];
+            case "c8": return raw_deck[2];
+            case "c9": return raw_deck[3];
+            case "c10": return raw_deck[4];
+            case "cj": return raw_deck[5];
+            case "cd": return raw_deck[6];
+            case "ck": return raw_deck[7];
+            case "ca": return raw_deck[8];
+            case "d6": return raw_deck[9];
+            case "d7": return raw_deck[10];
+            case "d8": return raw_deck[11];
+            case "d9": return raw_deck[12];
+            case "d10": return raw_deck[13];
+            case "dj": return raw_deck[14];
+            case "dd": return raw_deck[15];
+            case "dk": return raw_deck[16];
+            case "da": return raw_deck[17];
+            case "s6": return raw_deck[18];
+            case "s7": return raw_deck[19];
+            case "s8": return raw_deck[20];
+            case "s9": return raw_deck[21];
+            case "s10": return raw_deck[22];
+            case "sj": return raw_deck[23];
+            case "sd": return raw_deck[24];
+            case "sk": return raw_deck[25];
+            case "sa": return raw_deck[26];
+            case "h6": return raw_deck[27];
+            case "h7": return raw_deck[28];
+            case "h8": return raw_deck[29];
+            case "h9": return raw_deck[30];
+            case "h10": return raw_deck[31];
+            case "hj": return raw_deck[32];
+            case "hd": return raw_deck[33];
+            case "hk": return raw_deck[34];
+            case "ha": return raw_deck[35];
             default:
                 return null;
         }

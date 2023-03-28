@@ -1,5 +1,6 @@
 package com.example.cardgamesproject.GameActivities.DialogFragments;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,5 +32,10 @@ public class DialogSetBankSize extends DialogBetChooseFragment{
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+    }
+    @Override
+    public void onCancel(@NonNull DialogInterface dialog) {
+        super.onCancel(dialog);
+        TwentyOneGame.RecallOfDialogSetBankSize(getContext());
     }
 }

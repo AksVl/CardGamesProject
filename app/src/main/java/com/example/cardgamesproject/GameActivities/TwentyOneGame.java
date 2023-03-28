@@ -64,7 +64,6 @@ public class TwentyOneGame extends AppCompatActivity {
     private boolean MainGameLoop = false;
     private boolean HandOutStart = true;
     private boolean OnceCheckFlag = true;
-    private boolean OnceCheckFlag1 = true;
     private boolean OnceStart = true;
     private boolean LoopEnding = false;
     private static ArrayList<Card> deck = new ArrayList<>();
@@ -74,6 +73,8 @@ public class TwentyOneGame extends AppCompatActivity {
     private static DialogSetBankSize Banker_dialog;
     private static DialogBetChooseFragment dialog;
     private static final Handler handler = new Handler();
+    private static boolean IsInGame = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,7 +167,6 @@ public class TwentyOneGame extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 binding.available.setText(String.valueOf(available));
                 binding.ShowBet.setText(String.valueOf(bet));
-                int PassedCounter = 0;
                 int my_pos;
                 int pos;
                 if (snapshot.child("_ChoosingPlayer").exists()) {
@@ -175,65 +175,64 @@ public class TwentyOneGame extends AppCompatActivity {
                 if (snapshot.child(playerName).child("position").exists()) {
                     my_pos = parseInt(snapshot.child(playerName).child("position").getValue().toString());
                     for (String player : InRoomPlayers[0]) {
-                       /* if (OnceCheckFlag && snapshot.child(player).child("status").exists() &&
-                                snapshot.child(player).child("status").equals("passed")) {
-                            PassedCounter += 1;
-                            if (player.equals(playerName) && my_pos == ChoosingPlayerPos) {
-                                RoomRef.child("_ChoosingPlayer").setValue(String.valueOf(
-                                        AppMethods.nextPlayer(size[0], ChoosingPlayerPos)));
-                                RoomRef.child(player).child("status").setValue("passed");
-                            }
-                        }*/
                         if (!player.equals("_size") && snapshot.child(player).child("position").exists()
                                 && snapshot.child(player).child("role").exists()) {
-                            /*if (playerName.equals(player) && snapshot.child(player).child("WON").exists()) {
-                                OnceCheckFlag = false;
-                                available += bet;
-                                bet = 0;
-                                snapshot.child(player).child("currentBet").getRef().removeValue();
-                                snapshot.child(player).child("LOST").getRef().removeValue();
-                            } else if (OnceCheckFlag && playerName.equals(player) && snapshot.child(player).child("LOST").exists()) {
-                                OnceCheckFlag = false;
-                                available -= parseInt(snapshot.child(player).child("LOST").getValue().toString());
-                                bet = 0;
-                                snapshot.child(player).child("currentBet").getRef().removeValue();
-                                snapshot.child(player).child("LOST").getRef().removeValue();
-                            }*/
-                            OnceCheckFlag = true;
-                            //InGame Ui Enabling/Disabling
+                            // region player's choosing case
                             if (player.equals(playerName)
-                                    && parseInt(snapshot.child(player).child("position").getValue().toString()) != ChoosingPlayerPos){
-                                ((Button)binding.buttonBar.getChildAt(2)).setEnabled(false);
-                                ((Button)binding.buttonBar.getChildAt(3)).setEnabled(false);
+                                    && parseInt(snapshot.child(player).child("position").getValue().toString()) != ChoosingPlayerPos
+                                    && !LoopEnding) {
+                                ((Button) binding.buttonBar.getChildAt(2)).setEnabled(false);
+                                ((Button) binding.buttonBar.getChildAt(3)).setEnabled(false);
                             } else if (player.equals(playerName)
-                                    && parseInt(snapshot.child(player).child("position").getValue().toString()) == ChoosingPlayerPos) {
-                                ((Button)binding.buttonBar.getChildAt(2)).setEnabled(true);
-                                ((Button)binding.buttonBar.getChildAt(3)).setEnabled(true);
-                                RoomRef.child(playerName).child("status").setValue("choosing");
-                                binding.buttonBar.getChildAt(2).setOnClickListener(view -> {
-                                    ((Button)binding.buttonBar.getChildAt(2)).setEnabled(false);
-                                    ((Button)binding.buttonBar.getChildAt(3)).setEnabled(false);
-                                    RoomRef.child(playerName).child("status").setValue("takes more");
-                                    RoomRef.child("_ChoosingPlayer").setValue(String.valueOf(
-                                            AppMethods.nextPlayer(size[0], ChoosingPlayerPos)));
-                                    binding.buttonBar.getChildAt(2).setOnClickListener(null);
-                                });
-                                binding.buttonBar.getChildAt(3).setOnClickListener(view -> {
-                                    ((Button)binding.buttonBar.getChildAt(2)).setEnabled(false);
-                                    ((Button)binding.buttonBar.getChildAt(3)).setEnabled(false);
-                                    RoomRef.child(playerName).child("status").setValue("passed");
-                                    RoomRef.child("_ChoosingPlayer").setValue(String.valueOf(
-                                            AppMethods.nextPlayer(size[0], ChoosingPlayerPos)));
-                                    binding.buttonBar.getChildAt(3).setOnClickListener(null);
+                                    && parseInt(snapshot.child(player).child("position").getValue().toString()) == ChoosingPlayerPos
+                                    && !LoopEnding) {
+                                if (!snapshot.child(player).child("status").getValue().toString().equals("passed")
+                                        && !snapshot.child(player).child("status").getValue().toString().equals("Lost")
+                                        && !snapshot.child(player).child("status").getValue().toString().equals("Lost all")) {
                                     handler.postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
-                                            RoomRef.child(playerName).child("status").setValue("waiting");
+                                            if (parseInt(snapshot.child(player).child("position").getValue().toString()) == ChoosingPlayerPos) {
+                                                ((Button) binding.buttonBar.getChildAt(2)).setEnabled(true);
+                                                ((Button) binding.buttonBar.getChildAt(3)).setEnabled(true);
+                                            }
                                         }
-                                    }, 800);
-                                });
+                                    }, 1000);
+                                    RoomRef.child(playerName).child("status").setValue("choosing");
+                                    binding.buttonBar.getChildAt(2).setOnClickListener(view -> {
+                                        ((Button) binding.buttonBar.getChildAt(2)).setEnabled(false);
+                                        ((Button) binding.buttonBar.getChildAt(3)).setEnabled(false);
+                                        RoomRef.child(playerName).child("status").setValue("takes more");
+                                        binding.buttonBar.getChildAt(2).setOnClickListener(null);
+                                    });
+                                    binding.buttonBar.getChildAt(3).setOnClickListener(view -> {
+                                        ((Button) binding.buttonBar.getChildAt(2)).setEnabled(false);
+                                        ((Button) binding.buttonBar.getChildAt(3)).setEnabled(false);
+                                        handler.postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                RoomRef.child(playerName).child("status").setValue("passed");
+                                            }
+                                        }, 50);
+                                        if (snapshot.child("_ChoosingPlayer").exists()) {
+                                            RoomRef.child("_ChoosingPlayer").setValue(String.valueOf(
+                                                    AppMethods.nextPlayer(size[0], ChoosingPlayerPos)));
+                                        }
+                                        binding.buttonBar.getChildAt(3).setOnClickListener(null);
+                                    });
+                                } else if (!LoopEnding) {
+                                    if (snapshot.child("_ChoosingPlayer").exists()) {
+                                        RoomRef.child("_ChoosingPlayer").setValue(String.valueOf(
+                                                AppMethods.nextPlayer(size[0], ChoosingPlayerPos)));
+                                    }
+                                } else if (LoopEnding) {
+                                    if (snapshot.child("_ChoosingPlayer").exists()) {
+                                        snapshot.child("_ChoosingPLayer").getRef().removeValue();
+                                    }
+                                }
                             }
-                            //banker's shown card
+                            // endregion player's choosing case
+                            // region banker's shown card
                             if (player.equals(bankerName)
                                     && snapshot.child(player).child("hand").child(String.valueOf(0)).exists()) {
                                 String gotShownCard = snapshot.child(player).child("hand").child(String.valueOf(0)).getValue().toString();
@@ -243,7 +242,8 @@ public class TwentyOneGame extends AppCompatActivity {
                                     binding.shownCard.setImageResource(shownCard.img_res);
                                 }
                             }
-                            //MainGameLoop
+                            // endregion banker's shown card
+                            // region MainGameLoop
                             if (MainGameLoop) {
                                 boolean AllHaveCurrentBet = true;
                                 for (String player1 : InRoomPlayers[0]) {
@@ -280,70 +280,11 @@ public class TwentyOneGame extends AppCompatActivity {
                                             }
                                         }, 800);
                                     }
-                                    /*if (snapshot.child(player).child("status").getValue().toString().equals("Won") && OnceCheckFlag) {
-                                        RoomRef.child(player).child("status").setValue("out");
-                                        OnceCheckFlag = false;
-                                        handler.postDelayed(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                if (snapshot.child(player).child("currentBet").exists()) {
-                                                    Bank -= parseInt(snapshot.child(player).child("currentBet").getValue().toString());
-                                                    RoomRef.child(player).child("WON").setValue(parseInt(snapshot.child(player).child("currentBet").getValue().toString()));
-                                                    RoomRef.child("_bank").setValue(String.valueOf(Bank));
-                                                    if (snapshot.child(player).child("hand").exists()) {
-                                                        for (int i = 0; i < snapshot.child(player).child("hand").getChildrenCount(); i++) {
-                                                            if (snapshot.child(player).child("hand").child(String.valueOf(i)).exists()) {
-                                                                snapshot.child(player).child("hand").child(String.valueOf(i)).getRef().removeValue();
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }, 800);
-                                        OnceCheckFlag = true;
-                                    }
-                                    if (snapshot.child(player).child("status").getValue().toString().equals("Lost") && OnceCheckFlag) {
-                                        OnceCheckFlag = false;
-                                        RoomRef.child(player).child("status").setValue("out");
-                                        handler.postDelayed(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                if (snapshot.child(player).child("currentBet").exists()) {
-                                                    Bank += parseInt(snapshot.child(player).child("currentBet").getValue().toString());
-                                                    RoomRef.child(player).child("LOST").setValue(parseInt(snapshot.child(player).child("currentBet").getValue().toString()));
-                                                    RoomRef.child("_bank").setValue(String.valueOf(Bank));
-                                                    if (snapshot.child(player).child("hand").exists()) {
-                                                        for (int i = 0; i < snapshot.child(player).child("hand").getChildrenCount(); i++) {
-                                                            if (snapshot.child(player).child("hand").child(String.valueOf(i)).exists()) {
-                                                                snapshot.child(player).child("hand").child(String.valueOf(i)).getRef().removeValue();
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }, 800);
-                                        OnceCheckFlag = true;
-                                    }
-                                }
-                                //banker dealing with player has 21
-                                if (snapshot.child(player).child("status").getValue().toString().equals("TwentyOne")) {
-                                    if (snapshot.child(bankerName).child("position").exists()
-                                            && snapshot.child(bankerName).child("status").exists()) {
-                                        if (!snapshot.child(bankerName).child("status").equals("passed")) {
-                                            ChoosingPlayerPos = parseInt(snapshot.child(bankerName).child("position").getValue().toString());
-                                            RoomRef.child("_ChoosingPlayer").setValue(ChoosingPlayerPos);
-                                        } else {
-                                            if (!snapshot.child(bankerName).child("status").equals("TwentyOne")) {
-                                                RoomRef.child(player).child("status").setValue("Won");
-                                            } else {
-                                                RoomRef.child(player).child("status").setValue("Lost");
-                                            }
-                                        }
-                                    }*/
                                 }
                             }
-                            //user's hand
+                            // endregion MainGameLoop
                             if (player.equals(playerName) && snapshot.child(player).child("hand").exists()) {
+                                // region betting
                                 if (snapshot.child(player).child("hand").getChildrenCount() == 1) {
                                     handler.postDelayed(new Runnable() {
                                         @Override
@@ -356,6 +297,8 @@ public class TwentyOneGame extends AppCompatActivity {
                                         }
                                     }, 1000);
                                 }
+                                // endregion betting
+                                // region user's hand
                                 int total = 0;
                                 MainGameLoop = true;
                                 binding.hand.removeAllViews();
@@ -380,28 +323,45 @@ public class TwentyOneGame extends AppCompatActivity {
                                 ((TextView) (binding.buttonBar.getChildAt(1))).setTextColor(Color.WHITE);
                                 if (total == 21) {
                                     ((TextView) (binding.buttonBar.getChildAt(1))).setTextColor(Color.GREEN);
-                                    //RoomRef.child(player).child("status").setValue("TwentyOne");
                                 } else if (total > 21) {
                                     ((TextView) (binding.buttonBar.getChildAt(1))).setTextColor(Color.RED);
-                                    /*if (!playerName.equals(bankerName)) {
-                                        RoomRef.child(player).child("status").setValue("Lost");
+                                    if (!playerName.equals(bankerName)) {
+                                        RoomRef.child(playerName).child("status").setValue("Lost");
                                     } else {
-                                        for (String player1 : InRoomPlayers[0]) {
-                                            if (!player1.equals("_size") && !player1.equals("_bank") && !player1.equals("_ChoosingPlayer")
-                                                    && !player1.equals(bankerName)) {
-                                                if (snapshot.child(player1).child("status").exists()) {
-                                                    RoomRef.child(player1).child("status").setValue("Won");
-                                                }
-                                            }
-                                        }
-                                    }*/
+                                        RoomRef.child(playerName).child("status").setValue("Lost all");
+                                    }
                                 }
-                                //loop ending
-                                /*if (PassedCounter == size[0]) {
+                                // endregion user's hand
+                                // region Counters
+                                int FinishedCounter = 0;
+                                int LostCounter = 0;
+                                for (String player1 : InRoomPlayers[0]) {
+                                    if (snapshot.child(player1).child("status").exists()
+                                            && snapshot.child(player1).child("status").getValue().toString().equals("Lost")) {
+                                        LostCounter++;
+                                    }
+                                    if (snapshot.child(player1).child("status").exists()
+                                            && (snapshot.child(player1).child("status").getValue().toString().equals("passed")
+                                            || snapshot.child(player1).child("status").getValue().toString().equals("Lost"))) {
+                                        FinishedCounter++;
+                                    }
+                                    if (bankerName != null && snapshot.child(bankerName).child("status").exists()
+                                            && snapshot.child(bankerName).child("status").getValue().toString().equals("Lost all")) {
+                                        FinishedCounter = size[0];
+                                    }
+                                }
+                                // endregion Counters
+                                // region loop ending
+                                if (FinishedCounter == size[0]
+                                        || LostCounter == size[0] - 1) {
+                                    MainGameLoop = false;
                                     LoopEnding = true;
-                                    snapshot.child("_ChoosingPLayer").getRef().removeValue();
-                                }*/
-                                /*if (playerName.equals(player) && !playerName.equals(bankerName) && LoopEnding
+                                    if (snapshot.child(bankerName).child("status").exists()
+                                            && !snapshot.child(bankerName).child("status").getValue().toString().equals("Lost all")) {
+                                        RoomRef.child(bankerName).child("status").setValue("ending");
+                                    }
+                                }
+                                if (LoopEnding && playerName.equals(player) && !playerName.equals(bankerName)
                                         && snapshot.child(bankerName).child("hand").exists()) {
                                     ArrayList<String> BankerHand = new ArrayList<>();
                                     for (int i = 0; i < snapshot.child(bankerName).child("hand").getChildrenCount(); i++) {
@@ -414,16 +374,26 @@ public class TwentyOneGame extends AppCompatActivity {
                                         Card card = AppMethods.CardLink(got);
                                         bankerScore += GetValueOfCard(card);
                                     }
-                                    if (bankerScore >= total) {
-                                        RoomRef.child(playerName).child("status").setValue("Lost");
-                                    } else {
+                                    if (snapshot.child(bankerName).child("status").getValue().toString().equals("Lost all")) {
                                         RoomRef.child(playerName).child("status").setValue("Won");
+                                    } else if (total <= 21 && bankerScore <= 21) {
+                                        if (total > bankerScore) {
+                                            RoomRef.child(playerName).child("status").setValue("Won");
+                                        } else {
+                                            RoomRef.child(playerName).child("status").setValue("Lost");
+                                        }
                                     }
-                                }*/
-
+                                }
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //paying everyone their bets, backup to the start
+                                    }
+                                }, 2500);
+                                // endregion loop ending
                             }
+                            // region game status update
                             String GameStatus = "";
-                            //game status update
                             if (snapshot.child("_bank").exists()) {
                                 if (!playerName.equals(bankerName)) {
                                     Bank = parseInt(snapshot.child("_bank").getValue().toString());
@@ -431,21 +401,54 @@ public class TwentyOneGame extends AppCompatActivity {
                                         Bank = parseInt(snapshot.child("_bank").getValue().toString());
                                         GameStatus = "bank : " + Bank + "\n";
                                     }
+                                    binding.gameStatus.setText(GameStatus);
                                 } else {
                                     binding.ShowBet.setText(String.valueOf(Bank));
                                 }
                             }
                             if (snapshot.child(player).child("currentBet").exists()) {
-                                PlayerBet = parseInt(snapshot.child(player).child("currentBet").getValue().toString());
                                 if (player.equals(playerName)) {
                                     binding.ShowBet.setText(String.valueOf(bet));
+                                    if (LoopEnding) {
+                                        if (snapshot.child(playerName).child("status").exists()) {
+                                            if (snapshot.child(playerName).child("status").getValue().toString().equals("Won")) {
+                                                GameStatus += "You have won " + bet + "!\n";
+                                            } else if (snapshot.child(playerName).child("status").getValue().toString().equals("Lost")) {
+                                                GameStatus += "You have lost " + bet + "!\n";
+                                            }
+                                            binding.gameStatus.setText(GameStatus);
+                                        }
+                                    }
                                 } else {
-                                    GameStatus += player + "'s bet : " + PlayerBet + "\n";
+                                    PlayerBet = parseInt(snapshot.child(player).child("currentBet").getValue().toString());
+                                    if (LoopEnding) {
+                                        if (!playerName.equals(bankerName)) {
+                                            if (snapshot.child(player).child("status").exists()) {
+                                                if (snapshot.child(player).child("status").getValue().toString().equals("Won")) {
+                                                    GameStatus += player + " has won " + PlayerBet + "!\n";
+                                                } else if (snapshot.child(player).child("status").getValue().toString().equals("Lost")) {
+                                                    GameStatus += player + " has lost " + PlayerBet + "!\n";
+                                                }
+                                                binding.gameStatus.setText(GameStatus);
+                                            }
+                                        } else {
+                                            if (snapshot.child(player).child("status").exists()) {
+                                                if (snapshot.child(player).child("status").getValue().toString().equals("Won")) {
+                                                    GameStatus += "You have lost " + PlayerBet + " as " + player +"'s bet"+ "!\n";
+                                                } else if (snapshot.child(player).child("status").getValue().toString().equals("Lost")) {
+                                                    GameStatus += "You have won " + PlayerBet + " as " + player +"'s bet"+ "!\n";
+                                                }
+                                                binding.gameStatus.setText(GameStatus);
+                                            }
+                                        }
+                                    } else {
+                                        GameStatus += player + "'s bet : " + PlayerBet + "\n";
+                                        binding.gameStatus.setText(GameStatus);
+                                    }
                                 }
                             }
-                            binding.gameStatus.setText(GameStatus);
-
-                            //player's status update
+                            // endregion game status update
+                            // region player's status update
                             if (!player.equals(playerName)) {
                                 pos = parseInt(snapshot.child(player).child("position").getValue().toString());
                                 TextView status = binding.playersContainer
@@ -459,18 +462,19 @@ public class TwentyOneGame extends AppCompatActivity {
                                 status.setTextColor(Color.WHITE);
                                 if (gotStatus.equals("TwentyOne") || gotStatus.equals("Won")) {
                                     status.setTextColor(Color.GREEN);
-                                } else if (gotStatus.equals("Lost")) {
+                                } else if (gotStatus.equals("Lost") || gotStatus.equals("Lost all")) {
                                     status.setTextColor(Color.RED);
                                 }
                             }
-                            //first handing out
+                            // endregion player's status update
+                            // region first handing out
                             if (HandOutStart) {
                                 if (snapshot.child("_bank").exists() && playerName.equals(bankerName)) {
                                     HandOutStart = false;
                                     RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            deck.addAll(Arrays.asList(AppMethods.TwentyOne_raw_deck));
+                                            deck.addAll(Arrays.asList(AppMethods.raw_deck));
                                             Collections.shuffle(deck);
                                             for (String player : InRoomPlayers[0]) {
                                                 if (!player.equals("_size") && !player.equals("_bank")) {
@@ -496,6 +500,7 @@ public class TwentyOneGame extends AppCompatActivity {
                                     });
                                 }
                             }
+                            // endregion first handing out
                         }
                     }
                 }
@@ -505,11 +510,8 @@ public class TwentyOneGame extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        }
-
-        ;
+        };
         binding.ready.setOnClickListener(view ->
-
                 SetStatusToReady());
     }
 
@@ -538,8 +540,8 @@ public class TwentyOneGame extends AppCompatActivity {
         }
     }
 
-
     public static void onGameStart(Context context, ActivityTwentyOneGameBinding binding) {
+        IsInGame = true;
         UiCreate(context, binding);
         binding.buttonBar.getChildAt(2).setEnabled(false);
         binding.buttonBar.getChildAt(3).setEnabled(false);
@@ -644,7 +646,7 @@ public class TwentyOneGame extends AppCompatActivity {
     }
 
     public static void SetBankSize(String size) {
-        if (!size.equals("") && parseInt(size) > 9 && parseInt(size) < 5001) {
+        if (!size.equals("") && parseInt(size) > 99 && parseInt(size) < 5001) {
             Bank = parseInt(size);
             available -= Bank;
             RoomRef.child("_bank").setValue(Bank);
@@ -658,7 +660,7 @@ public class TwentyOneGame extends AppCompatActivity {
     }
 
     public static void SetBetSize(String gotBet) {
-        if (!gotBet.equals("") && parseInt(gotBet) > 10 && parseInt(gotBet) <= Bank) {
+        if (!gotBet.equals("") && parseInt(gotBet) > 9 && parseInt(gotBet) <= Bank) {
             bet = parseInt(gotBet);
             available -= bet;
             fm.beginTransaction().remove(dialog).commit();
@@ -669,6 +671,29 @@ public class TwentyOneGame extends AppCompatActivity {
         }
     }
 
+    public static void RecallOfDialogBetChooseFragment(Context context) {
+        fm.beginTransaction().remove(dialog).commit();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                dialog.show(fm.beginTransaction().addToBackStack("dialog"), "dialog");
+                fm.beginTransaction().remove(Banker_dialog).commit();
+            }
+        }, 50);
+        Toast.makeText(context, "you can't skip this dialog", Toast.LENGTH_SHORT).show();
+    }
+
+    public static void RecallOfDialogSetBankSize(Context context) {
+        fm.beginTransaction().remove(Banker_dialog).commit();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                fm.beginTransaction().remove(dialog).commit();
+                Banker_dialog.show(fm.beginTransaction().addToBackStack("dialog"), "dialog");
+            }
+        }, 50);
+        Toast.makeText(context, "you can't skip this dialog", Toast.LENGTH_SHORT).show();
+    }
 
     private static void UiCreate(Context context, ActivityTwentyOneGameBinding binding) {
         ViewGroup.LayoutParams params = new LinearLayout.
@@ -702,14 +727,24 @@ public class TwentyOneGame extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        AppMethods.Disconnect(RoomRef, playerName, listener);
-        finish();
+        if(IsInGame){
+            AppMethods.Disconnect(RoomRef, playerName, InGameListener);
+            finish();
+        }else{
+            AppMethods.Disconnect(RoomRef, playerName, listener);
+            finish();
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        AppMethods.Disconnect(RoomRef, playerName, listener);
-        finish();
+        if(IsInGame){
+            AppMethods.Disconnect(RoomRef, playerName, InGameListener);
+            finish();
+        }else{
+            AppMethods.Disconnect(RoomRef, playerName, listener);
+            finish();
+        }
     }
 }
