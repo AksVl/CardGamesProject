@@ -172,12 +172,12 @@ public class TwentyOneGame extends AppCompatActivity {
                 int my_pos;
                 int pos;
                 // region bank reading
-                if(snapshot.child("_bank").exists()){
+                if (snapshot.child("_bank").exists()) {
                     Bank = parseInt(snapshot.child("_bank").getValue().toString());
                 }
                 // endregion bank reading
                 // region bet reading
-                if(snapshot.child(playerName).child("currentBet").exists() && !LoopEnding){
+                if (snapshot.child(playerName).child("currentBet").exists() && !LoopEnding) {
                     bet = parseInt(snapshot.child(playerName).child("currentBet").getValue().toString());
                 } else {
                     bet = 0;
@@ -387,8 +387,6 @@ public class TwentyOneGame extends AppCompatActivity {
                                         GameStatus = "bank : " + Bank + "\n";
                                     }
                                     binding.gameStatus.setText(GameStatus);
-                                } else {
-                                    binding.ShowBet.setText(String.valueOf(Bank));
                                 }
                             }
                             if (snapshot.child(player).child("currentBet").exists()) {
@@ -445,7 +443,11 @@ public class TwentyOneGame extends AppCompatActivity {
                     }
                 }
                 // region game status extention
-                binding.ShowBet.setText(String.valueOf(bet));
+                if (playerName.equals(bankerName)) {
+                    binding.ShowBet.setText(String.valueOf(Bank));
+                } else {
+                    binding.ShowBet.setText(String.valueOf(bet));
+                }
                 if (LoopEnding) {
                     if (snapshot.child(playerName).child("status").exists()) {
                         if (snapshot.child(playerName).child("status").getValue().toString().equals("Won")) {
@@ -550,7 +552,7 @@ public class TwentyOneGame extends AppCompatActivity {
                                 } else {
                                     bet_flag = true;
                                 }
-                                if(playerName.equals(adminName)){
+                                if (playerName.equals(adminName)) {
                                     handler.postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
