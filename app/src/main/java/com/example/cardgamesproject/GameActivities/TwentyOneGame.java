@@ -171,6 +171,18 @@ public class TwentyOneGame extends AppCompatActivity {
                 binding.ShowBet.setText(String.valueOf(bet));
                 int my_pos;
                 int pos;
+                // region bank reading
+                if(snapshot.child("_bank").exists()){
+                    Bank = parseInt(snapshot.child("_bank").getValue().toString());
+                }
+                // endregion bank reading
+                // region bet reading
+                if(snapshot.child(playerName).child("currentBet").exists() && !LoopEnding){
+                    bet = parseInt(snapshot.child(playerName).child("currentBet").getValue().toString());
+                } else {
+                    bet = 0;
+                }
+                // endregion bet reading
                 // region Counters
                 int FinishedCounter = 0;
                 int LostCounter = 0;
@@ -337,6 +349,7 @@ public class TwentyOneGame extends AppCompatActivity {
                     }
                     // endregion betting
                 }
+                String GameStatus = "";
                 if (snapshot.child(playerName).child("position").exists()) {
                     my_pos = parseInt(snapshot.child(playerName).child("position").getValue().toString());
                     for (String player : InRoomPlayers[0]) {
@@ -366,7 +379,6 @@ public class TwentyOneGame extends AppCompatActivity {
                             }
                             // endregion MainGameLoop(banker's role)
                             // region game status update
-                            String GameStatus = "";
                             if (snapshot.child("_bank").exists()) {
                                 if (!playerName.equals(bankerName)) {
                                     Bank = parseInt(snapshot.child("_bank").getValue().toString());
@@ -381,19 +393,7 @@ public class TwentyOneGame extends AppCompatActivity {
                             }
                             if (snapshot.child(player).child("currentBet").exists()) {
                                 bet = parseInt(snapshot.child(player).child("currentBet").getValue().toString());
-                                if (player.equals(playerName)) {
-                                    binding.ShowBet.setText(String.valueOf(bet));
-                                    if (LoopEnding) {
-                                        if (snapshot.child(playerName).child("status").exists()) {
-                                            if (snapshot.child(playerName).child("status").getValue().toString().equals("Won")) {
-                                                GameStatus += "You have won " + bet + "!\n";
-                                            } else if (snapshot.child(playerName).child("status").getValue().toString().equals("Lost")) {
-                                                GameStatus += "You have lost " + bet + "!\n";
-                                            }
-                                            binding.gameStatus.setText(GameStatus);
-                                        }
-                                    }
-                                } else {
+                                if (!player.equals(playerName)) {
                                     PlayerBet = parseInt(snapshot.child(player).child("currentBet").getValue().toString());
                                     if (LoopEnding) {
                                         if (!playerName.equals(bankerName)) {
@@ -444,6 +444,19 @@ public class TwentyOneGame extends AppCompatActivity {
                         }
                     }
                 }
+                // region game status extention
+                binding.ShowBet.setText(String.valueOf(bet));
+                if (LoopEnding) {
+                    if (snapshot.child(playerName).child("status").exists()) {
+                        if (snapshot.child(playerName).child("status").getValue().toString().equals("Won")) {
+                            GameStatus += "You have won " + bet + "!\n";
+                        } else if (snapshot.child(playerName).child("status").getValue().toString().equals("Lost")) {
+                            GameStatus += "You have lost " + bet + "!\n";
+                        }
+                        binding.gameStatus.setText(GameStatus);
+                    }
+                }
+                // endregion game status extention
                 // region user's hand
                 int total = 0;
                 binding.hand.removeAllViews();
