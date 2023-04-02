@@ -85,33 +85,14 @@
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="50dp"
         android:background="@color/DarkGrey"
         android:gravity="start"
         android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@id/button_bar"
         app:layout_constraintStart_toStartOf="parent">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" available:"
-                android:textColor="@color/white"
-                android:textSize="20dp" />
-
-            <TextView
-                android:id="@+id/available"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="@color/white"
-                android:textSize="20dp" />
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -121,26 +102,51 @@
             <TextView
                 android:id="@+id/betText"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="current bet:"
-                android:textColor="@color/white"
-                android:textSize="20dp" />
+                android:layout_height="match_parent"
+                android:text=" current bet:"
+                android:textColor="@color/buttonGrey"
+                android:textSize="24dp" />
 
             <TextView
                 android:id="@+id/ShowBet"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:gravity="center"
                 android:textColor="@color/white"
-                android:textSize="20dp" />/>
+                android:textSize="24dp" />/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text=" available:"
+                android:textColor="@color/buttonGrey"
+                android:textSize="24dp" />
+
+            <TextView
+                android:id="@+id/available"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="24dp" />
         </LinearLayout>
     </LinearLayout>
 
-
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/button_bar"
+        android:background="@color/buttonGrey"
+        />
     <LinearLayout
         android:id="@+id/button_bar"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="90dp"
         android:background="@color/DarkGrey"
         android:gravity="center"
         android:orientation="horizontal"
@@ -149,8 +155,8 @@
 
         <Button
             android:id="@+id/ready"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:text="I'm ready"
             android:textColor="@color/black" />
     </LinearLayout>

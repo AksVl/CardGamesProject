@@ -5,16 +5,19 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="8dp"
+    android:background="@color/DarkGrey"
     tools:context=".GameActivities.DialogFragments.DialogBetChooseFragment">
 
     <TextView
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColor="@color/white"
         android:text="Choose a bet size"
         android:textSize="20dp"/>
     <EditText
         android:id="@+id/size"
+        android:textColor="@color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="number"

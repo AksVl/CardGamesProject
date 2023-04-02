@@ -97,6 +97,7 @@ public class TwentyOneGame extends AppCompatActivity {
         RoomRef = database.getReference("TwentyOneRooms/" + RoomName);
         binding.ready.setEnabled(false);
         binding.textBankersFirstCard.setVisibility(View.INVISIBLE);
+        binding.betText.setVisibility(View.INVISIBLE);
         RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -172,6 +173,7 @@ public class TwentyOneGame extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 binding.available.setText(String.valueOf(available));
                 binding.ShowBet.setText(String.valueOf(bet));
+                binding.betText.setVisibility(View.VISIBLE);
                 int my_pos;
                 int pos;
                 // region bank reading
@@ -528,6 +530,7 @@ public class TwentyOneGame extends AppCompatActivity {
                 } else {
                     binding.hand.removeAllViews();
                 }
+                Collections.reverse(Hand);
                 for (String got : Hand) {
                     Card card = AppMethods.CardLink(got);
                     total += GetValueOfCard(card);
@@ -778,7 +781,7 @@ public class TwentyOneGame extends AppCompatActivity {
     }
 
     public static void SetBankSize(String size) {
-        if (!size.equals("") && parseInt(size) > 99 && parseInt(size) < 5001) {
+        if (!size.equals("") && parseInt(size) > 99 && parseInt(size) < 5001 && parseInt(size) <= available) {
             Bank = parseInt(size);
             available -= Bank;
             RoomRef.child("_bank").setValue(Bank);
@@ -803,7 +806,7 @@ public class TwentyOneGame extends AppCompatActivity {
     }
 
     public static void SetBetSize(String gotBet) {
-        if (!gotBet.equals("") && parseInt(gotBet) > 9 && parseInt(gotBet) <= Bank) {
+        if (!gotBet.equals("") && parseInt(gotBet) > 9 && parseInt(gotBet) <= Bank && parseInt(gotBet) <= available) {
             bet = parseInt(gotBet);
             available -= bet;
             fm.beginTransaction().remove(dialog).commit();
@@ -847,13 +850,13 @@ public class TwentyOneGame extends AppCompatActivity {
         Pass.setText("Pass");
         TextView text = new TextView(context);
         text.setText("TOTAL :");
-        text.setTextSize(18);
+        text.setTextSize(20);
         text.setTextColor(Color.WHITE);
         text.setGravity(Gravity.CENTER);
         TextView total = new TextView(context);
         total.setText("0");
         total.setTextColor(Color.WHITE);
-        total.setTextSize(24);
+        total.setTextSize(30);
         total.setGravity(Gravity.CENTER);
         binding.buttonBar.addView(text, 0, params);
         binding.buttonBar.addView(total, 1, params);
