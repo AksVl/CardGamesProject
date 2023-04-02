@@ -76,6 +76,7 @@ public class TwentyOneGame extends AppCompatActivity {
     private static DialogBetChooseFragment dialog;
     private static final Handler handler = new Handler();
     private static boolean IsInGame = false;
+    private final boolean[] Return = {false};
 
 
     @Override
@@ -205,6 +206,21 @@ public class TwentyOneGame extends AppCompatActivity {
                         FinishedCounter = size[0];
                     }
                 }
+                if (snapshot.child(playerName).child("hand").exists()) {
+                    MainGameLoop = true;
+                }
+                if (FinishedCounter == size[0]
+                        || LostCounter == size[0] - 1) {
+                    OnceCheckFlag = true;
+                    MainGameLoop = false;
+                    LoopEnding = true;
+                    if (snapshot.child(bankerName).child("status").exists()
+                            && !snapshot.child(bankerName).child("status").getValue().toString().equals("Lost all")) {
+                        if (BankerEndingPermission && playerName.equals(bankerName)) {
+                            RoomRef.child(bankerName).child("status").setValue("ending");
+                        }
+                    }
+                }
                 // endregion Counters
                 // region ChoosingPlayer reading
                 if (snapshot.child("_ChoosingPlayer").exists()) {
@@ -285,7 +301,7 @@ public class TwentyOneGame extends AppCompatActivity {
                 }
                 // endregion banker's shown card
                 // region MainGameLoop(everyone's role)
-                if (MainGameLoop) {
+                if (MainGameLoop && playerName.equals(adminName)) {
                     boolean AllHaveCurrentBet = true;
                     for (String player1 : InRoomPlayers[0]) {
                         if (!player1.equals("_size") && !player1.equals("_bank") && !player1.equals(bankerName)) {
@@ -296,12 +312,10 @@ public class TwentyOneGame extends AppCompatActivity {
                         }
                     }
                     if (AllHaveCurrentBet && OnceStart) {
-                        if (snapshot.child(bankerName).child("position").exists() && playerName.equals(adminName)) {
-                            ChoosingPlayerPos = AppMethods.nextPlayer(size[0],
-                                    parseInt(snapshot.child(bankerName).child("position").getValue().toString()));
-                            RoomRef.child("_ChoosingPlayer").setValue(ChoosingPlayerPos);
-                            OnceStart = false;
-                        }
+                        ChoosingPlayerPos = AppMethods.nextPlayer(size[0],
+                                parseInt(snapshot.child(bankerName).child("position").getValue().toString()));
+                        RoomRef.child("_ChoosingPlayer").setValue(ChoosingPlayerPos);
+                        OnceStart = false;
                     }
                 }
                 // endregion MainGameLoop(everyone's role)
@@ -340,7 +354,8 @@ public class TwentyOneGame extends AppCompatActivity {
                 // endregion first handing out
                 if (snapshot.child(playerName).child("status").exists()) {
                     // region betting
-                    if (snapshot.child(playerName).child("hand").getChildrenCount() == 1) {
+                    if (snapshot.child(playerName).child("hand").getChildrenCount() == 1
+                            && !playerName.equals(bankerName)) {
                         handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -355,7 +370,6 @@ public class TwentyOneGame extends AppCompatActivity {
                     }
                     // endregion betting
                 }
-                final boolean[] Return = {false};
                 String GameStatus = "";
                 if (snapshot.child(playerName).child("position").exists()) {
                     my_pos = parseInt(snapshot.child(playerName).child("position").getValue().toString());
@@ -451,20 +465,20 @@ public class TwentyOneGame extends AppCompatActivity {
                                 if (snapshot.child(player).child("status").exists() && snapshot.child(player).child("currentBet").exists()) {
                                     int Bet = parseInt(snapshot.child(player).child("currentBet").getValue().toString());
                                     if (snapshot.child(player).child("status").getValue().toString().equals("Won")) {
-                                        Return[0] = true;
                                         OnceCheckFlag = false;
                                         BackUpBank -= Bet;
-                                    } else if (snapshot.child(player).child("status").getValue().toString().equals("Lost")) {
                                         Return[0] = true;
+                                    } else if (snapshot.child(player).child("status").getValue().toString().equals("Lost")) {
                                         OnceCheckFlag = false;
                                         BackUpBank += Bet;
+                                        Return[0] = true;
                                     } else {
                                         OnceCheckFlag = true;
                                         Return[0] = false;
                                     }
                                 }
                             }
-                            // endregion back to start bank's path
+                            // endregion back to start bank's counting
                         }
                     }
                 }
@@ -517,26 +531,16 @@ public class TwentyOneGame extends AppCompatActivity {
                     ((TextView) (binding.buttonBar.getChildAt(1))).setTextColor(Color.RED);
                     if (!playerName.equals(bankerName)) {
                         RoomRef.child(playerName).child("status").setValue("Lost");
+                        Return[0] = true;
                     } else {
                         RoomRef.child(playerName).child("status").setValue("Lost all");
+                        Return[0] = true;
                     }
                 }
                 // endregion user's hand
                 if (snapshot.child(playerName).child("hand").exists()) {
-                    MainGameLoop = true;
                     // region loop ending
-                    if (FinishedCounter == size[0]
-                            || LostCounter == size[0] - 1) {
-                        MainGameLoop = false;
-                        LoopEnding = true;
-                        if (snapshot.child(bankerName).child("status").exists()
-                                && !snapshot.child(bankerName).child("status").getValue().toString().equals("Lost all")) {
-                            if (BankerEndingPermission && playerName.equals(bankerName)) {
-                                RoomRef.child(bankerName).child("status").setValue("ending");
-                            }
-                        }
-                    }
-                    if (!MainGameLoop && LoopEnding && !playerName.equals(bankerName)
+                    if (LoopEnding && !playerName.equals(bankerName)
                             && snapshot.child(bankerName).child("hand").exists()) {
                         ArrayList<String> BankerHand = new ArrayList<>();
                         for (int i = 0; i < snapshot.child(bankerName).child("hand").getChildrenCount(); i++) {
@@ -551,6 +555,7 @@ public class TwentyOneGame extends AppCompatActivity {
                         }
                         if (snapshot.child(bankerName).child("status").getValue().toString().equals("Lost all")) {
                             RoomRef.child(playerName).child("status").setValue("Won");
+                            Return[0] = true;
                         } else if (total <= 21 && bankerScore <= 21) {
                             if (total > bankerScore) {
                                 RoomRef.child(playerName).child("status").setValue("Won");
@@ -560,43 +565,48 @@ public class TwentyOneGame extends AppCompatActivity {
                                 Return[0] = true;
                             }
                         }
+                    } else if (!MainGameLoop && LoopEnding && playerName.equals(bankerName)
+                            && snapshot.child(bankerName).child("hand").exists() && !OnceCheckFlag) {
+
                     }
                     // endregion loop ending
                     // region back to start
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (!MainGameLoop && LoopEnding && Return[0]) {
-                                Return[0] = false;
-                                LoopEnding = false;
-                                if (playerName.equals(bankerName)) {
-                                    handler.postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            binding.gameStatus.setText("");
-                                            RoomRef.setValue(SnapshotForBackup.getValue());
-                                            RoomRef.child("_bank").setValue(BackUpBank);
-                                            HandOutStart = true;
-                                            OnceCheckFlag = false;
-                                        }
-                                    }, 3000);
-                                } else {
+                    if (LoopEnding && Return[0]) {
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (LoopEnding && Return[0]) {
                                     bet_flag = true;
-                                    //profit counting
-                                    if (snapshot.child(playerName).child("status").exists()) {
-                                        if (snapshot.child(playerName).child("status").getValue().toString().equals("Won")) {
-                                            available += 2 * bet;
-                                            HandOutStart = true;
+                                    Return[0] = false;
+                                    LoopEnding = false;
+                                    if (playerName.equals(bankerName)) {
+                                        handler.postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                binding.gameStatus.setText("");
+                                                RoomRef.setValue(SnapshotForBackup.getValue());
+                                                RoomRef.child("_bank").setValue(BackUpBank);
+                                                OnceCheckFlag = false;
+                                                HandOutStart = true;
+                                            }
+                                        }, 3000);
+                                    } else {
+                                        //profit counting
+                                        if (snapshot.child(playerName).child("status").exists()) {
+                                            if (snapshot.child(playerName).child("status").getValue().toString().equals("Won")) {
+                                                available += 2 * bet;
+                                                HandOutStart = true;
+                                            }
                                         }
                                     }
-                                }
-                                if (playerName.equals(adminName)) {
-                                    OnceStart = true;
+                                    if (playerName.equals(adminName)) {
+                                        OnceStart = true;
+                                    }
                                 }
                             }
-                        }
-                    }, 3000);
-                    // endregion back to start
+                        }, 3000);
+                        // endregion back to start
+                    }
                 }
             }
 
@@ -608,6 +618,7 @@ public class TwentyOneGame extends AppCompatActivity {
         binding.ready.setOnClickListener(view ->
                 SetStatusToReady());
     }
+
 
     private int GetValueOfCard(Card card) {
         switch (card.value) {
