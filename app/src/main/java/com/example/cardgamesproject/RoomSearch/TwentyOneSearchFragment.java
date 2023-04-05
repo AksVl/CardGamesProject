@@ -114,21 +114,23 @@ public class TwentyOneSearchFragment extends Fragment {
         });
     }
     private void CreateNewRoom() {
-        RoomRef = database.getReference("TwentyOneRooms/" + RoomName + "/_size");
-        RoomRef.setValue(binding.sizePicker.getValue());
+        RoomRef = database.getReference("TwentyOneRooms/" + RoomName);
+        RoomRef.child("_size").setValue(binding.sizePicker.getValue());
         binding.create.setEnabled(false);
-        RoomRef = database.getReference("TwentyOneRooms/"+RoomName + "/" + playerName);
         RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                binding.create.setEnabled(false);
-                Intent intent = new Intent(getContext(), TwentyOneGame.class);
-                intent.putExtra("RoomName",RoomName);
-                intent.putExtra("playerName",playerName);
-                intent.putExtra("size",binding.sizePicker.getValue());
-                startActivity(intent);
-                RoomRef.child("status").setValue("joined");
-                RoomRef.child("position").setValue(1);
+                if(snapshot.exists()) {
+                    Intent intent = new Intent(getContext(), TwentyOneGame.class);
+                    intent.putExtra("RoomName", RoomName);
+                    intent.putExtra("playerName", playerName);
+                    intent.putExtra("size", binding.sizePicker.getValue());
+                    startActivity(intent);
+                    RoomRef.child(playerName).child("status").setValue("joined");
+                    RoomRef.child(playerName).child("position").setValue(1);
+                } else{
+                    binding.create.setEnabled(true);
+                }
             }
 
             @Override
