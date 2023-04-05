@@ -105,6 +105,7 @@ public class TwentyOneGame extends AppCompatActivity {
         binding.betText.setVisibility(View.INVISIBLE);
         final boolean[] OnceAnimated = {true};
         final long[] EndGameDelay = {3000};
+        final boolean[] Out = {false};
         binding.ready.setOnClickListener(view ->
                 SetStatusToReady());
         // endregion onCreate init
@@ -202,7 +203,7 @@ public class TwentyOneGame extends AppCompatActivity {
                     }
                     if (Bank == 0) {
                         EndGame = true;
-                        if(!KnockKnock) {
+                        if (!KnockKnock) {
                             RoomRef.child(playerName).child("hand").removeValue();
                             HandOutStart = false;
                         }
@@ -671,6 +672,29 @@ public class TwentyOneGame extends AppCompatActivity {
                         EndGame = true;
                     }
                     // endregion loop ending
+                    // region is money still out there?
+                    if (available == 0 && bet == 0 && !playerName.equals(bankerName)) {
+                        RoomRef.child(playerName).child("status").setValue("out");
+                        RoomRef.child(playerName).child("hand").removeValue();
+                        EndGame = true;
+                        bet_flag = false;
+                        EndGameDelay[0] = 0;
+                        binding.message.setText("You have run out of money!");
+                        binding.message.setVisibility(View.VISIBLE);
+                    }
+                    for (String player : InRoomPlayers[0]) {
+                        if (snapshot.child(player).child("status").exists()
+                                && snapshot.child(player).child("status").getValue().toString().equals("out")) {
+                            RoomRef.child(playerName).child("hand").removeValue();
+                            EndGame = true;
+                            bet_flag = false;
+                            EndGameDelay[0] = 0;
+                            binding.message.setText(player+" has run out of money!");
+                            binding.message.setVisibility(View.VISIBLE);
+                            break;
+                        }
+                    }
+                    // endregion is money still out there?
                     // region back to start
                     if (LoopEnding && Return[0]) {
                         handler.postDelayed(new Runnable() {
@@ -694,8 +718,10 @@ public class TwentyOneGame extends AppCompatActivity {
                                     } else {
                                         //profit counting
                                         if (status.equals("Won") || status.equals("TwentyOne")) {
-                                            available += 2 * bet;
-                                            HandOutStart = true;
+                                            if(!EndGame) {
+                                                available += 2 * bet;
+                                                HandOutStart = true;
+                                            }
                                         }
                                     }
                                     if (playerName.equals(adminName)) {
@@ -716,7 +742,7 @@ public class TwentyOneGame extends AppCompatActivity {
                     MainGameLoop = false;
                     OnceCheckFlag = false;
                     OnceStart = false;
-                    if(playerName.equals(adminName)){
+                    if (playerName.equals(adminName)) {
                         RoomRef.child("_ChoosingPlayer").removeValue();
                     }
                     boolean[] AllEnded = {true};
@@ -727,7 +753,7 @@ public class TwentyOneGame extends AppCompatActivity {
                             break;
                         }
                     }
-                    if(AllEnded[0] && !playerName.equals(bankerName)){
+                    if (AllEnded[0] && !playerName.equals(bankerName)) {
                         if (status.equals("Won") || status.equals("TwentyOne")) {
                             available += 2 * bet;
                         }
@@ -737,7 +763,7 @@ public class TwentyOneGame extends AppCompatActivity {
                         public void run() {
                             RoomRef.child(playerName).child("status").setValue("ended");
                             LoopEnding = false;
-                            if(OnceEndBank && playerName.equals(bankerName)) {
+                            if (OnceEndBank && playerName.equals(bankerName)) {
                                 OnceEndBank = false;
                                 available += BackUpBank;
                             }
