@@ -33,6 +33,7 @@ public class GameChooseActivity extends AppCompatActivity {
         binding = ActivityGameChooseBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         playerName = getSharedPreferences("PREFS",0).getString("name","");
+        playerRef = database.getReference("playerList/" + playerName);
         binding.name.setText("logged in as "+playerName);
         binding.logout.setOnClickListener(view -> LogOut());
         binding.Fool.setOnClickListener(view -> FoolSearch());
@@ -43,6 +44,7 @@ public class GameChooseActivity extends AppCompatActivity {
     private void LogOut() {
         SharedPreferences prefs = getSharedPreferences("PREFS",0);
         prefs.edit().remove("name").apply();
+        playerRef.removeValue();
         startActivity(new Intent(this,StartActivity.class));
     }
 
@@ -52,7 +54,6 @@ public class GameChooseActivity extends AppCompatActivity {
         binding.Fool.setEnabled(true);
         binding.Liar.setEnabled(true);
         //
-
         //showing fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
         TwentyOneSearchFragment fragment = new TwentyOneSearchFragment();
@@ -66,6 +67,7 @@ public class GameChooseActivity extends AppCompatActivity {
         binding.Fool.setEnabled(true);
         binding.TwentyOne.setEnabled(true);
         //
+
 
         //showing fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -88,5 +90,10 @@ public class GameChooseActivity extends AppCompatActivity {
                 .addToBackStack(null)
                 .replace(R.id.FragmentsContainer,fragment,String.valueOf(false)).commit();
 
+    }
+    @Override
+    protected void onDestroy() {
+        playerRef.removeValue();
+        super.onDestroy();
     }
 }

@@ -23,6 +23,7 @@ public class StartActivity extends AppCompatActivity {
     DatabaseReference playerRef;
     String playerName = "";
     private ActivityMainBinding binding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,38 +31,42 @@ public class StartActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         database = FirebaseDatabase.getInstance(
                 "https://cardgamesproject-6d467-default-rtdb.europe-west1.firebasedatabase.app/");
-        SharedPreferences prefs = getSharedPreferences("PREFS",0);
-        playerName = prefs.getString("name","");
+        SharedPreferences prefs = getSharedPreferences("PREFS", 0);
+        playerName = prefs.getString("name", "");
         binding.name.setText(playerName);
-        if(!playerName.equals("")){
+        if (!playerName.equals("")) {
             playerRef = database.getReference("playerList/" + playerName);
             AddEventListener();
-            playerRef.setValue("");
         }
 
         binding.btnLogin.setOnClickListener(view -> {
             playerName = binding.name.getText().toString();
-            if(!playerName.equals("")){
-                prefs.edit().putString("name",playerName).apply();
+            if (!playerName.equals("")) {
+                prefs.edit().putString("name", playerName).apply();
                 binding.btnLogin.setEnabled(false);
                 binding.btnLogin.setText("Please Wait...");
                 playerRef = database.getReference("playerList/" + playerName);
                 AddEventListener();
-                playerRef.setValue("");
             }
         });
     }
 
     private void AddEventListener() {
-        playerRef.addValueEventListener(new ValueEventListener() {
+        playerRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                 if(!playerName.equals("")){
-                     SharedPreferences prefs = getSharedPreferences("PREFS",0);
-                     prefs.edit().putString("name",playerName).apply();
-                     startActivity(new Intent(StartActivity.this,GameChooseActivity.class));
-                     finish();
-                 }
+                if (!playerName.equals("")) {
+                    if (!snapshot.exists()) {
+                        playerRef.setValue("");
+                        SharedPreferences prefs = getSharedPreferences("PREFS", 0);
+                        prefs.edit().putString("name", playerName).apply();
+                        startActivity(new Intent(StartActivity.this, GameChooseActivity.class));
+                    } else{
+                        binding.btnLogin.setText("Log in");
+                        binding.btnLogin.setEnabled(true);
+                        Toast.makeText(StartActivity.this, "This player already exists", Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
 
             @Override
@@ -71,5 +76,11 @@ public class StartActivity extends AppCompatActivity {
                 Toast.makeText(StartActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        playerRef.removeValue();
+        super.onDestroy();
     }
 }

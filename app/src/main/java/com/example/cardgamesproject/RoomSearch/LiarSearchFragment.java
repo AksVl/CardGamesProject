@@ -54,14 +54,16 @@ public class LiarSearchFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         listView = requireView().findViewById(R.id.list);
-        binding.create.setEnabled(true);
         SharedPreferences prefs = Objects.requireNonNull(getActivity()).getSharedPreferences("PREFS", 0);
         playerName = prefs.getString("name","");
         RoomName = playerName+"_Room";
         ShowAvailable();
         binding.sizePicker.setMinValue(2);
         binding.sizePicker.setMaxValue(6);
-        binding.create.setOnClickListener(v -> CreateNewRoom());
+        //temporary
+        binding.create.setEnabled(false);
+        //binding.create.setOnClickListener(v -> CreateNewRoom());
+        //temporary
         binding.list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -154,6 +156,6 @@ public class LiarSearchFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        binding.create.setEnabled(true);
+        binding.create.setEnabled(false);
     }
 }
