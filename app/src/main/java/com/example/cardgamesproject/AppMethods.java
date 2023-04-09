@@ -74,12 +74,20 @@ public class AppMethods {
 
     public static void Disconnect(DatabaseReference RoomRef, String playerName, ValueEventListener listener) {
         RoomRef.removeEventListener(listener);
-        RoomRef.child(playerName).child("status").setValue("empty");
         RoomRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 snapshot.child(playerName).getRef().removeValue();
-                if (snapshot.getChildrenCount() == 1) {
+                boolean PlayersAreInRoom = false;
+                for(DataSnapshot node :snapshot.getChildren()){
+                    String element = node.getKey();
+                    if(!element.equals("_size") && !element.equals("_ChoosingPlayer")
+                    && !element.equals("_bank") && !element.equals("_bank_choosing")
+                    && !element.equals("_disconnected")){
+                        PlayersAreInRoom = true;
+                    }
+                }
+                if (!PlayersAreInRoom) {
                     snapshot.getRef().removeValue();
                 }
             }
@@ -192,5 +200,28 @@ public class AppMethods {
             PlayerPos = 1;
         }
         return PlayerPos;
+    }
+
+    public static String findPlayerByPos(DatabaseReference roomRef, int i) {
+        final String[] player = {null};
+        roomRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot node : snapshot.getChildren()){
+                    String key = node.getKey();
+                    if(snapshot.child(key).child("position").exists()
+                            && Integer.parseInt(snapshot.child(key).child("position").getValue().toString())==i){
+                        player[0] = key;
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        return player[0];
     }
 }
