@@ -1,26 +1,19 @@
-package com.example.cardgamesproject;
+package com.example.cardgamesproject.general;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
-import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import com.example.cardgamesproject.RoomSearch.FoolSearchFragment;
-import com.example.cardgamesproject.RoomSearch.LiarSearchFragment;
-import com.example.cardgamesproject.RoomSearch.TwentyOneSearchFragment;
+import com.example.cardgamesproject.R;
+import com.example.cardgamesproject.roomSearchFragments.FoolSearchFragment;
+import com.example.cardgamesproject.roomSearchFragments.LiarSearchFragment;
+import com.example.cardgamesproject.roomSearchFragments.TwentyOneSearchFragment;
 import com.example.cardgamesproject.databinding.ActivityGameChooseBinding;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class GameChooseActivity extends AppCompatActivity {
     FirebaseDatabase database = FirebaseDatabase.getInstance("https://cardgamesproject-6d467-default-rtdb.europe-west1.firebasedatabase.app/");

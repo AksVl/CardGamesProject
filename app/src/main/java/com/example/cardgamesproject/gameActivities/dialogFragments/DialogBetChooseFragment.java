@@ -1,4 +1,4 @@
-package com.example.cardgamesproject.GameActivities.DialogFragments;
+package com.example.cardgamesproject.gameActivities.dialogFragments;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
-import com.example.cardgamesproject.GameActivities.TwentyOneGame;
+import com.example.cardgamesproject.gameActivities.TwentyOneGame;
 import com.example.cardgamesproject.databinding.FragmentDialogBetChooseBinding;
 import com.example.cardgamesproject.databinding.FragmentDialogSetBankBinding;
 

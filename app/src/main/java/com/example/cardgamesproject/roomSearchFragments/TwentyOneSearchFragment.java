@@ -1,9 +1,10 @@
-package com.example.cardgamesproject.RoomSearch;
+package com.example.cardgamesproject.roomSearchFragments;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
-import android.util.ArraySet;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +17,9 @@ import androidx.fragment.app.Fragment;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.cardgamesproject.AppMethods;
-import com.example.cardgamesproject.GameActivities.FoolGame;
-import com.example.cardgamesproject.GameActivities.LiarGame;
-import com.example.cardgamesproject.GameActivities.TwentyOneGame;
+import com.example.cardgamesproject.general.AppMethods;
+import com.example.cardgamesproject.gameActivities.TwentyOneGame;
 import com.example.cardgamesproject.R;
-import com.example.cardgamesproject.databinding.FragmentLiarSearchBinding;
 import com.example.cardgamesproject.databinding.FragmentTwentyOneSearchBinding;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -30,8 +28,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Objects;
 
 public class TwentyOneSearchFragment extends Fragment {
@@ -66,6 +62,10 @@ public class TwentyOneSearchFragment extends Fragment {
         ShowAvailable();
         binding.sizePicker.setMinValue(2);
         binding.sizePicker.setMaxValue(4);
+        float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 24, getResources().getDisplayMetrics());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            binding.sizePicker.setTextSize(px);
+        }
         binding.create.setOnClickListener(v -> CreateNewRoom());
         binding.list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

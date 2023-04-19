@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:background="@color/backgroundGreen"
     android:padding="8dp"
-    tools:context=".StartActivity">
+    tools:context=".general.StartActivity">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,6 +22,7 @@
             android:layout_height="32sp"
             />
         <Button
+            app:cornerRadius="@android:dimen/thumbnail_height"
             android:id="@+id/logout"
             android:layout_width="match_parent"
             android:layout_weight="1"

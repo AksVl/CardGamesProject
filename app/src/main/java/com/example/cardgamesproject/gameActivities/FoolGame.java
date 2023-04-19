@@ -1,26 +1,20 @@
-package com.example.cardgamesproject.GameActivities;
+package com.example.cardgamesproject.gameActivities;
 
 import static java.lang.Integer.parseInt;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.ThemedSpinnerAdapter;
 
 import android.annotation.SuppressLint;
-import android.app.ActivityManager;
-import android.app.Application;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.cardgamesproject.AppMethods;
+import com.example.cardgamesproject.general.AppMethods;
 import com.example.cardgamesproject.R;
-import com.example.cardgamesproject.StartActivity;
 import com.example.cardgamesproject.databinding.ActivityFoolGameBinding;
 import com.example.cardgamesproject.databinding.PlayerItemBinding;
 import com.google.firebase.database.DataSnapshot;

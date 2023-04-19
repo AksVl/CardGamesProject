@@ -1,8 +1,10 @@
-package com.example.cardgamesproject.RoomSearch;
+package com.example.cardgamesproject.roomSearchFragments;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +17,8 @@ import androidx.fragment.app.Fragment;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.cardgamesproject.AppMethods;
-import com.example.cardgamesproject.GameActivities.FoolGame;
+import com.example.cardgamesproject.general.AppMethods;
+import com.example.cardgamesproject.gameActivities.FoolGame;
 import com.example.cardgamesproject.R;
 import com.example.cardgamesproject.databinding.FragmentFoolSearchBinding;
 import com.google.firebase.database.DataSnapshot;
@@ -26,9 +28,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class FoolSearchFragment extends Fragment {
     FirebaseDatabase database = FirebaseDatabase.getInstance("https://cardgamesproject-6d467-default-rtdb.europe-west1.firebasedatabase.app/");
@@ -56,6 +56,10 @@ public class FoolSearchFragment extends Fragment {
         listView = requireView().findViewById(R.id.list);
         binding.sizePicker.setMinValue(2);
         binding.sizePicker.setMaxValue(6);
+        float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 24, getResources().getDisplayMetrics());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            binding.sizePicker.setTextSize(px);
+        }
         SharedPreferences prefs = Objects.requireNonNull(getActivity()).getSharedPreferences("PREFS", 0);
         playerName = prefs.getString("name","");
         RoomName = playerName+"_Room";

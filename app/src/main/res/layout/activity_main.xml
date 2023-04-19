@@ -8,7 +8,7 @@
     android:background="@color/backgroundGreen"
     android:padding="8dp"
     android:gravity="center"
-    tools:context=".StartActivity">
+    tools:context=".general.StartActivity">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
         android:textSize="24sp">
 
     </EditText>
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_login"
         android:layout_width="match_parent"
         android:layout_height="78sp"
@@ -35,6 +35,7 @@
         android:textSize="24sp"
         android:layout_marginBottom="12sp"
         android:textColor="@color/black"
+        app:cornerRadius="@android:dimen/thumbnail_height"
         />
 
 </LinearLayout>

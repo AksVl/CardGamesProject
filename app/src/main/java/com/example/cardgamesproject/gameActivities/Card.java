@@ -1,4 +1,4 @@
-package com.example.cardgamesproject.GameActivities;
+package com.example.cardgamesproject.gameActivities;
 
 import androidx.annotation.NonNull;
 

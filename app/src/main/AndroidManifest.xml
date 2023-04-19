@@ -15,25 +15,25 @@
         tools:targetApi="33">
         <activity
             android:noHistory="true"
-            android:name=".GameActivities.TwentyOneGame"
+            android:name=".gameActivities.TwentyOneGame"
             android:exported="false"
             android:screenOrientation="portrait"/>
         <activity
             android:noHistory="true"
-            android:name=".GameActivities.LiarGame"
+            android:name=".gameActivities.LiarGame"
             android:exported="false"
             android:screenOrientation="portrait"/>
         <activity
             android:noHistory="true"
-            android:name=".GameActivities.FoolGame"
+            android:name=".gameActivities.FoolGame"
             android:exported="false"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".GameChooseActivity"
+            android:name=".general.GameChooseActivity"
             android:exported="false"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".StartActivity"
+            android:name=".general.StartActivity"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>

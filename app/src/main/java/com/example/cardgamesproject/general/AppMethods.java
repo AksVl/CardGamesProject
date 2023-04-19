@@ -1,11 +1,13 @@
-package com.example.cardgamesproject;
+package com.example.cardgamesproject.general;
 
 import android.content.Context;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 
-import com.example.cardgamesproject.GameActivities.Card;
-import com.example.cardgamesproject.GameActivities.TwentyOneGame;
+import com.example.cardgamesproject.R;
+import com.example.cardgamesproject.gameActivities.Card;
+import com.example.cardgamesproject.gameActivities.TwentyOneGame;
 import com.example.cardgamesproject.databinding.ActivityTwentyOneGameBinding;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -83,7 +85,7 @@ public class AppMethods {
                     String element = node.getKey();
                     if(!element.equals("_size") && !element.equals("_ChoosingPlayer")
                     && !element.equals("_bank") && !element.equals("_bank_choosing")
-                    && !element.equals("_disconnected")){
+                    && !element.equals("_offline")){
                         PlayersAreInRoom = true;
                     }
                 }
@@ -127,7 +129,7 @@ public class AppMethods {
                                   ValueEventListener InGameListener,
                                   ArrayList<String> InRoomPlayers,
                                   DatabaseReference RoomRef, int readyCount, int IntentSize,
-                                  ActivityTwentyOneGameBinding binding, Context context) {
+                                  ActivityTwentyOneGameBinding binding, Context context, WindowManager windowManager) {
         if (readyCount >= IntentSize) {
             binding.buttonBar.removeAllViews();
             for (String player : InRoomPlayers) {
@@ -140,7 +142,7 @@ public class AppMethods {
             binding.gameStatus.setText("");
             switch (game) {
                 case "TwentyOne":
-                    TwentyOneGame.onGameStart(context, binding);
+                    TwentyOneGame.onGameStart(context, binding,windowManager);
                 case "Fool":
                     //Fool.onGameStart(context, binding);
                 case "Liar":

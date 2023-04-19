@@ -10,16 +10,17 @@
     <LinearLayout
         android:id="@+id/playersContainer"
         android:layout_width="match_parent"
-        android:layout_height="125dp"
+        android:layout_height="195dp"
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="8dp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:id="@+id/linearLayout3"
+        android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="262dp"
         android:gravity="center"
         app:layout_constraintTop_toBottomOf="@+id/playersContainer">
 
@@ -41,12 +42,12 @@
                     android:layout_height="36dp"
                     android:gravity="center"
                     android:text="banker's first card :"
-                    android:textSize="16dp" />
+                    android:textSize="24dp" />
 
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/shownCard"
-                    android:layout_width="120dp"
-                    android:layout_height="160dp"
+                    android:layout_width="171dp"
+                    android:layout_height="228dp"
                     app:shapeAppearanceOverlay="@style/roundedImageView" />
             </LinearLayout>
 
@@ -58,7 +59,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:textSize="20dp" />
+            android:textSize="25dp" />
     </LinearLayout>
 
 
@@ -66,18 +67,17 @@
         android:id="@+id/message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="188dp"
+        android:layout_marginBottom="32dp"
         android:text="Waiting for other players"
-        android:textSize="24dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textSize="30dp"
+        app:layout_constraintBottom_toTopOf="@+id/scrollView2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/linearLayout3" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <HorizontalScrollView
         android:id="@+id/scrollView2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="244dp"
         android:fillViewport="false"
         app:layout_constraintBottom_toTopOf="@id/linearLayout"
         app:layout_constraintStart_toStartOf="parent">
@@ -85,14 +85,13 @@
         <LinearLayout
             android:id="@+id/hand"
             android:layout_width="match_parent"
-            android:layout_height="176dp"
+            android:layout_height="match_parent"
             android:orientation="horizontal" />
     </HorizontalScrollView>
-
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/crown"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_margin="12dp"
         android:background="@color/DarkGrey"
         android:src="@drawable/crown_down_scaled"
@@ -104,7 +103,7 @@
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="45dp"
+        android:layout_height="50dp"
         android:background="@color/DarkGrey"
         android:gravity="start"
         android:orientation="horizontal"
@@ -124,15 +123,15 @@
                 android:layout_marginStart="8dp"
                 android:text="current bet:"
                 android:textColor="@color/buttonGrey"
-                android:textSize="24dp" />
+                android:textSize="32dp" />
 
             <TextView
                 android:id="@+id/ShowBet"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="match_parent"
                 android:gravity="center"
                 android:textColor="@color/white"
-                android:textSize="24dp" />
+                android:textSize="36dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -145,15 +144,15 @@
                 android:layout_height="match_parent"
                 android:text=" available:"
                 android:textColor="@color/buttonGrey"
-                android:textSize="24dp" />
+                android:textSize="32dp" />
 
             <TextView
                 android:id="@+id/available"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="match_parent"
                 android:gravity="center"
                 android:textColor="@color/white"
-                android:textSize="24dp" />
+                android:textSize="36dp" />
         </LinearLayout>
     </LinearLayout>
 
@@ -166,19 +165,18 @@
     <LinearLayout
         android:id="@+id/button_bar"
         android:layout_width="match_parent"
-        android:layout_height="90dp"
+        android:layout_height="100dp"
         android:background="@color/DarkGrey"
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="8dp"
-        android:paddingHorizontal="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <Button
             android:id="@+id/ready"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textSize="20dp"
+            android:textSize="32dp"
             android:text="I'm ready"
             app:cornerRadius="@android:dimen/thumbnail_height"
             android:textColor="@color/black" />
