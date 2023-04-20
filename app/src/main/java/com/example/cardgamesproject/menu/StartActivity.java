@@ -1,4 +1,4 @@
-package com.example.cardgamesproject.general;
+package com.example.cardgamesproject.menu;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -76,8 +76,20 @@ public class StartActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        binding.btnLogin.setText("Log in");
+        binding.btnLogin.setEnabled(true);
+        super.onResume();
+    }
+
+    @Override
     protected void onDestroy() {
         playerRef.removeValue();
         super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+        //ignore this
     }
 }

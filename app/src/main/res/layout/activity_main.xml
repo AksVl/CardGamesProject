@@ -8,7 +8,7 @@
     android:background="@color/backgroundGreen"
     android:padding="8dp"
     android:gravity="center"
-    tools:context=".general.StartActivity">
+    tools:context=".menu.StartActivity">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -1,4 +1,4 @@
-package com.example.cardgamesproject.roomSearchFragments;
+package com.example.cardgamesproject.menu.roomSearchFragments;
 
 import android.content.Intent;
 import android.content.SharedPreferences;

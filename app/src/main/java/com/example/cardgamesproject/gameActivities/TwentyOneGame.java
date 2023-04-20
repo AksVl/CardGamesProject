@@ -34,6 +34,7 @@ import com.example.cardgamesproject.R;
 import com.example.cardgamesproject.databinding.ActivityTwentyOneGameBinding;
 import com.example.cardgamesproject.databinding.CardLayoutBinding;
 import com.example.cardgamesproject.databinding.PlayerItemBinding;
+import com.example.cardgamesproject.general.Card;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -94,7 +95,7 @@ public class TwentyOneGame extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // region onCreate init
-        super.onCreate(savedInstanceState);
+        super.onCreate(null);
         binding = ActivityTwentyOneGameBinding.inflate(getLayoutInflater());
         Banker_dialog = new DialogSetBankSize();
         dialog = new DialogBetChooseFragment();
@@ -141,6 +142,12 @@ public class TwentyOneGame extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 int readyCount = 0;
+                for (int i = 0; i < binding.playersContainer.getChildCount(); i++) {
+                    TextView name = binding.playersContainer.getChildAt(i).findViewById(R.id.name);
+                    TextView status = binding.playersContainer.getChildAt(i).findViewById(R.id.status);
+                    status.setText("empty");
+                    name.setText("none");
+                }
                 InRoomPlayers[0].clear();
                 for (DataSnapshot d : snapshot.getChildren()) {
                     InRoomPlayers[0].add(d.getKey());
@@ -171,10 +178,6 @@ public class TwentyOneGame extends AppCompatActivity {
                                 status.setText(gotStatus);
                                 status.setTextColor(Color.WHITE);
                                 if (gotStatus.equals("ready")) status.setTextColor(Color.GREEN);
-                                if (gotStatus.equals("empty")) {
-                                    name.setText("none");
-                                    binding.ready.setEnabled(false);
-                                }
                             }
                             if (gotStatus.equals("ready")) {
                                 readyCount++;
@@ -557,6 +560,7 @@ public class TwentyOneGame extends AppCompatActivity {
                                             OnceCheckFlag = false;
                                         }
                                         BackUpBank -= Bet;
+                                        AddedCounter++;
                                         if (!KnockKnock) {
                                             Return[0] = true;
                                         }
@@ -565,6 +569,7 @@ public class TwentyOneGame extends AppCompatActivity {
                                             OnceCheckFlag = false;
                                         }
                                         BackUpBank += Bet;
+                                        AddedCounter++;
                                         if (!KnockKnock) {
                                             Return[0] = true;
                                         }
@@ -1026,7 +1031,7 @@ public class TwentyOneGame extends AppCompatActivity {
     private static void UiCreate(Context context, ActivityTwentyOneGameBinding binding, WindowManager windowManager) {
         LinearLayout.LayoutParams params = new LinearLayout.
                 LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
-        params.setMargins(8,8,8,8);
+        params.setMargins(8, 8, 8, 8);
         MaterialButton OneMore = new MaterialButton(context);
         MaterialButton Pass = new MaterialButton(context);
         TextView text = new TextView(context);

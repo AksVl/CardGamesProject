@@ -29,11 +29,11 @@
             android:exported="false"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".general.GameChooseActivity"
+            android:name=".menu.GameChooseActivity"
             android:exported="false"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".general.StartActivity"
+            android:name=".menu.StartActivity"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
