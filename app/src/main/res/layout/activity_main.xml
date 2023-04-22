@@ -9,14 +9,12 @@
     android:padding="8dp"
     android:gravity="center"
     tools:context="com.akscardgames.cardgamesproject.menu.StartActivity">
-    <TextView
+
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="CardGamesApp"
-        android:gravity="center"
-        android:textStyle="bold"
-        android:textSize="36sp"
-        />
+        android:layout_height="500dp"
+        android:src="@drawable/logo_foregroung" />
+
     <EditText
         android:id="@+id/name"
         android:layout_width="match_parent"

@@ -54,7 +54,6 @@ public class TwentyOneGame extends Fragment {
     private ActivityTwentyOneGameBinding binding;
     private static FragmentManager fm;
     private final FirebaseDatabase database = FirebaseDatabase.getInstance("https://cardgamesproject-6d467-default-rtdb.europe-west1.firebasedatabase.app/");
-    private DatabaseReference PlayerRef;
     private static DatabaseReference RoomRef;
     private static String RoomName;
     private static String playerName;
@@ -122,7 +121,6 @@ public class TwentyOneGame extends Fragment {
         RoomName = roomNameBuff;
         SharedPreferences prefs = getActivity().getSharedPreferences("PREFS", 0);
         playerName = prefs.getString("name", "");
-        PlayerRef = database.getReference("playerList/" + playerName);
         RoomRef = database.getReference("TwentyOneRooms/" + RoomName);
         binding.ready.setEnabled(false);
         binding.textBankersFirstCard.setVisibility(View.INVISIBLE);
@@ -178,7 +176,7 @@ public class TwentyOneGame extends Fragment {
                     if (snapshot.child(playerName).child("status").exists()
                             && snapshot.child(playerName).child("status").getValue().toString().equals("ready")
                             && snapshot.getChildrenCount() - 2 != size[0]) {
-                        PlayerRef.child("status").setValue("joined");
+                        RoomRef.child(playerName).child("status").setValue("joined");
                     }
                 }
                 if (snapshot.child(playerName).child("position").exists()) {
