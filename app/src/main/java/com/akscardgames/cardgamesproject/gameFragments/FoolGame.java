@@ -1,4 +1,4 @@
-package com.akscardgames.cardgamesproject.gameActivities;
+package com.akscardgames.cardgamesproject.gameFragments;
 
 import static java.lang.Integer.parseInt;
 
@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.akscardgames.cardgamesproject.general.AppMethods;
 import com.example.cardgamesproject.R;
-import com.example.cardgamesproject.databinding.ActivityLiarGameBinding;
+import com.example.cardgamesproject.databinding.ActivityFoolGameBinding;
 import com.example.cardgamesproject.databinding.PlayerItemBinding;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,9 +25,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class LiarGame extends AppCompatActivity {
-
-    ActivityLiarGameBinding binding;
+public class FoolGame extends AppCompatActivity {
+    ActivityFoolGameBinding binding;
     FirebaseDatabase database = FirebaseDatabase.getInstance("https://cardgamesproject-6d467-default-rtdb.europe-west1.firebasedatabase.app/");
     DatabaseReference PlayerRef;
     DatabaseReference RoomRef;
@@ -37,14 +36,14 @@ public class LiarGame extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityLiarGameBinding.inflate(getLayoutInflater());
+        binding = ActivityFoolGameBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         //
         Intent inputIntent = getIntent();
         RoomName = inputIntent.getStringExtra("RoomName");
         playerName = inputIntent.getStringExtra("playerName");
-        PlayerRef = database.getReference("LiarRooms/"+RoomName+"/"+playerName);
-        RoomRef = database.getReference("LiarRooms/"+RoomName);
+        PlayerRef = database.getReference("FoolRooms/" + RoomName + "/" + playerName);
+        RoomRef = database.getReference("FoolRooms/"+RoomName);
         final int[] size = new int[1];
         ArrayList<String> InRoomPlayers = new ArrayList<>();
         RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -80,7 +79,7 @@ public class LiarGame extends AppCompatActivity {
                         if(snapshot.child(player).child("position").exists()) {
                             pos = parseInt(snapshot.child(player).child("position").getValue().toString());
                             TextView name = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])).findViewById(R.id.name);
-                            TextView status = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos,size[0])).findViewById(R.id.status);
+                            TextView status = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])).findViewById(R.id.status);
                             String gotStatus = snapshot.child(player).child("status").getValue().toString();
                             name.setText(player);
                             status.setText(gotStatus);
@@ -100,7 +99,6 @@ public class LiarGame extends AppCompatActivity {
 
             }
         });
-
         binding.ready.setOnClickListener(view -> SetStatusToReady());
     }
     private void SetStatusToReady() {

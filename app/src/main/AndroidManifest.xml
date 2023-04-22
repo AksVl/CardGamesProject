@@ -15,12 +15,12 @@
         tools:targetApi="33">
         <activity
             android:noHistory="true"
-            android:name="com.akscardgames.cardgamesproject.gameActivities.LiarGame"
+            android:name="com.akscardgames.cardgamesproject.gameFragments.LiarGame"
             android:exported="false"
             android:screenOrientation="portrait"/>
         <activity
             android:noHistory="true"
-            android:name="com.akscardgames.cardgamesproject.gameActivities.FoolGame"
+            android:name="com.akscardgames.cardgamesproject.gameFragments.FoolGame"
             android:exported="false"
             android:screenOrientation="portrait"/>
         <activity

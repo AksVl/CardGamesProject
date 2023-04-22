@@ -1,4 +1,4 @@
-package com.akscardgames.cardgamesproject.gameActivities.dialogFragments;
+package com.akscardgames.cardgamesproject.gameFragments.dialogFragments;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentManager;
 
-import com.akscardgames.cardgamesproject.gameActivities.TwentyOneGame;
+import com.akscardgames.cardgamesproject.gameFragments.TwentyOneGame;
 import com.example.cardgamesproject.databinding.FragmentDialogSetBankBinding;
 
 public class DialogSetBankSize extends DialogBetChooseFragment{

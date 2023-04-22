@@ -3,7 +3,6 @@ package com.akscardgames.cardgamesproject.menu;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Intent;
@@ -11,10 +10,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.akscardgames.cardgamesproject.gameActivities.TwentyOneGame;
+import com.akscardgames.cardgamesproject.gameFragments.TwentyOneGame;
 import com.akscardgames.cardgamesproject.menu.adapters.TabLayoutAdapter;
 import com.akscardgames.cardgamesproject.menu.roomSearchFragments.TwentyOneSearchFragment;
-import com.example.cardgamesproject.R;
 import com.example.cardgamesproject.databinding.ActivityGameChooseBinding;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.database.DataSnapshot;

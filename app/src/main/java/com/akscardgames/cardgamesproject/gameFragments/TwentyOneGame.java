@@ -1,17 +1,15 @@
-package com.akscardgames.cardgamesproject.gameActivities;
+package com.akscardgames.cardgamesproject.gameFragments;
 
 
 import static java.lang.Integer.parseInt;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -31,8 +29,8 @@ import android.widget.Toast;
 
 import com.akscardgames.cardgamesproject.general.AppMethods;
 import com.akscardgames.cardgamesproject.general.Card;
-import com.akscardgames.cardgamesproject.gameActivities.dialogFragments.DialogBetChooseFragment;
-import com.akscardgames.cardgamesproject.gameActivities.dialogFragments.DialogSetBankSize;
+import com.akscardgames.cardgamesproject.gameFragments.dialogFragments.DialogBetChooseFragment;
+import com.akscardgames.cardgamesproject.gameFragments.dialogFragments.DialogSetBankSize;
 import com.akscardgames.cardgamesproject.menu.GameChooseActivity;
 import com.example.cardgamesproject.R;
 import com.example.cardgamesproject.databinding.ActivityTwentyOneGameBinding;
@@ -885,6 +883,7 @@ public class TwentyOneGame extends Fragment {
     }
 
     public static void onGameStart(Context context, ActivityTwentyOneGameBinding binding, WindowManager windowManager) {
+        AvailableBuff = available;
         IsInGame = true;
         UiCreate(context, binding, windowManager);
         binding.buttonBar.getChildAt(2).setEnabled(false);
@@ -1096,6 +1095,8 @@ public class TwentyOneGame extends Fragment {
 
     @SuppressLint("ResourceAsColor")
     private void UiDestroy(Context context, ActivityTwentyOneGameBinding binding) {
+        fm.beginTransaction().remove(dialog).commit();
+        fm.beginTransaction().remove(Banker_dialog).commit();
         binding.buttonBar.removeAllViews();
         binding.gameStatus.setText("");
         binding.hand.removeAllViews();

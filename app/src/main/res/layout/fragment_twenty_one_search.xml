@@ -28,19 +28,23 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:layout_weight="3">
+                <CheckBox
+                    android:layout_gravity="bottom"
+                    android:buttonTint="@color/DarkGrey"
+                    android:id="@+id/privateCheck"
+                    android:layout_width="wrap_content"
+                    android:layout_height="22dp"/>
                 <TextView
-                    android:layout_marginStart="12dp"
+                    android:layout_gravity="top"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:text="private access"
-                    android:textSize="24sp"/>
-                <CheckBox
-                    android:id="@+id/privateCheck"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"/>
+                    android:textStyle="bold"
+                    android:text="private mode"
+                    android:textSize="22sp"/>
             </LinearLayout>
             <Button
+                android:layout_margin="8dp"
                 android:id="@+id/create"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

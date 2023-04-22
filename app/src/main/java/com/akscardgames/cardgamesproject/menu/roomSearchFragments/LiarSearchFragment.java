@@ -17,7 +17,7 @@ import androidx.fragment.app.Fragment;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.akscardgames.cardgamesproject.gameActivities.LiarGame;
+import com.akscardgames.cardgamesproject.gameFragments.LiarGame;
 import com.akscardgames.cardgamesproject.general.AppMethods;
 import com.example.cardgamesproject.R;
 import com.example.cardgamesproject.databinding.FragmentLiarSearchBinding;

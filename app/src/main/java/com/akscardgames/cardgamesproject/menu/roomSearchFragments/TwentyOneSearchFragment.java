@@ -2,8 +2,6 @@ package com.akscardgames.cardgamesproject.menu.roomSearchFragments;
 
 import static java.lang.Integer.parseInt;
 
-import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,7 +18,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.akscardgames.cardgamesproject.gameActivities.TwentyOneGame;
 import com.akscardgames.cardgamesproject.general.AppMethods;
 import com.akscardgames.cardgamesproject.general.RoomData;
 import com.akscardgames.cardgamesproject.menu.GameChooseActivity;

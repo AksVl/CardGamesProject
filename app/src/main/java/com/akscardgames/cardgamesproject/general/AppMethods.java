@@ -6,7 +6,7 @@ import android.view.WindowManager;
 import androidx.annotation.NonNull;
 
 import com.example.cardgamesproject.R;
-import com.akscardgames.cardgamesproject.gameActivities.TwentyOneGame;
+import com.akscardgames.cardgamesproject.gameFragments.TwentyOneGame;
 import com.example.cardgamesproject.databinding.ActivityTwentyOneGameBinding;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
