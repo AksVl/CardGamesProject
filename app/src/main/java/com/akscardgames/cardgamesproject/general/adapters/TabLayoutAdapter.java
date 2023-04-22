@@ -1,4 +1,4 @@
-package com.akscardgames.cardgamesproject.menu.adapters;
+package com.akscardgames.cardgamesproject.general.adapters;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;

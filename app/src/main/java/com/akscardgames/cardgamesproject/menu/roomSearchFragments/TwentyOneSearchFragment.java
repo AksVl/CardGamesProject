@@ -21,7 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.akscardgames.cardgamesproject.general.AppMethods;
 import com.akscardgames.cardgamesproject.general.RoomData;
 import com.akscardgames.cardgamesproject.menu.GameChooseActivity;
-import com.akscardgames.cardgamesproject.menu.adapters.RecyclerViewAdapter;
+import com.akscardgames.cardgamesproject.general.adapters.SearchRecyclerViewAdapter;
 import com.akscardgames.cardgamesproject.menu.dialogFragments.CreatePasswordFragment;
 import com.akscardgames.cardgamesproject.menu.dialogFragments.PasswordRequestFragment;
 import com.example.cardgamesproject.databinding.FragmentTwentyOneSearchBinding;
@@ -120,6 +120,9 @@ public class TwentyOneSearchFragment extends Fragment {
                         String name = d.getKey();
                         int size = parseInt(d.child("_size").getValue().toString());
                         int playerCount = (int) (d.getChildrenCount() - 2);
+                        if(d.child("_messages").exists()){
+                            playerCount = (int) (d.getChildrenCount() - 3);
+                        }
                         String mode = d.child("_access").getValue().toString();
                         roomData[0] = new RoomData(name, size, playerCount, mode);
                     }
@@ -129,7 +132,7 @@ public class TwentyOneSearchFragment extends Fragment {
                         }
                     }
                 }
-                RecyclerViewAdapter adapter = new RecyclerViewAdapter(getContext(), AvailableRooms, new RecyclerViewAdapter.ItemClickListener() {
+                SearchRecyclerViewAdapter adapter = new SearchRecyclerViewAdapter(getContext(), AvailableRooms, new SearchRecyclerViewAdapter.ItemClickListener() {
                     @Override
                     public void onItemClick(RoomData roomData) {
                         RoomName = roomData.getName();

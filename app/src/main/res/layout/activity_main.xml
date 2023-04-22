@@ -20,6 +20,8 @@
         android:layout_width="match_parent"
         android:layout_height="78sp"
         android:hint="Enter Nickname"
+        android:backgroundTint="@color/black"
+        android:textCursorDrawable="@drawable/cursor"
         android:maxLength="10"
         android:gravity="center"
         android:textSize="24sp">

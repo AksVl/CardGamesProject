@@ -5,9 +5,14 @@ import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 
+import com.akscardgames.cardgamesproject.gamesRelated.GameFragment;
+import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.FoolGame;
+import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.LiarGame;
 import com.example.cardgamesproject.R;
-import com.akscardgames.cardgamesproject.gameFragments.TwentyOneGame;
-import com.example.cardgamesproject.databinding.ActivityTwentyOneGameBinding;
+import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.TwentyOneGame;
+import com.example.cardgamesproject.databinding.FragmentFoolGameBinding;
+import com.example.cardgamesproject.databinding.FragmentLiarGameBinding;
+import com.example.cardgamesproject.databinding.FragmentTwentyOneGameBinding;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -16,6 +21,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 public class AppMethods {
+    //region cards objects
     static Card h6 = new Card("6", 'h', R.drawable.h6);
     static Card h7 = new Card("7", 'h', R.drawable.h7);
     static Card h8 = new Card("8", 'h', R.drawable.h8);
@@ -55,6 +61,7 @@ public class AppMethods {
     static Card cd = new Card("d", 'c', R.drawable.cd);
     static Card ck = new Card("k", 'c', R.drawable.ck);
     static Card ca = new Card("a", 'c', R.drawable.ca);
+    //endregion cards objects
 
     public static Card[] raw_deck = {
             c6, c7, c8, c9, c10, cj, cd, ck, ca,
@@ -73,8 +80,9 @@ public class AppMethods {
         return uiPosition;
     }
 
-    public static void Disconnect(DatabaseReference RoomRef, String playerName, ValueEventListener listener) {
+    public static void Disconnect(DatabaseReference RoomRef, String playerName, ValueEventListener listener, ValueEventListener chatListener) {
         RoomRef.removeEventListener(listener);
+        RoomRef.removeEventListener(chatListener);
         RoomRef.child(playerName).removeValue();
         RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -84,7 +92,8 @@ public class AppMethods {
                     String element = node.getKey();
                     if(!element.equals("_size") && !element.equals("_ChoosingPlayer")
                     && !element.equals("_bank") && !element.equals("_bank_choosing")
-                    && !element.equals("_offline") && !element.equals("_access")){
+                    && !element.equals("_offline") && !element.equals("_access")
+                            && !element.equals("_messages")){
                         PlayersAreInRoom = true;
                     }
                 }
@@ -111,7 +120,7 @@ public class AppMethods {
             InRoomPlayers.add(d.getKey());
         }
         for (String player : InRoomPlayers) {
-            if (!player.equals("_size") && snapshot.child(player).child("position").exists()) {
+            if (!player.equals("_size") && !player.equals("_access") && !player.equals("_messages") && snapshot.child(player).child("position").exists()) {
                 PlayersPositions.add(Integer.parseInt(snapshot.child(player).child("position").getValue().toString()));
             }
         }
@@ -124,32 +133,57 @@ public class AppMethods {
         return -1;
     }
 
-    public static void readyCheck(String game, ValueEventListener listener,
-                                  ValueEventListener InGameListener,
-                                  ArrayList<String> InRoomPlayers,
-                                  DatabaseReference RoomRef, int readyCount, int size,
-                                  ActivityTwentyOneGameBinding binding, Context context, WindowManager windowManager) {
+    public static void twentyOneReadyCheck(ValueEventListener listener,
+                                           ValueEventListener InGameListener,
+                                           ArrayList<String> InRoomPlayers,
+                                           DatabaseReference RoomRef, int readyCount, int size,
+                                           FragmentTwentyOneGameBinding binding, Context context, WindowManager windowManager) {
         if (readyCount >= size) {
             binding.buttonBar.removeAllViews();
             for (String player : InRoomPlayers) {
-                if (!player.equals("_size") && !player.equals("_mode")) {
+                if (!player.equals("_size") && !player.equals("_access") && !player.equals("_messages")) {
                     RoomRef.child(player).child("status").setValue("waiting");
                 }
             }
             RoomRef.removeEventListener(listener);
             RoomRef.addValueEventListener(InGameListener);
             binding.gameStatus.setText("");
-            switch (game) {
-                case "TwentyOne":
-                    TwentyOneGame.onGameStart(context, binding,windowManager);
-                case "Fool":
-                    //Fool.onGameStart(context, binding);
-                case "Liar":
-                    //Liar.onGameStart(context, binding);
-            }
+            TwentyOneGame.onGameStart(context, binding,windowManager);
         }
     }
-
+    public static void foolReadyCheck(ValueEventListener listener,
+                                      ValueEventListener InGameListener, ArrayList<String> inRoomPlayers,
+                                      DatabaseReference roomRef, int readyCount, int size,
+                                      FragmentFoolGameBinding binding, Context context, WindowManager windowManager) {
+        if (readyCount >= size) {
+            binding.buttonBar.removeAllViews();
+            for (String player : inRoomPlayers) {
+                if (!player.equals("_size") && !player.equals("_access") && !player.equals("_messages")) {
+                    roomRef.child(player).child("status").setValue("waiting");
+                }
+            }
+            roomRef.removeEventListener(listener);
+            roomRef.addValueEventListener(InGameListener);
+            FoolGame.onGameStart(context, binding, windowManager);
+        }
+    }
+    public static void liarReadyCheck(ValueEventListener listener,
+                                      ValueEventListener InGameListener, ArrayList<String> inRoomPlayers,
+                                      DatabaseReference roomRef, int readyCount, int size, FragmentLiarGameBinding binding,
+                                      Context context, WindowManager windowManager) {
+        if (readyCount >= size) {
+            binding.buttonBar.removeAllViews();
+            for (String player : inRoomPlayers) {
+                if (!player.equals("_size") && !player.equals("_access") && !player.equals("_messages")) {
+                    roomRef.child(player).child("status").setValue("waiting");
+                }
+            }
+            roomRef.removeEventListener(listener);
+            roomRef.addValueEventListener(InGameListener);
+            GameFragment.listener = InGameListener;
+            LiarGame.onGameStart(context, binding, windowManager);
+        }
+    }
     public static Card CardLink(String name) {
         switch (name) {
             case "c6": return raw_deck[0];
@@ -225,4 +259,5 @@ public class AppMethods {
         });
         return player[0];
     }
+
 }

@@ -10,8 +10,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.akscardgames.cardgamesproject.gameFragments.TwentyOneGame;
-import com.akscardgames.cardgamesproject.menu.adapters.TabLayoutAdapter;
+import com.akscardgames.cardgamesproject.gamesRelated.GameFragment;
+import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.TwentyOneGame;
+import com.akscardgames.cardgamesproject.general.adapters.GameViewPagerAdapter;
+import com.akscardgames.cardgamesproject.general.adapters.TabLayoutAdapter;
 import com.akscardgames.cardgamesproject.menu.roomSearchFragments.TwentyOneSearchFragment;
 import com.example.cardgamesproject.databinding.ActivityGameChooseBinding;
 import com.google.android.material.tabs.TabLayout;
@@ -23,7 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class GameChooseActivity extends AppCompatActivity {
     private static FragmentManager fm;
-    FirebaseDatabase database = FirebaseDatabase.getInstance("https://cardgamesproject-6d467-default-rtdb.europe-west1.firebasedatabase.app/");
+    static FirebaseDatabase database = FirebaseDatabase.getInstance("https://cardgamesproject-6d467-default-rtdb.europe-west1.firebasedatabase.app/");
     String playerName = "";
     DatabaseReference playerRef;
     private ActivityGameChooseBinding binding;
@@ -70,9 +72,13 @@ public class GameChooseActivity extends AppCompatActivity {
         });
     }
     public static void launchTwentyOne(String roomName, String playerName){
-        TwentyOneGame fragment = new TwentyOneGame();
+        //TwentyOneGame fragment = new TwentyOneGame();
         TwentyOneGame.roomNameBuff = roomName;
         TwentyOneGame.playerNameBuff = playerName;
+        GameFragment.playerName = playerName;
+        GameFragment.RoomRef = database.getReference("TwentyOneRooms/" + roomName);
+        GameViewPagerAdapter.gameType = "TwentyOne";
+        GameFragment fragment = new GameFragment();
         fragmentManager.beginTransaction().addToBackStack(null).replace(android.R.id.content, fragment).commit();
         TwentyOneSearchFragment.binding.create.setEnabled(true);
     }

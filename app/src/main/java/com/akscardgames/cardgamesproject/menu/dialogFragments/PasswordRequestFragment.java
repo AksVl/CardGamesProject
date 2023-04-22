@@ -5,14 +5,13 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.akscardgames.cardgamesproject.menu.roomSearchFragments.TwentyOneSearchFragment;
-import com.example.cardgamesproject.R;
 import com.example.cardgamesproject.databinding.FragmentPasswordRequestBinding;
 
 public class PasswordRequestFragment extends DialogFragment {

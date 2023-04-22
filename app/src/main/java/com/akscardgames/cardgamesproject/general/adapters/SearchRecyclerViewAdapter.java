@@ -1,4 +1,4 @@
-package com.akscardgames.cardgamesproject.menu.adapters;
+package com.akscardgames.cardgamesproject.general.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -15,12 +15,12 @@ import com.example.cardgamesproject.R;
 
 import java.util.ArrayList;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+public class SearchRecyclerViewAdapter extends RecyclerView.Adapter<SearchRecyclerViewAdapter.ViewHolder> {
     Context context;
     ArrayList<RoomData> roomList;
     ItemClickListener itemClickListener;
 
-    public RecyclerViewAdapter(Context context, ArrayList<RoomData> roomList,ItemClickListener itemClickListener) {
+    public SearchRecyclerViewAdapter(Context context, ArrayList<RoomData> roomList, ItemClickListener itemClickListener) {
         this.context = context;
         this.roomList = roomList;
         this.itemClickListener = itemClickListener;
@@ -28,14 +28,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @NonNull
     @Override
-    public RecyclerViewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public SearchRecyclerViewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.recycler_room_item,parent,false);
-        return new RecyclerViewAdapter.ViewHolder(view);
+        return new SearchRecyclerViewAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerViewAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull SearchRecyclerViewAdapter.ViewHolder holder, int position) {
         if(roomList.get(position)!=null) {
             if (roomList.get(position).getName() != null && holder.name != null) {
                 holder.name.setText(roomList.get(position).getName());

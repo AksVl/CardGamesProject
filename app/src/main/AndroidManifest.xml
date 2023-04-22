@@ -14,19 +14,9 @@
         android:theme="@style/Theme.CardGamesProject"
         tools:targetApi="33">
         <activity
-            android:noHistory="true"
-            android:name="com.akscardgames.cardgamesproject.gameFragments.LiarGame"
-            android:exported="false"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:noHistory="true"
-            android:name="com.akscardgames.cardgamesproject.gameFragments.FoolGame"
-            android:exported="false"
-            android:screenOrientation="portrait"/>
-        <activity
             android:name="com.akscardgames.cardgamesproject.menu.GameChooseActivity"
-            android:windowSoftInputMode="adjustNothing"
             android:exported="false"
+            android:windowSoftInputMode="adjustUnspecified"
             android:screenOrientation="portrait"/>
         <activity
             android:name="com.akscardgames.cardgamesproject.menu.StartActivity"
