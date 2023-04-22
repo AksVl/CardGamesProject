@@ -1,4 +1,4 @@
-package com.example.cardgamesproject.menu.adapters;
+package com.akscardgames.cardgamesproject.menu.adapters;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -6,9 +6,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.example.cardgamesproject.menu.roomSearchFragments.FoolSearchFragment;
-import com.example.cardgamesproject.menu.roomSearchFragments.LiarSearchFragment;
-import com.example.cardgamesproject.menu.roomSearchFragments.TwentyOneSearchFragment;
+import com.akscardgames.cardgamesproject.menu.roomSearchFragments.FoolSearchFragment;
+import com.akscardgames.cardgamesproject.menu.roomSearchFragments.LiarSearchFragment;
+import com.akscardgames.cardgamesproject.menu.roomSearchFragments.TwentyOneSearchFragment;
 
 public class TabLayoutAdapter extends FragmentStateAdapter {
 

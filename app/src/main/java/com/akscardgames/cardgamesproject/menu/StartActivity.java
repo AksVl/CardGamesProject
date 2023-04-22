@@ -1,4 +1,4 @@
-package com.example.cardgamesproject.menu;
+package com.akscardgames.cardgamesproject.menu;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;

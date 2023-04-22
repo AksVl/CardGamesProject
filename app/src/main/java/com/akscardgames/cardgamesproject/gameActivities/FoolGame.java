@@ -1,4 +1,4 @@
-package com.example.cardgamesproject.gameActivities;
+package com.akscardgames.cardgamesproject.gameActivities;
 
 import static java.lang.Integer.parseInt;
 
@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.cardgamesproject.general.AppMethods;
+import com.akscardgames.cardgamesproject.general.AppMethods;
 import com.example.cardgamesproject.R;
 import com.example.cardgamesproject.databinding.ActivityFoolGameBinding;
 import com.example.cardgamesproject.databinding.PlayerItemBinding;

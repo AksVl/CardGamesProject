@@ -7,7 +7,8 @@
     android:background="@color/backgroundGreen"
     android:orientation="vertical"
     android:padding="8dp"
-    tools:context=".menu.StartActivity">
+    android:id="@+id/parentLayout"
+    tools:context="com.akscardgames.cardgamesproject.menu.StartActivity">
 
     <LinearLayout
         android:layout_width="match_parent"

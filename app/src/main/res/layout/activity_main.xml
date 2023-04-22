@@ -8,7 +8,7 @@
     android:background="@color/backgroundGreen"
     android:padding="8dp"
     android:gravity="center"
-    tools:context=".menu.StartActivity">
+    tools:context="com.akscardgames.cardgamesproject.menu.StartActivity">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

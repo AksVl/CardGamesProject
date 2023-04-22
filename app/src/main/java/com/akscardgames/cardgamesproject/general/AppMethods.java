@@ -1,4 +1,4 @@
-package com.example.cardgamesproject.general;
+package com.akscardgames.cardgamesproject.general;
 
 import android.content.Context;
 import android.view.WindowManager;
@@ -6,7 +6,7 @@ import android.view.WindowManager;
 import androidx.annotation.NonNull;
 
 import com.example.cardgamesproject.R;
-import com.example.cardgamesproject.gameActivities.TwentyOneGame;
+import com.akscardgames.cardgamesproject.gameActivities.TwentyOneGame;
 import com.example.cardgamesproject.databinding.ActivityTwentyOneGameBinding;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -75,16 +75,16 @@ public class AppMethods {
 
     public static void Disconnect(DatabaseReference RoomRef, String playerName, ValueEventListener listener) {
         RoomRef.removeEventListener(listener);
-        RoomRef.addValueEventListener(new ValueEventListener() {
+        RoomRef.child(playerName).removeValue();
+        RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                snapshot.child(playerName).getRef().removeValue();
                 boolean PlayersAreInRoom = false;
                 for(DataSnapshot node :snapshot.getChildren()){
                     String element = node.getKey();
                     if(!element.equals("_size") && !element.equals("_ChoosingPlayer")
                     && !element.equals("_bank") && !element.equals("_bank_choosing")
-                    && !element.equals("_offline")){
+                    && !element.equals("_offline") && !element.equals("_access")){
                         PlayersAreInRoom = true;
                     }
                 }
@@ -127,12 +127,12 @@ public class AppMethods {
     public static void readyCheck(String game, ValueEventListener listener,
                                   ValueEventListener InGameListener,
                                   ArrayList<String> InRoomPlayers,
-                                  DatabaseReference RoomRef, int readyCount, int IntentSize,
+                                  DatabaseReference RoomRef, int readyCount, int size,
                                   ActivityTwentyOneGameBinding binding, Context context, WindowManager windowManager) {
-        if (readyCount >= IntentSize) {
+        if (readyCount >= size) {
             binding.buttonBar.removeAllViews();
             for (String player : InRoomPlayers) {
-                if (!player.equals("_size")) {
+                if (!player.equals("_size") && !player.equals("_mode")) {
                     RoomRef.child(player).child("status").setValue("waiting");
                 }
             }

@@ -1,4 +1,4 @@
-package com.example.cardgamesproject;
+package com.akscardgames.cardgamesproject;
 
 import android.content.Context;
 

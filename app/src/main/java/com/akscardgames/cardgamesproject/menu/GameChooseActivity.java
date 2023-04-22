@@ -1,24 +1,30 @@
-package com.example.cardgamesproject.menu;
+package com.akscardgames.cardgamesproject.menu;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.Toast;
 
+import com.akscardgames.cardgamesproject.gameActivities.TwentyOneGame;
+import com.akscardgames.cardgamesproject.menu.adapters.TabLayoutAdapter;
+import com.akscardgames.cardgamesproject.menu.roomSearchFragments.TwentyOneSearchFragment;
 import com.example.cardgamesproject.R;
-import com.example.cardgamesproject.menu.adapters.TabLayoutAdapter;
-import com.example.cardgamesproject.menu.roomSearchFragments.FoolSearchFragment;
-import com.example.cardgamesproject.menu.roomSearchFragments.LiarSearchFragment;
-import com.example.cardgamesproject.menu.roomSearchFragments.TwentyOneSearchFragment;
 import com.example.cardgamesproject.databinding.ActivityGameChooseBinding;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class GameChooseActivity extends AppCompatActivity {
+    private static FragmentManager fm;
     FirebaseDatabase database = FirebaseDatabase.getInstance("https://cardgamesproject-6d467-default-rtdb.europe-west1.firebasedatabase.app/");
     String playerName = "";
     DatabaseReference playerRef;
@@ -26,6 +32,8 @@ public class GameChooseActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager2 viewPager2;
     private TabLayoutAdapter adapter;
+    public static FragmentManager fragmentManager;
+    private boolean shutDownFlag = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +45,7 @@ public class GameChooseActivity extends AppCompatActivity {
         binding.logout.setOnClickListener(view -> LogOut());
         tabLayout = binding.tabLayout;
         viewPager2 = binding.FragmentsContainer;
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager = getSupportFragmentManager();
         adapter = new TabLayoutAdapter(fragmentManager,getLifecycle());
         viewPager2.setAdapter(adapter);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -63,6 +71,13 @@ public class GameChooseActivity extends AppCompatActivity {
             }
         });
     }
+    public static void launchTwentyOne(String roomName, String playerName){
+        TwentyOneGame fragment = new TwentyOneGame();
+        TwentyOneGame.roomNameBuff = roomName;
+        TwentyOneGame.playerNameBuff = playerName;
+        fragmentManager.beginTransaction().addToBackStack(null).replace(android.R.id.content, fragment).commit();
+        TwentyOneSearchFragment.binding.create.setEnabled(true);
+    }
 
     private void LogOut() {
         SharedPreferences prefs = getSharedPreferences("PREFS",0);
@@ -70,9 +85,40 @@ public class GameChooseActivity extends AppCompatActivity {
         playerRef.removeValue();
         startActivity(new Intent(this,StartActivity.class));
     }
+
     @Override
-    protected void onDestroy() {
+    protected void onResume() {
+        super.onResume();
+        if(shutDownFlag) {
+            shutDownFlag = false;
+            playerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (!playerName.equals("")) {
+                        if (!snapshot.exists()) {
+                            playerRef.setValue("");
+                            SharedPreferences prefs = getSharedPreferences("PREFS", 0);
+                            prefs.edit().putString("name", playerName).apply();
+                        } else {
+                            Toast.makeText(GameChooseActivity.this, "This player already exists", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Toast.makeText(GameChooseActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            });
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        shutDownFlag = true;
         playerRef.removeValue();
-        super.onDestroy();
+        super.onPause();
     }
 }

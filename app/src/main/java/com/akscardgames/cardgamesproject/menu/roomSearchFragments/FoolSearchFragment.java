@@ -1,4 +1,4 @@
-package com.example.cardgamesproject.menu.roomSearchFragments;
+package com.akscardgames.cardgamesproject.menu.roomSearchFragments;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,8 +17,8 @@ import androidx.fragment.app.Fragment;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.cardgamesproject.general.AppMethods;
-import com.example.cardgamesproject.gameActivities.FoolGame;
+import com.akscardgames.cardgamesproject.gameActivities.FoolGame;
+import com.akscardgames.cardgamesproject.general.AppMethods;
 import com.example.cardgamesproject.R;
 import com.example.cardgamesproject.databinding.FragmentFoolSearchBinding;
 import com.google.firebase.database.DataSnapshot;

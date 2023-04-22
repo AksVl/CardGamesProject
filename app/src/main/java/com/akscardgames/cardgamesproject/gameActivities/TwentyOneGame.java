@@ -1,10 +1,12 @@
-package com.example.cardgamesproject.gameActivities;
+package com.akscardgames.cardgamesproject.gameActivities;
 
 
 import static java.lang.Integer.parseInt;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.annotation.SuppressLint;
@@ -12,11 +14,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -27,14 +29,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.cardgamesproject.general.AppMethods;
-import com.example.cardgamesproject.gameActivities.dialogFragments.DialogBetChooseFragment;
-import com.example.cardgamesproject.gameActivities.dialogFragments.DialogSetBankSize;
+import com.akscardgames.cardgamesproject.general.AppMethods;
+import com.akscardgames.cardgamesproject.general.Card;
+import com.akscardgames.cardgamesproject.gameActivities.dialogFragments.DialogBetChooseFragment;
+import com.akscardgames.cardgamesproject.gameActivities.dialogFragments.DialogSetBankSize;
+import com.akscardgames.cardgamesproject.menu.GameChooseActivity;
 import com.example.cardgamesproject.R;
 import com.example.cardgamesproject.databinding.ActivityTwentyOneGameBinding;
 import com.example.cardgamesproject.databinding.CardLayoutBinding;
 import com.example.cardgamesproject.databinding.PlayerItemBinding;
-import com.example.cardgamesproject.general.Card;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -48,7 +51,8 @@ import java.util.Collections;
 import java.util.Random;
 
 
-public class TwentyOneGame extends AppCompatActivity {
+public class TwentyOneGame extends Fragment {
+    //region variables
     private ActivityTwentyOneGameBinding binding;
     private static FragmentManager fm;
     private final FirebaseDatabase database = FirebaseDatabase.getInstance("https://cardgamesproject-6d467-default-rtdb.europe-west1.firebasedatabase.app/");
@@ -92,19 +96,33 @@ public class TwentyOneGame extends AppCompatActivity {
     private static int StartBank;
     private static int AvailableBuff;
 
+    public static String roomNameBuff;
+    public static String playerNameBuff;
+    //endregion variables
+
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        // region onCreate init
-        super.onCreate(null);
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = ActivityTwentyOneGameBinding.inflate(getLayoutInflater());
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         Banker_dialog = new DialogSetBankSize();
         dialog = new DialogBetChooseFragment();
         binding.available.setText(String.valueOf(available));
-        setContentView(binding.getRoot());
-        fm = getSupportFragmentManager();
-        Intent inputIntent = getIntent();
-        RoomName = inputIntent.getStringExtra("RoomName");
-        SharedPreferences prefs = getSharedPreferences("PREFS", 0);
+        fm = getParentFragmentManager();
+        //Intent inputIntent = getIntent();
+        RoomName = roomNameBuff;
+        SharedPreferences prefs = getActivity().getSharedPreferences("PREFS", 0);
         playerName = prefs.getString("name", "");
         PlayerRef = database.getReference("playerList/" + playerName);
         RoomRef = database.getReference("TwentyOneRooms/" + RoomName);
@@ -113,7 +131,7 @@ public class TwentyOneGame extends AppCompatActivity {
         binding.betText.setVisibility(View.INVISIBLE);
         final boolean[] OnceAnimated = {true};
         final long[] EndGameDelay = {3000};
-        binding.ready.setOnClickListener(view ->
+        binding.ready.setOnClickListener(v ->
                 SetStatusToReady());
         // endregion onCreate init
         RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -153,7 +171,7 @@ public class TwentyOneGame extends AppCompatActivity {
                     InRoomPlayers[0].add(d.getKey());
                 }
                 int pos;
-                if (snapshot.getChildrenCount() - 1 == size[0] &&
+                if (snapshot.getChildrenCount() - 2 == size[0] &&
                         snapshot.child(playerName).child("status").exists() &&
                         !snapshot.child(playerName).child("status").getValue().toString().equals("ready")) {
                     binding.ready.setEnabled(true);
@@ -161,23 +179,27 @@ public class TwentyOneGame extends AppCompatActivity {
                     binding.ready.setEnabled(false);
                     if (snapshot.child(playerName).child("status").exists()
                             && snapshot.child(playerName).child("status").getValue().toString().equals("ready")
-                            && snapshot.getChildrenCount() - 1 != size[0]) {
+                            && snapshot.getChildrenCount() - 2 != size[0]) {
                         PlayerRef.child("status").setValue("joined");
                     }
                 }
                 if (snapshot.child(playerName).child("position").exists()) {
                     my_pos = parseInt(snapshot.child(playerName).child("position").getValue().toString());
                     for (String player : InRoomPlayers[0]) {
-                        if (!player.equals("_size") && snapshot.child(player).child("position").exists()) {
+                        if (!snapshot.child(player).equals("_size") && !player.equals("_mode") && snapshot.child(player).child("position").exists()) {
                             String gotStatus = snapshot.child(player).child("status").getValue().toString();
                             if (!player.equals(playerName)) {
                                 pos = parseInt(snapshot.child(player).child("position").getValue().toString());
-                                TextView name = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])).findViewById(R.id.name);
-                                TextView status = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])).findViewById(R.id.status);
-                                name.setText(player);
-                                status.setText(gotStatus);
-                                status.setTextColor(Color.WHITE);
-                                if (gotStatus.equals("ready")) status.setTextColor(Color.GREEN);
+                                if (binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])) != null) {
+                                    TextView name = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])).findViewById(R.id.name);
+                                    TextView status = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])).findViewById(R.id.status);
+                                    name.setText(player);
+                                    status.setText(gotStatus);
+                                    status.setTextColor(Color.WHITE);
+                                    if (gotStatus.equals("ready")) {
+                                        status.setTextColor(Color.GREEN);
+                                    }
+                                }
                             }
                             if (gotStatus.equals("ready")) {
                                 readyCount++;
@@ -187,7 +209,7 @@ public class TwentyOneGame extends AppCompatActivity {
                 }
                 AppMethods.readyCheck("TwentyOne", listener, InGameListener,
                         InRoomPlayers[0], RoomRef, readyCount, size[0],
-                        binding, TwentyOneGame.this, getWindowManager());
+                        binding, getContext(), getActivity().getWindowManager());
             }
 
             @Override
@@ -208,15 +230,13 @@ public class TwentyOneGame extends AppCompatActivity {
                 int pos;
                 //region if someone offline
                 if (snapshot.child("_offline").exists()) {
-                    UiDestroy(TwentyOneGame.this, binding);
                     offlinePlayerName = snapshot.child("_offline").getValue().toString();
                     available = AvailableBuff;
                     binding.available.setText(String.valueOf(available));
                     RoomRef.removeEventListener(InGameListener);
-                    RoomRef.removeValue();
-                    binding.gameStatus.setVisibility(View.INVISIBLE);
                     binding.message.setText(offlinePlayerName + " went offline, all bets were returned");
                     binding.message.setVisibility(View.VISIBLE);
+                    UiDestroy(getContext(), binding);
                 }
                 //endregion if someone offline
                 // region bank reading
@@ -369,7 +389,7 @@ public class TwentyOneGame extends AppCompatActivity {
                 }
                 // endregion player's choosing case
                 // region banker's shown card
-                if (bankerName != null) {
+                if (bankerName != null && !snapshot.child("_offline").exists()) {
                     binding.shownCard.setImageDrawable(null);
                     if (snapshot.child(bankerName).child("hand").child(String.valueOf(0)).exists()) {
                         String gotShownCard = snapshot.child(bankerName).child("hand").child(String.valueOf(0)).getValue().toString();
@@ -388,7 +408,7 @@ public class TwentyOneGame extends AppCompatActivity {
                 if (MainGameLoop && playerName.equals(adminName)) {
                     boolean AllHaveCurrentBet = true;
                     for (String player1 : InRoomPlayers[0]) {
-                        if (!player1.equals("_size") && !player1.equals("_bank") && !player1.equals(bankerName)) {
+                        if (!player1.equals("_size") && !player1.equals("_bank") && !player1.equals("_mode") && !player1.equals(bankerName)) {
                             if (!snapshot.child(player1).child("currentBet").exists()) {
                                 AllHaveCurrentBet = false;
                                 break;
@@ -414,7 +434,7 @@ public class TwentyOneGame extends AppCompatActivity {
                                     deck.addAll(Arrays.asList(AppMethods.raw_deck));
                                     Collections.shuffle(deck);
                                     for (String player : InRoomPlayers[0]) {
-                                        if (!player.equals("_size") && !player.equals("_bank")) {
+                                        if (!player.equals("_mode") && !player.equals("_size") && !player.equals("_bank")) {
                                             if (!player.equals(playerName)) {
                                                 Card chosen = deck.get(0);
                                                 deck.remove(chosen);
@@ -461,7 +481,7 @@ public class TwentyOneGame extends AppCompatActivity {
                             .child("position").getValue().toString());
                     int AddedCounter = 0;
                     for (String player : InRoomPlayers[0]) {
-                        if (!player.equals("_size")
+                        if (!player.equals("_size") && !player.equals("_mode")
                                 && snapshot.child(player).child("position").exists()
                                 && snapshot.child(player).child("role").exists()) {
                             // region MainGameLoop(banker's role)
@@ -606,7 +626,7 @@ public class TwentyOneGame extends AppCompatActivity {
                 int total = 0;
                 binding.hand.removeAllViews();
                 ArrayList<String> Hand = new ArrayList<>();
-                if (snapshot.child(playerName).child("hand").exists()) {
+                if (snapshot.child(playerName).child("hand").exists() && !snapshot.child("_offline").exists()) {
                     for (int i = 0; i < snapshot.child(playerName).child("hand").getChildrenCount(); i++) {
                         if (snapshot.child(playerName).child("hand").child(String.valueOf(i)).exists()) {
                             Hand.add(snapshot.child(playerName).child("hand").child(String.valueOf(i)).getValue().toString());
@@ -661,8 +681,10 @@ public class TwentyOneGame extends AppCompatActivity {
                     // region loop ending
                     if (LoopEnding) {
                         BankerEndingPermission = true;
-                        ((Button) binding.buttonBar.getChildAt(2)).setEnabled(false);
-                        ((Button) binding.buttonBar.getChildAt(3)).setEnabled(false);
+                        if(binding.buttonBar.getChildAt(2)!=null && binding.buttonBar.getChildAt(3)!=null) {
+                            ((Button) binding.buttonBar.getChildAt(2)).setEnabled(false);
+                            ((Button) binding.buttonBar.getChildAt(3)).setEnabled(false);
+                        }
                     }
                     if (LoopEnding && !playerName.equals(bankerName)
                             && snapshot.child(bankerName).child("hand").exists()) {
@@ -816,7 +838,7 @@ public class TwentyOneGame extends AppCompatActivity {
                                     @Override
                                     public void run() {
                                         binding.message.setVisibility(View.VISIBLE);
-                                        UiDestroy(TwentyOneGame.this, binding);
+                                        UiDestroy(getContext(), binding);
                                         RoomRef.removeEventListener(InGameListener);
                                         if (playerName.equals(adminName)) {
                                             RoomRef.removeValue();
@@ -875,7 +897,7 @@ public class TwentyOneGame extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (String player : InRoomPlayers[0]) {
-                    if (!snapshot.child(player).equals("_size")) {
+                    if (!snapshot.child(player).equals("_size") && !snapshot.child(player).equals("_mode")) {
                         if (snapshot.child(player).child("position").exists() && !LoopEnding) {
                             if (parseInt(snapshot.child(player).child("position").getValue().toString()) == Bank_chosen[0]
                                     && !player.equals(playerName)) {
@@ -1075,6 +1097,13 @@ public class TwentyOneGame extends AppCompatActivity {
     @SuppressLint("ResourceAsColor")
     private void UiDestroy(Context context, ActivityTwentyOneGameBinding binding) {
         binding.buttonBar.removeAllViews();
+        binding.gameStatus.setText("");
+        binding.hand.removeAllViews();
+        binding.shownCard.setImageDrawable(null);
+        binding.textBankersFirstCard.setVisibility(View.INVISIBLE);
+        binding.ShowBet.setVisibility(View.INVISIBLE);
+        binding.betText.setVisibility(View.INVISIBLE);
+        binding.crown.setVisibility(View.INVISIBLE);
         ViewGroup.LayoutParams params = new LinearLayout.
                 LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
         MaterialButton Disconnect = new MaterialButton(context);
@@ -1082,16 +1111,10 @@ public class TwentyOneGame extends AppCompatActivity {
         Disconnect.setTextColor(R.color.black);
         Disconnect.setText("Disconnect");
         Disconnect.setTextSize(20);
-        binding.gameStatus.setText("");
-        binding.hand.removeAllViews();
-        binding.shownCard.setImageDrawable(null);
         binding.buttonBar.addView(Disconnect, params);
-        binding.textBankersFirstCard.setVisibility(View.INVISIBLE);
-        binding.ShowBet.setVisibility(View.INVISIBLE);
-        binding.betText.setVisibility(View.INVISIBLE);
         binding.buttonBar.getChildAt(0).setOnClickListener(view -> {
             AppMethods.Disconnect(RoomRef, playerName, InGameListener);
-            finish();
+            GameChooseActivity.fragmentManager.beginTransaction().remove(this).commit();
         });
     }
 
@@ -1101,15 +1124,15 @@ public class TwentyOneGame extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
         if (IsInGame) {
             RoomRef.child("_offline").setValue(playerName);
             AppMethods.Disconnect(RoomRef, playerName, InGameListener);
-            finish();
+            GameChooseActivity.fragmentManager.beginTransaction().remove(this).commit();
         } else {
             AppMethods.Disconnect(RoomRef, playerName, listener);
-            finish();
+            GameChooseActivity.fragmentManager.beginTransaction().remove(this).commit();
         }
     }
 }
