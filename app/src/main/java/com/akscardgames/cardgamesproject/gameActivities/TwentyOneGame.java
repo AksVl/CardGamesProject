@@ -186,7 +186,7 @@ public class TwentyOneGame extends Fragment {
                 if (snapshot.child(playerName).child("position").exists()) {
                     my_pos = parseInt(snapshot.child(playerName).child("position").getValue().toString());
                     for (String player : InRoomPlayers[0]) {
-                        if (!snapshot.child(player).equals("_size") && !player.equals("_mode") && snapshot.child(player).child("position").exists()) {
+                        if (!snapshot.child(player).equals("_size") && !player.equals("_access") && snapshot.child(player).child("position").exists()) {
                             String gotStatus = snapshot.child(player).child("status").getValue().toString();
                             if (!player.equals(playerName)) {
                                 pos = parseInt(snapshot.child(player).child("position").getValue().toString());
@@ -408,7 +408,7 @@ public class TwentyOneGame extends Fragment {
                 if (MainGameLoop && playerName.equals(adminName)) {
                     boolean AllHaveCurrentBet = true;
                     for (String player1 : InRoomPlayers[0]) {
-                        if (!player1.equals("_size") && !player1.equals("_bank") && !player1.equals("_mode") && !player1.equals(bankerName)) {
+                        if (!player1.equals("_size") && !player1.equals("_bank") && !player1.equals("_access") && !player1.equals(bankerName)) {
                             if (!snapshot.child(player1).child("currentBet").exists()) {
                                 AllHaveCurrentBet = false;
                                 break;
@@ -434,7 +434,7 @@ public class TwentyOneGame extends Fragment {
                                     deck.addAll(Arrays.asList(AppMethods.raw_deck));
                                     Collections.shuffle(deck);
                                     for (String player : InRoomPlayers[0]) {
-                                        if (!player.equals("_mode") && !player.equals("_size") && !player.equals("_bank")) {
+                                        if (!player.equals("_access") && !player.equals("_size") && !player.equals("_bank")) {
                                             if (!player.equals(playerName)) {
                                                 Card chosen = deck.get(0);
                                                 deck.remove(chosen);
@@ -481,7 +481,7 @@ public class TwentyOneGame extends Fragment {
                             .child("position").getValue().toString());
                     int AddedCounter = 0;
                     for (String player : InRoomPlayers[0]) {
-                        if (!player.equals("_size") && !player.equals("_mode")
+                        if (!player.equals("_size") && !player.equals("_access")
                                 && snapshot.child(player).child("position").exists()
                                 && snapshot.child(player).child("role").exists()) {
                             // region MainGameLoop(banker's role)
@@ -897,7 +897,7 @@ public class TwentyOneGame extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (String player : InRoomPlayers[0]) {
-                    if (!snapshot.child(player).equals("_size") && !snapshot.child(player).equals("_mode")) {
+                    if (!snapshot.child(player).equals("_size") && !snapshot.child(player).equals("_access")) {
                         if (snapshot.child(player).child("position").exists() && !LoopEnding) {
                             if (parseInt(snapshot.child(player).child("position").getValue().toString()) == Bank_chosen[0]
                                     && !player.equals(playerName)) {
