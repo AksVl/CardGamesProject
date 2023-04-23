@@ -43,6 +43,7 @@
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/send"
             android:backgroundTint="@color/white"
+            app:backgroundTint="@color/white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/send_btn" />

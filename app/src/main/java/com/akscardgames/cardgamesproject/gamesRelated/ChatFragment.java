@@ -15,12 +15,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
+import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.TwentyOneGame;
 import com.akscardgames.cardgamesproject.general.Message;
 import com.akscardgames.cardgamesproject.general.adapters.ChatRecyclerViewAdapter;
 import com.example.cardgamesproject.databinding.FragmentChatBinding;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.time.Instant;
@@ -31,6 +31,7 @@ public class ChatFragment extends Fragment {
     public static ValueEventListener listener;
     private FragmentChatBinding binding;
     private RecyclerView recyclerView;
+    private boolean uiFlag = false;
     ChatRecyclerViewAdapter adapter;
     Handler handler = new Handler();
     private ArrayList<Message> chat = new ArrayList<>();
@@ -52,6 +53,7 @@ public class ChatFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        GameFragment.viewPager2.setCurrentItem(0);
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -101,16 +103,20 @@ public class ChatFragment extends Fragment {
                 chat.sort(new Comparator<Message>() {
                     @Override
                     public int compare(Message o1, Message o2) {
-                        if(o1.getTime() < o2.getTime()){
+                        if (o1.getTime() < o2.getTime()) {
                             return -1;
-                        } else if(o1.getTime() > o2.getTime()){
+                        } else if (o1.getTime() > o2.getTime()) {
                             return 1;
-                        } else{
+                        } else {
                             return 0;
                         }
                     }
                 });
                 adapter.notifyDataSetChanged();
+                recyclerView.scrollToPosition(adapter.getItemCount()-1);
+                if(snapshot.exists()) {
+                    TwentyOneGame.notifyPlayer();
+                }
             }
 
             @Override

@@ -8,6 +8,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.widget.Toast;
 
 import com.akscardgames.cardgamesproject.gamesRelated.GameFragment;
@@ -34,6 +35,8 @@ public class GameChooseActivity extends AppCompatActivity {
     private TabLayoutAdapter adapter;
     public static FragmentManager fragmentManager;
     private boolean shutDownFlag = false;
+    private int backPressedCount = 0;
+    Handler handler = new Handler();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,7 +75,6 @@ public class GameChooseActivity extends AppCompatActivity {
         });
     }
     public static void launchTwentyOne(String roomName, String playerName){
-        //TwentyOneGame fragment = new TwentyOneGame();
         TwentyOneGame.roomNameBuff = roomName;
         TwentyOneGame.playerNameBuff = playerName;
         GameFragment.playerName = playerName;
@@ -124,5 +126,21 @@ public class GameChooseActivity extends AppCompatActivity {
         shutDownFlag = true;
         playerRef.removeValue();
         super.onPause();
+    }
+
+    @Override
+    public void onBackPressed() {
+        backPressedCount += 1;
+        if(backPressedCount == 1){
+            Toast.makeText(this, "press again to leave", Toast.LENGTH_SHORT).show();
+        } else if (backPressedCount == 2) {
+            super.onBackPressed();
+        }
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                backPressedCount = 0;
+            }
+        }, 1200);
     }
 }

@@ -21,7 +21,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class GameFragment extends Fragment {
     private FragmentGameBinding binding;
-    private ViewPager2 viewPager2;
+    public static ViewPager2 viewPager2;
     public static boolean isInGame = false;
     public static DatabaseReference RoomRef;
     public static String playerName;
