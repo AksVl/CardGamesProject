@@ -114,7 +114,7 @@ public class ChatFragment extends Fragment {
                 });
                 adapter.notifyDataSetChanged();
                 recyclerView.scrollToPosition(adapter.getItemCount()-1);
-                if(snapshot.exists()) {
+                if(snapshot.exists() && !TwentyOneGame.chatUpdatePermission) {
                     TwentyOneGame.notifyPlayer();
                 }
             }

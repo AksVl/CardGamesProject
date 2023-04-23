@@ -99,6 +99,7 @@ public class TwentyOneGame extends Fragment {
 
     public static String roomNameBuff;
     public static String playerNameBuff;
+    public static boolean chatUpdatePermission = false;
 
     //endregion variables
 
@@ -120,54 +121,38 @@ public class TwentyOneGame extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         GameFragment.viewPager2.setCurrentItem(1);
-        Thread thread = new Thread(new Runnable() {
+        handler.post(new Runnable() {
             @Override
             public void run() {
                 Banker_dialog = new DialogSetBankSize();
                 dialog = new DialogBetChooseFragment();
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        binding.available.setText(String.valueOf(available));
-                        binding.ready.setEnabled(false);
-                        binding.textBankersFirstCard.setVisibility(View.INVISIBLE);
-                        binding.betText.setVisibility(View.INVISIBLE);
-                        binding.ready.setOnClickListener(v ->
-                                SetStatusToReady());
-                    }
-                });
-
+                binding.available.setText(String.valueOf(available));
                 fm = getParentFragmentManager();
                 //Intent inputIntent = getIntent();
                 RoomName = roomNameBuff;
                 SharedPreferences prefs = getActivity().getSharedPreferences("PREFS", 0);
                 playerName = prefs.getString("name", "");
                 RoomRef = database.getReference("TwentyOneRooms/" + RoomName);
+                binding.ready.setEnabled(false);
+                binding.textBankersFirstCard.setVisibility(View.INVISIBLE);
+                binding.betText.setVisibility(View.INVISIBLE);
                 final boolean[] OnceAnimated = {true};
                 final long[] EndGameDelay = {3000};
+                binding.ready.setOnClickListener(v ->
+                        SetStatusToReady());
                 // endregion onCreate init
                 RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                binding.playersContainer.removeAllViews();
-                            }
-                        });
+                        binding.playersContainer.removeAllViews();
                         ViewGroup.LayoutParams params = new LinearLayout.
                                 LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
                         if (snapshot.child("_size").exists()) {
                             size[0] = parseInt(snapshot.child("_size").getValue().toString());
                             for (int i = 0; size[0] - 1 > i; i++) {
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        PlayerItemBinding playerItem = PlayerItemBinding.inflate(getLayoutInflater());
-                                        binding.playersContainer.addView(playerItem.getRoot(), params);
-                                        binding.playersContainer.invalidate();
-                                    }
-                                });
+                                PlayerItemBinding playerItem = PlayerItemBinding.inflate(getLayoutInflater());
+                                binding.playersContainer.addView(playerItem.getRoot(), params);
+                                binding.playersContainer.invalidate();
                             }
                         }
                         RoomRef.addValueEventListener(listener);
@@ -183,17 +168,12 @@ public class TwentyOneGame extends Fragment {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         int readyCount = 0;
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                for (int i = 0; i < binding.playersContainer.getChildCount(); i++) {
-                                    TextView name = binding.playersContainer.getChildAt(i).findViewById(R.id.name);
-                                    TextView status = binding.playersContainer.getChildAt(i).findViewById(R.id.status);
-                                    status.setText("empty");
-                                    name.setText("none");
-                                }
-                            }
-                        });
+                        for (int i = 0; i < binding.playersContainer.getChildCount(); i++) {
+                            TextView name = binding.playersContainer.getChildAt(i).findViewById(R.id.name);
+                            TextView status = binding.playersContainer.getChildAt(i).findViewById(R.id.status);
+                            status.setText("empty");
+                            name.setText("none");
+                        }
                         InRoomPlayers[0].clear();
                         for (DataSnapshot d : snapshot.getChildren()) {
                             if (!Objects.equals(d.getKey(), "_size")
@@ -210,19 +190,9 @@ public class TwentyOneGame extends Fragment {
                         if (snapshot.getChildrenCount() - noPlayersCount == size[0] &&
                                 snapshot.child(playerName).child("status").exists() &&
                                 !snapshot.child(playerName).child("status").getValue().toString().equals("ready")) {
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    binding.ready.setEnabled(true);
-                                }
-                            });
+                            binding.ready.setEnabled(true);
                         } else {
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    binding.ready.setEnabled(false);
-                                }
-                            });
+                            binding.ready.setEnabled(false);
                             if (snapshot.child(playerName).child("status").exists()
                                     && snapshot.child(playerName).child("status").getValue().toString().equals("ready")
                                     && snapshot.getChildrenCount()-noPlayersCount != size[0]) {
@@ -237,22 +207,16 @@ public class TwentyOneGame extends Fragment {
                                     String gotStatus = snapshot.child(player).child("status").getValue().toString();
                                     if (!player.equals(playerName)) {
                                         pos = parseInt(snapshot.child(player).child("position").getValue().toString());
-                                        int[] finalPos = {pos};
-                                        handler.post(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                if (binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, finalPos[0], size[0])) != null) {
-                                                    TextView name = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, finalPos[0], size[0])).findViewById(R.id.name);
-                                                    TextView status = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, finalPos[0], size[0])).findViewById(R.id.status);
-                                                    name.setText(player);
-                                                    status.setText(gotStatus);
-                                                    status.setTextColor(Color.WHITE);
-                                                    if (gotStatus.equals("ready")) {
-                                                        status.setTextColor(Color.GREEN);
-                                                    }
-                                                }
+                                        if (binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])) != null) {
+                                            TextView name = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])).findViewById(R.id.name);
+                                            TextView status = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])).findViewById(R.id.status);
+                                            name.setText(player);
+                                            status.setText(gotStatus);
+                                            status.setTextColor(Color.WHITE);
+                                            if (gotStatus.equals("ready")) {
+                                                status.setTextColor(Color.GREEN);
                                             }
-                                        });
+                                        }
                                     }
                                     if (gotStatus.equals("ready")) {
                                         readyCount++;
@@ -260,15 +224,9 @@ public class TwentyOneGame extends Fragment {
                                 }
                             }
                         }
-                        int[] finalReadyCount = {readyCount};
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                AppMethods.twentyOneReadyCheck(listener, InGameListener,
-                                        InRoomPlayers[0], RoomRef, finalReadyCount[0], size[0],
-                                        binding, getContext(), getActivity().getWindowManager());
-                            }
-                        });
+                        AppMethods.twentyOneReadyCheck(listener, InGameListener,
+                                InRoomPlayers[0], RoomRef, readyCount, size[0],
+                                binding, getContext(), getActivity().getWindowManager());
                     }
 
                     @Override
@@ -279,33 +237,23 @@ public class TwentyOneGame extends Fragment {
                 InGameListener = new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                binding.available.setText(String.valueOf(available));
-                                if (!playerName.equals(bankerName)) {
-                                    binding.ShowBet.setText(String.valueOf(bet));
-                                }
-                                binding.betText.setVisibility(View.VISIBLE);
-                            }
-                        });
-                        String[] offlinePlayerName = {""};
+                        binding.available.setText(String.valueOf(available));
+                        if (!playerName.equals(bankerName)) {
+                            binding.ShowBet.setText(String.valueOf(bet));
+                        }
+                        binding.betText.setVisibility(View.VISIBLE);
+                        String offlinePlayerName = "";
                         int my_pos;
-                        final int[] pos = new int[1];
+                        int pos;
                         //region if someone offline
                         if (snapshot.child("_offline").exists()) {
-                            offlinePlayerName[0] = snapshot.child("_offline").getValue().toString();
+                            offlinePlayerName = snapshot.child("_offline").getValue().toString();
                             available = AvailableBuff;
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    binding.available.setText(String.valueOf(available));
-                                    binding.message.setText(offlinePlayerName + " went offline, all bets were returned");
-                                    binding.message.setVisibility(View.VISIBLE);
-                                    UiDestroy(getContext(), binding);
-                                }
-                            });
+                            binding.available.setText(String.valueOf(available));
                             RoomRef.removeEventListener(InGameListener);
+                            binding.message.setText(offlinePlayerName + " went offline, all bets were returned");
+                            binding.message.setVisibility(View.VISIBLE);
+                            UiDestroy(getContext(), binding);
                         }
                         //endregion if someone offline
                         // region bank reading
@@ -323,28 +271,18 @@ public class TwentyOneGame extends Fragment {
                                 }
                                 bet_flag = false;
                                 EndGameDelay[0] = 0;
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        binding.message.setText("Bank has no money!");
-                                        binding.message.setVisibility(View.VISIBLE);
-                                    }
-                                });
+                                binding.message.setText("Bank has no money!");
+                                binding.message.setVisibility(View.VISIBLE);
                             } else if (StartBank * 3 <= Bank) {
                                 KnockKnock = true;
                                 if (OnceAnimated[0]) {
                                     OnceAnimated[0] = false;
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            binding.message.setText("knock - knock!");
-                                            binding.message.setVisibility(View.VISIBLE);
-                                            AlphaAnimation fadeOut = new AlphaAnimation(1.0f, 0.0f);
-                                            fadeOut.setDuration(2400);
-                                            binding.message.startAnimation(fadeOut);
-                                            binding.message.setVisibility(View.INVISIBLE);
-                                        }
-                                    });
+                                    binding.message.setText("knock - knock!");
+                                    binding.message.setVisibility(View.VISIBLE);
+                                    AlphaAnimation fadeOut = new AlphaAnimation(1.0f, 0.0f);
+                                    fadeOut.setDuration(2400);
+                                    binding.message.startAnimation(fadeOut);
+                                    binding.message.setVisibility(View.INVISIBLE);
                                 }
                             }
                             if (LoopEnding) {
@@ -403,19 +341,13 @@ public class TwentyOneGame extends Fragment {
                         }
                         // endregion ChoosingPlayer reading
                         // region player's choosing case
+                        if (binding.buttonBar.getChildAt(2) != null && binding.buttonBar.getChildAt(3) != null) {
                             if (MainGameLoop) {
                                 if (snapshot.child(playerName).child("position").exists()
                                         && parseInt(snapshot.child(playerName).child("position").getValue().toString()) != ChoosingPlayerPos
                                         && !LoopEnding) {
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            if (binding.buttonBar.getChildAt(2) != null && binding.buttonBar.getChildAt(3) != null) {
-                                                ((Button) binding.buttonBar.getChildAt(2)).setEnabled(false);
-                                                ((Button) binding.buttonBar.getChildAt(3)).setEnabled(false);
-                                            }
-                                        }
-                                    });
+                                    ((Button) binding.buttonBar.getChildAt(2)).setEnabled(false);
+                                    ((Button) binding.buttonBar.getChildAt(3)).setEnabled(false);
                                 } else if (snapshot.child(playerName).child("position").exists()
                                         && parseInt(snapshot.child(playerName).child("position").getValue().toString()) == ChoosingPlayerPos
                                         && !LoopEnding) {
@@ -439,31 +371,26 @@ public class TwentyOneGame extends Fragment {
                                             }
                                         }, 1000);
                                         RoomRef.child(playerName).child("status").setValue("choosing");
-                                        handler.post(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                binding.buttonBar.getChildAt(2).setOnClickListener(view -> {
-                                                    ((Button) binding.buttonBar.getChildAt(2)).setEnabled(false);
-                                                    ((Button) binding.buttonBar.getChildAt(3)).setEnabled(false);
-                                                    RoomRef.child(playerName).child("status").setValue("takes more");
-                                                    binding.buttonBar.getChildAt(2).setOnClickListener(null);
-                                                });
-                                                binding.buttonBar.getChildAt(3).setOnClickListener(view -> {
-                                                    ((Button) binding.buttonBar.getChildAt(2)).setEnabled(false);
-                                                    ((Button) binding.buttonBar.getChildAt(3)).setEnabled(false);
-                                                    handler.postDelayed(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            RoomRef.child(playerName).child("status").setValue("passed");
-                                                        }
-                                                    }, 50);
-                                                    if (snapshot.child("_ChoosingPlayer").exists()) {
-                                                        RoomRef.child("_ChoosingPlayer").setValue(String.valueOf(
-                                                                AppMethods.nextPlayer(size[0], ChoosingPlayerPos)));
-                                                    }
-                                                    binding.buttonBar.getChildAt(3).setOnClickListener(null);
-                                                });
+                                        binding.buttonBar.getChildAt(2).setOnClickListener(view -> {
+                                            ((Button) binding.buttonBar.getChildAt(2)).setEnabled(false);
+                                            ((Button) binding.buttonBar.getChildAt(3)).setEnabled(false);
+                                            RoomRef.child(playerName).child("status").setValue("takes more");
+                                            binding.buttonBar.getChildAt(2).setOnClickListener(null);
+                                        });
+                                        binding.buttonBar.getChildAt(3).setOnClickListener(view -> {
+                                            ((Button) binding.buttonBar.getChildAt(2)).setEnabled(false);
+                                            ((Button) binding.buttonBar.getChildAt(3)).setEnabled(false);
+                                            handler.postDelayed(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    RoomRef.child(playerName).child("status").setValue("passed");
+                                                }
+                                            }, 50);
+                                            if (snapshot.child("_ChoosingPlayer").exists()) {
+                                                RoomRef.child("_ChoosingPlayer").setValue(String.valueOf(
+                                                        AppMethods.nextPlayer(size[0], ChoosingPlayerPos)));
                                             }
+                                            binding.buttonBar.getChildAt(3).setOnClickListener(null);
                                         });
                                     } else {
                                         if (snapshot.child("_ChoosingPlayer").exists()) {
@@ -473,45 +400,24 @@ public class TwentyOneGame extends Fragment {
                                     }
                                 }
                             } else {
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (binding.buttonBar.getChildAt(2) != null && binding.buttonBar.getChildAt(3) != null) {
-                                            ((Button) binding.buttonBar.getChildAt(2)).setEnabled(false);
-                                            ((Button) binding.buttonBar.getChildAt(3)).setEnabled(false);
-                                        }
-                                    }
-                                });
+                                ((Button) binding.buttonBar.getChildAt(2)).setEnabled(false);
+                                ((Button) binding.buttonBar.getChildAt(3)).setEnabled(false);
                             }
+                        }
                         // endregion player's choosing case
                         // region banker's shown card
                         if (bankerName != null && !snapshot.child("_offline").exists()) {
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    binding.shownCard.setImageDrawable(null);
-                                }
-                            });
+                            binding.shownCard.setImageDrawable(null);
                             if (snapshot.child(bankerName).child("hand").child(String.valueOf(0)).exists()) {
                                 String gotShownCard = snapshot.child(bankerName).child("hand").child(String.valueOf(0)).getValue().toString();
                                 Card shownCard = AppMethods.CardLink(gotShownCard);
                                 if (shownCard != null) {
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            binding.textBankersFirstCard.setVisibility(View.VISIBLE);
-                                            binding.shownCard.setImageResource(shownCard.img_res);
-                                        }
-                                    });
+                                    binding.textBankersFirstCard.setVisibility(View.VISIBLE);
+                                    binding.shownCard.setImageResource(shownCard.img_res);
                                 }
                             } else {
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        binding.textBankersFirstCard.setVisibility(View.INVISIBLE);
-                                        binding.shownCard.setImageDrawable(null);
-                                    }
-                                });
+                                binding.textBankersFirstCard.setVisibility(View.INVISIBLE);
+                                binding.shownCard.setImageDrawable(null);
                             }
                         }
                         // endregion banker's shown card
@@ -527,21 +433,29 @@ public class TwentyOneGame extends Fragment {
                                 }
                             }
                             if (AllHaveCurrentBet && OnceStart) {
-                                ChoosingPlayerPos = AppMethods.nextPlayer(size[0],
-                                        parseInt(snapshot.child(bankerName).child("position").getValue().toString()));
-                                RoomRef.child("_ChoosingPlayer").setValue(ChoosingPlayerPos);
-                                OnceStart = false;
+                                Thread thread = new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ChoosingPlayerPos = AppMethods.nextPlayer(size[0],
+                                                parseInt(snapshot.child(bankerName).child("position").getValue().toString()));
+                                        RoomRef.child("_ChoosingPlayer").setValue(ChoosingPlayerPos);
+                                        OnceStart = false;
+                                    }
+                                });
+                                thread.start();
                             }
                         }
                         // endregion MainGameLoop(everyone's role)
                         // region first handing out
                         if (HandOutStart) {
+                            chatUpdatePermission = false;
                             if (snapshot.child("_bank").exists()) {
                                 HandOutStart = false;
                                 if (playerName.equals(bankerName)) {
                                     handler.postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
+                                            deck.clear();
                                             deck.addAll(Arrays.asList(AppMethods.raw_deck));
                                             Collections.shuffle(deck);
                                             for (String player : InRoomPlayers[0]) {
@@ -619,28 +533,23 @@ public class TwentyOneGame extends Fragment {
                                     }
                                     // endregion MainGameLoop(banker's role)
                                     // region player's status update
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            if (!player.equals(playerName)) {
-                                                pos[0] = parseInt(snapshot.child(player).child("position").getValue().toString());
-                                                TextView status = binding.playersContainer
-                                                        .getChildAt(AppMethods.getUiPosition(my_pos, pos[0], size[0])).findViewById(R.id.status);
-                                                TextView CardCount = binding.playersContainer
-                                                        .getChildAt(AppMethods.getUiPosition(my_pos, pos[0], size[0])).findViewById(R.id.CardCount);
-                                                String gotCount = String.valueOf(snapshot.child(player).child("hand").getChildrenCount());
-                                                String gotStatus = snapshot.child(player).child("status").getValue().toString();
-                                                CardCount.setText(gotCount);
-                                                status.setText(gotStatus);
-                                                status.setTextColor(Color.WHITE);
-                                                if (gotStatus.equals("TwentyOne") || gotStatus.equals("Won")) {
-                                                    status.setTextColor(Color.GREEN);
-                                                } else if (gotStatus.equals("Lost") || gotStatus.equals("Lost all")) {
-                                                    status.setTextColor(Color.RED);
-                                                }
-                                            }
+                                    if (!player.equals(playerName)) {
+                                        pos = parseInt(snapshot.child(player).child("position").getValue().toString());
+                                        TextView status = binding.playersContainer
+                                                .getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])).findViewById(R.id.status);
+                                        TextView CardCount = binding.playersContainer
+                                                .getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])).findViewById(R.id.CardCount);
+                                        String gotCount = String.valueOf(snapshot.child(player).child("hand").getChildrenCount());
+                                        String gotStatus = snapshot.child(player).child("status").getValue().toString();
+                                        CardCount.setText(gotCount);
+                                        status.setText(gotStatus);
+                                        status.setTextColor(Color.WHITE);
+                                        if (gotStatus.equals("TwentyOne") || gotStatus.equals("Won")) {
+                                            status.setTextColor(Color.GREEN);
+                                        } else if (gotStatus.equals("Lost") || gotStatus.equals("Lost all")) {
+                                            status.setTextColor(Color.RED);
                                         }
-                                    });
+                                    }
                                     // endregion player's status update
                                     // region game status update
                                     if (snapshot.child("_bank").exists()) {
@@ -650,13 +559,7 @@ public class TwentyOneGame extends Fragment {
                                                 Bank = parseInt(snapshot.child("_bank").getValue().toString());
                                                 GameStatus = "bank : " + Bank + "\n";
                                             }
-                                            String[] finalGameStatus = {GameStatus};
-                                            handler.post(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    binding.gameStatus.setText(finalGameStatus[0]);
-                                                }
-                                            });
+                                            binding.gameStatus.setText(GameStatus);
                                         }
                                     }
                                     if (!player.equals(playerName)) {
@@ -664,13 +567,7 @@ public class TwentyOneGame extends Fragment {
                                             PlayerBet = parseInt(snapshot.child(player).child("currentBet").getValue().toString());
                                             if (!LoopEnding) {
                                                 GameStatus += player + "'s bet : " + PlayerBet + "\n";
-                                                String[] finalGameStatus = {GameStatus};
-                                                handler.post(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        binding.gameStatus.setText(finalGameStatus[0]);
-                                                    }
-                                                });
+                                                binding.gameStatus.setText(GameStatus);
                                             }
                                             if (LoopEnding) {
                                                 if (!playerName.equals(bankerName)) {
@@ -681,13 +578,7 @@ public class TwentyOneGame extends Fragment {
                                                         } else if (snapshot.child(player).child("status").getValue().toString().equals("Lost")) {
                                                             GameStatus += player + " has lost " + PlayerBet + "!\n";
                                                         }
-                                                        String[] finalGameStatus = {GameStatus};
-                                                        handler.post(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                binding.gameStatus.setText(finalGameStatus[0]);
-                                                            }
-                                                        });
+                                                        binding.gameStatus.setText(GameStatus);
                                                     }
                                                 } else {
                                                     if (snapshot.child(player).child("status").exists()) {
@@ -697,13 +588,7 @@ public class TwentyOneGame extends Fragment {
                                                         } else if (snapshot.child(player).child("status").getValue().toString().equals("Lost")) {
                                                             GameStatus += "You have won " + PlayerBet + " as " + player + "'s bet" + "!\n";
                                                         }
-                                                        String[] finalGameStatus = {GameStatus};
-                                                        handler.post(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                binding.gameStatus.setText(finalGameStatus[0]);
-                                                            }
-                                                        });
+                                                        binding.gameStatus.setText(GameStatus);
                                                     }
                                                 }
                                             }
@@ -746,19 +631,9 @@ public class TwentyOneGame extends Fragment {
                         }
                         // region game status extension
                         if (playerName.equals(bankerName)) {
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    binding.ShowBet.setText(String.valueOf(Bank));
-                                }
-                            });
+                            binding.ShowBet.setText(String.valueOf(Bank));
                         } else {
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    binding.ShowBet.setText(String.valueOf(bet));
-                                }
-                            });
+                            binding.ShowBet.setText(String.valueOf(bet));
                         }
                         if (LoopEnding) {
                             if (snapshot.child(playerName).child("status").exists()) {
@@ -768,24 +643,13 @@ public class TwentyOneGame extends Fragment {
                                 } else if (snapshot.child(playerName).child("status").getValue().toString().equals("Lost")) {
                                     GameStatus += "You have lost " + bet + "!\n";
                                 }
-                                String[] finalGameStatus = {GameStatus};
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        binding.gameStatus.setText(finalGameStatus[0]);
-                                    }
-                                });
+                                binding.gameStatus.setText(GameStatus);
                             }
                         }
                         // endregion game status extension
                         // region user's hand
                         int total = 0;
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                binding.hand.removeAllViews();
-                            }
-                        });
+                        binding.hand.removeAllViews();
                         ArrayList<String> Hand = new ArrayList<>();
                         if (snapshot.child(playerName).child("hand").exists() && !snapshot.child("_offline").exists()) {
                             for (int i = 0; i < snapshot.child(playerName).child("hand").getChildrenCount(); i++) {
@@ -794,47 +658,26 @@ public class TwentyOneGame extends Fragment {
                                 }
                             }
                         } else {
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    binding.hand.removeAllViews();
-                                }
-                            });
+                            binding.hand.removeAllViews();
                         }
                         Collections.reverse(Hand);
                         for (String got : Hand) {
                             Card card = AppMethods.CardLink(got);
                             total += GetValueOfCard(card);
                             if (card != null) {
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        CardLayoutBinding image = CardLayoutBinding.inflate(getLayoutInflater());
-                                        image.image.setImageResource(card.img_res);
-                                        binding.hand.addView(image.getRoot(), ViewGroup.LayoutParams.WRAP_CONTENT
-                                                , ViewGroup.LayoutParams.MATCH_PARENT);
-                                        binding.hand.invalidate();
-                                    }
-                                });
+                                CardLayoutBinding image = CardLayoutBinding.inflate(getLayoutInflater());
+                                image.image.setImageResource(card.img_res);
+                                binding.hand.addView(image.getRoot(), ViewGroup.LayoutParams.WRAP_CONTENT
+                                        , ViewGroup.LayoutParams.MATCH_PARENT);
+                                binding.hand.invalidate();
                             }
                         }
-                        int[] finalTotal = {total};
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (binding.buttonBar.getChildAt(1) != null) {
-                                    ((TextView) (binding.buttonBar.getChildAt(1))).setText(String.valueOf(finalTotal[0]));
-                                    ((TextView) (binding.buttonBar.getChildAt(1))).setTextColor(Color.WHITE);
-                                }
-                            }
-                        });
+                        if (binding.buttonBar.getChildAt(1) != null) {
+                            ((TextView) (binding.buttonBar.getChildAt(1))).setText(String.valueOf(total));
+                            ((TextView) (binding.buttonBar.getChildAt(1))).setTextColor(Color.WHITE);
+                        }
                         if (total == 21) {
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    ((TextView) (binding.buttonBar.getChildAt(1))).setTextColor(Color.GREEN);
-                                }
-                            });
+                            ((TextView) (binding.buttonBar.getChildAt(1))).setTextColor(Color.GREEN);
                             if (!playerName.equals(bankerName) && snapshot.child(playerName).child("status").exists()
                                     && !snapshot.child(playerName).child("status").getValue().toString().equals("Lost")) {
                                 RoomRef.child(playerName).child("status").setValue("TwentyOne");
@@ -845,12 +688,7 @@ public class TwentyOneGame extends Fragment {
                                 Return[0] = true;
                             }
                         } else if (total > 21) {
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    ((TextView) (binding.buttonBar.getChildAt(1))).setTextColor(Color.RED);
-                                }
-                            });
+                            ((TextView) (binding.buttonBar.getChildAt(1))).setTextColor(Color.RED);
                             if (!playerName.equals(bankerName)) {
                                 if (snapshot.child(bankerName).child("status").exists()
                                         && !snapshot.child(bankerName).child("status").getValue().toString().equals("Lost all")) {
@@ -868,15 +706,10 @@ public class TwentyOneGame extends Fragment {
                             // region loop ending
                             if (LoopEnding) {
                                 BankerEndingPermission = true;
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (binding.buttonBar.getChildAt(2) != null && binding.buttonBar.getChildAt(3) != null) {
-                                            ((Button) binding.buttonBar.getChildAt(2)).setEnabled(false);
-                                            ((Button) binding.buttonBar.getChildAt(3)).setEnabled(false);
-                                        }
-                                    }
-                                });
+                                if (binding.buttonBar.getChildAt(2) != null && binding.buttonBar.getChildAt(3) != null) {
+                                    ((Button) binding.buttonBar.getChildAt(2)).setEnabled(false);
+                                    ((Button) binding.buttonBar.getChildAt(3)).setEnabled(false);
+                                }
                             }
                             if (LoopEnding && !playerName.equals(bankerName)
                                     && snapshot.child(bankerName).child("hand").exists()) {
@@ -936,13 +769,8 @@ public class TwentyOneGame extends Fragment {
                                 EndGame = true;
                                 bet_flag = false;
                                 EndGameDelay[0] = 0;
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        binding.message.setText("You have run out of money!");
-                                        binding.message.setVisibility(View.VISIBLE);
-                                    }
-                                });
+                                binding.message.setText("You have run out of money!");
+                                binding.message.setVisibility(View.VISIBLE);
                             }
                             for (String player : InRoomPlayers[0]) {
                                 if (snapshot.child(player).child("status").exists()
@@ -951,13 +779,8 @@ public class TwentyOneGame extends Fragment {
                                     EndGame = true;
                                     bet_flag = false;
                                     EndGameDelay[0] = 0;
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            binding.message.setText(player + " has run out of money!");
-                                            binding.message.setVisibility(View.VISIBLE);
-                                        }
-                                    });
+                                    binding.message.setText(player + " has run out of money!");
+                                    binding.message.setVisibility(View.VISIBLE);
                                     break;
                                 }
                             }
@@ -975,12 +798,8 @@ public class TwentyOneGame extends Fragment {
                                                 handler.postDelayed(new Runnable() {
                                                     @Override
                                                     public void run() {
-                                                        handler.post(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                binding.gameStatus.setText("");
-                                                            }
-                                                        });
+                                                        chatUpdatePermission = true;
+                                                        binding.gameStatus.setText("");
                                                         DataSnapshot chatSnapshot = snapshot.child("_messages");
                                                         RoomRef.setValue(SnapshotForBackup.getValue());
                                                         RoomRef.child("_messages").setValue(chatSnapshot.getValue());
@@ -1046,13 +865,8 @@ public class TwentyOneGame extends Fragment {
                                         handler.postDelayed(new Runnable() {
                                             @Override
                                             public void run() {
-                                                handler.post(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        binding.message.setVisibility(View.VISIBLE);
-                                                        UiDestroy(getContext(), binding);
-                                                    }
-                                                });
+                                                binding.message.setVisibility(View.VISIBLE);
+                                                UiDestroy(getContext(), binding);
                                                 RoomRef.removeEventListener(InGameListener);
                                                 if (playerName.equals(adminName)) {
                                                     RoomRef.removeValue();
@@ -1073,7 +887,7 @@ public class TwentyOneGame extends Fragment {
                 };
             }
         });
-        thread.start();
+
     }
 
     private int GetValueOfCard(Card card) {
@@ -1340,7 +1154,8 @@ public class TwentyOneGame extends Fragment {
         binding.buttonBar.addView(Disconnect, params);
         binding.buttonBar.getChildAt(0).setOnClickListener(view -> {
             AppMethods.Disconnect(RoomRef, playerName, InGameListener, ChatFragment.listener);
-            GameChooseActivity.fragmentManager.beginTransaction().remove(this).commit();
+            assert getParentFragment() != null;
+            GameChooseActivity.fragmentManager.beginTransaction().remove(getParentFragment()).commit();
         });
     }
 
