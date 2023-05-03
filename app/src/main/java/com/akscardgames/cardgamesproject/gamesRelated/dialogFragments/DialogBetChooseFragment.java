@@ -26,7 +26,7 @@ public class DialogBetChooseFragment extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //return super.onCreateView(inflater, container, savedInstanceState);
         binding = FragmentDialogBetChooseBinding.inflate(getLayoutInflater());
-        binding.bet.setOnClickListener(view -> TwentyOneGame.SetBetSize(binding.size.getText().toString()));
+        binding.bet.setOnClickListener(view -> TwentyOneGame.setBetSize(binding.size.getText().toString()));
         return binding.getRoot();
     }
 
@@ -38,6 +38,6 @@ public class DialogBetChooseFragment extends DialogFragment {
     @Override
     public void onCancel(@NonNull DialogInterface dialog) {
         super.onCancel(dialog);
-        TwentyOneGame.RecallOfDialogBetChooseFragment(getContext());
+        TwentyOneGame.recallOfDialogBetChooseFragment(getContext());
     }
 }

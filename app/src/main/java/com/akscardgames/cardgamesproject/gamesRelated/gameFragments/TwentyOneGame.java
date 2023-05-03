@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -29,10 +31,12 @@ import android.widget.Toast;
 
 import com.akscardgames.cardgamesproject.gamesRelated.ChatFragment;
 import com.akscardgames.cardgamesproject.gamesRelated.GameFragment;
+import com.akscardgames.cardgamesproject.gamesRelated.ResultData;
 import com.akscardgames.cardgamesproject.general.AppMethods;
 import com.akscardgames.cardgamesproject.general.Card;
 import com.akscardgames.cardgamesproject.gamesRelated.dialogFragments.DialogBetChooseFragment;
 import com.akscardgames.cardgamesproject.gamesRelated.dialogFragments.DialogSetBankSize;
+import com.akscardgames.cardgamesproject.general.adapters.EndResultRecyclerViewAdapter;
 import com.akscardgames.cardgamesproject.menu.GameChooseActivity;
 import com.example.cardgamesproject.R;
 import com.example.cardgamesproject.databinding.CardLayoutBinding;
@@ -49,6 +53,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Random;
 
@@ -80,12 +85,12 @@ public class TwentyOneGame extends Fragment {
     private boolean OnceStart = true;
     private static boolean LoopEnding = false;
     boolean BankerEndingPermission = false;
-    private static boolean IsInGame = false;
     private final boolean[] Return = {false};
     private static boolean EndGame = false;
     private static boolean StartBankReading = true;
     private static boolean KnockKnock = false;
     private boolean OnceEndBank = true;
+    private boolean alreadyCounted = false;
     private static final ArrayList<Card> deck = new ArrayList<>();
     private final static int[] size = new int[1];
     private static int my_pos;
@@ -100,6 +105,7 @@ public class TwentyOneGame extends Fragment {
     public static String roomNameBuff;
     public static String playerNameBuff;
     public static boolean chatUpdatePermission = false;
+    private boolean OnceAddProfit = false;
 
     //endregion variables
 
@@ -114,12 +120,46 @@ public class TwentyOneGame extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentTwentyOneGameBinding.inflate(getLayoutInflater());
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
+        //region init
+        adminName = null;
+        bankerName = null;
+        SnapshotForBackup = null;
+        bet = 0;
+        ChoosingPlayerPos = 0;
+        PlayerBet = 0;
+        Bank = 0;
+        BackUpBank = 0;
+        available = 5000;
+        bet_flag = true;
+        MainGameLoop = false;
+        HandOutStart = true;
+        OnceCheckFlag = true;
+        OnceStart = true;
+        OnceAddProfit = false;
+        alreadyCounted = false;
+        LoopEnding = false;
+        BankerEndingPermission = false;
+        Return[0] = false;
+        EndGame = false;
+        StartBankReading = true;
+        KnockKnock = false;
+        OnceEndBank = true;
+        ArrayList<Card> deck = new ArrayList<>();
+        size[0] = 0;
+        my_pos = 0;
+        ArrayList<String>[] InRoomPlayers = new ArrayList[]{new ArrayList<>()};
+        Handler handler = new Handler();
+        status = "";
+        StartBank = 0;
+        AvailableBuff = 0;
+        chatUpdatePermission = false;
+        //endregion init
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        super.onViewCreated(view, null);
         GameFragment.viewPager2.setCurrentItem(1);
         handler.post(new Runnable() {
             @Override
@@ -139,7 +179,7 @@ public class TwentyOneGame extends Fragment {
                 final boolean[] OnceAnimated = {true};
                 final long[] EndGameDelay = {3000};
                 binding.ready.setOnClickListener(v ->
-                        SetStatusToReady());
+                        setStatusToReady());
                 // endregion onCreate init
                 RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -184,7 +224,7 @@ public class TwentyOneGame extends Fragment {
                         }
                         int pos;
                         int noPlayersCount = 2;
-                        if(snapshot.child("_messages").exists()){
+                        if (snapshot.child("_messages").exists()) {
                             noPlayersCount = 3;
                         }
                         if (snapshot.getChildrenCount() - noPlayersCount == size[0] &&
@@ -195,7 +235,7 @@ public class TwentyOneGame extends Fragment {
                             binding.ready.setEnabled(false);
                             if (snapshot.child(playerName).child("status").exists()
                                     && snapshot.child(playerName).child("status").getValue().toString().equals("ready")
-                                    && snapshot.getChildrenCount()-noPlayersCount != size[0]) {
+                                    && snapshot.getChildrenCount() - noPlayersCount != size[0]) {
                                 RoomRef.child(playerName).child("status").setValue("joined");
                             }
                         }
@@ -253,7 +293,7 @@ public class TwentyOneGame extends Fragment {
                             RoomRef.removeEventListener(InGameListener);
                             binding.message.setText(offlinePlayerName + " went offline, all bets were returned");
                             binding.message.setVisibility(View.VISIBLE);
-                            UiDestroy(getContext(), binding);
+                            uiDestroy(getContext(), binding);
                         }
                         //endregion if someone offline
                         // region bank reading
@@ -264,11 +304,11 @@ public class TwentyOneGame extends Fragment {
                                 StartBankReading = false;
                             }
                             if (Bank == 0) {
+                                RoomRef.child(playerName).child("status").setValue("ended");
+                                alreadyCounted = true;
                                 EndGame = true;
-                                if (!KnockKnock) {
-                                    RoomRef.child(playerName).child("hand").removeValue();
-                                    HandOutStart = false;
-                                }
+                                RoomRef.child(playerName).child("hand").removeValue();
+                                HandOutStart = false;
                                 bet_flag = false;
                                 EndGameDelay[0] = 0;
                                 binding.message.setText("Bank has no money!");
@@ -448,6 +488,7 @@ public class TwentyOneGame extends Fragment {
                         // endregion MainGameLoop(everyone's role)
                         // region first handing out
                         if (HandOutStart) {
+                            OnceAddProfit = true;
                             chatUpdatePermission = false;
                             if (snapshot.child("_bank").exists()) {
                                 HandOutStart = false;
@@ -488,7 +529,7 @@ public class TwentyOneGame extends Fragment {
                                 handler.postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
-                                        if (bet_flag) {
+                                        if (bet_flag && !EndGame) {
                                             bet = 0;
                                             fm.beginTransaction().remove(dialog).commit();
                                             dialog.show(fm.beginTransaction().addToBackStack("dialog"), "dialog");
@@ -663,8 +704,8 @@ public class TwentyOneGame extends Fragment {
                         Collections.reverse(Hand);
                         for (String got : Hand) {
                             Card card = AppMethods.CardLink(got);
-                            total += GetValueOfCard(card);
-                            if (card != null) {
+                            total += getValueOfCard(card);
+                            if (card != null && !EndGame) {
                                 CardLayoutBinding image = CardLayoutBinding.inflate(getLayoutInflater());
                                 image.image.setImageResource(card.img_res);
                                 binding.hand.addView(image.getRoot(), ViewGroup.LayoutParams.WRAP_CONTENT
@@ -722,7 +763,7 @@ public class TwentyOneGame extends Fragment {
                                 int bankerScore = 0;
                                 for (String got : BankerHand) {
                                     Card card = AppMethods.CardLink(got);
-                                    bankerScore += GetValueOfCard(card);
+                                    bankerScore += getValueOfCard(card);
                                 }
                                 if (snapshot.child(bankerName).child("status").getValue().toString().equals("Lost all")) {
                                     if (snapshot.child(playerName).child("status").exists()
@@ -786,7 +827,7 @@ public class TwentyOneGame extends Fragment {
                             }
                             // endregion is money still out there?
                             // region back to start
-                            if (LoopEnding && Return[0]) {
+                            if (LoopEnding && Return[0] && !EndGame) {
                                 handler.postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
@@ -829,6 +870,7 @@ public class TwentyOneGame extends Fragment {
                         }
                         // region endgame
                         if (EndGame) {
+                            uiDestroy(getContext(),binding);
                             LoopEnding = false;
                             Return[0] = false;
                             bet_flag = false;
@@ -848,9 +890,13 @@ public class TwentyOneGame extends Fragment {
                                 }
                             }
                             if (AllEnded[0] && !playerName.equals(bankerName)) {
-                                if (status.equals("Won") || status.equals("TwentyOne")) {
-                                    available += 2 * bet;
+                                if ((status.equals("Won") || status.equals("TwentyOne")) && OnceAddProfit) {
+                                    OnceAddProfit = false;
+                                    if(!alreadyCounted) {
+                                        available = AvailableBuff + bet;
+                                    }
                                 }
+                                RoomRef.child(playerName).child("profit").setValue(available - 5000);
                             }
                             handler.postDelayed(new Runnable() {
                                 @Override
@@ -859,20 +905,67 @@ public class TwentyOneGame extends Fragment {
                                     LoopEnding = false;
                                     if (OnceEndBank && playerName.equals(bankerName)) {
                                         OnceEndBank = false;
-                                        available += BackUpBank;
+                                        Bank = BackUpBank;
+                                        available = BackUpBank;
+                                        RoomRef.child(playerName).child("profit").setValue(available - 5000);
                                     }
                                     if (AllEnded[0]) {
                                         handler.postDelayed(new Runnable() {
                                             @Override
                                             public void run() {
-                                                binding.message.setVisibility(View.VISIBLE);
-                                                UiDestroy(getContext(), binding);
                                                 RoomRef.removeEventListener(InGameListener);
                                                 if (playerName.equals(adminName)) {
                                                     RoomRef.removeValue();
                                                 }
+                                                //region endGameTable
+                                                ArrayList<ResultData> results = new ArrayList<>();
+                                                results.clear();
+                                                binding.endGameTable.setVisibility(View.INVISIBLE);
+                                                for (String player : InRoomPlayers[0]) {
+                                                    boolean playerInList = false;
+                                                    for (ResultData data : results) {
+                                                        if (data.getName().equals(player)) {
+                                                            playerInList = true;
+                                                        }
+                                                    }
+                                                    if (snapshot.child(player).child("profit").exists() && !playerInList) {
+                                                        int profit = parseInt(snapshot.child(player).child("profit").getValue().toString());
+                                                        ResultData playerResult = new ResultData(player, profit);
+                                                        results.add(playerResult);
+                                                    }
+                                                }
+                                                results.sort(new Comparator<ResultData>() {
+                                                    @Override
+                                                    public int compare(ResultData o1, ResultData o2) {
+                                                        if (o1.getProfit() < o2.getProfit())
+                                                            return 1;
+                                                        else if (o1.getProfit() > o2.getProfit())
+                                                            return -1;
+                                                        else return 0;
+                                                    }
+                                                });
+                                                RecyclerView recyclerView = binding.endGameRecyclerView;
+                                                EndResultRecyclerViewAdapter adapter = new EndResultRecyclerViewAdapter(getContext(), results);
+                                                recyclerView.setAdapter(adapter);
+                                                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                                                AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
+                                                fadeIn.setDuration(2400);
+                                                binding.endGameTable.startAnimation(fadeIn);
+                                                binding.endGameTable.setVisibility(View.VISIBLE);
                                             }
-                                        }, 1000);
+                                        }, 3000);
+                                        //endregion endGameTable
+                                        //region recounting avg
+                                        SharedPreferences prefs = getActivity().getSharedPreferences("PREFS", 0);
+                                        int gamesCount = prefs.getInt("gamesCount", 0);
+                                        int avgProfit = prefs.getInt("avgProfit", 0);
+                                        int profit = available - 5000;
+                                        avgProfit = (avgProfit * gamesCount + profit) / (gamesCount + 1);
+                                        gamesCount++;
+                                        prefs.edit().putInt("gamesCount", gamesCount).apply();
+                                        prefs.edit().putInt("avgProfit", avgProfit).apply();
+                                        //endregion recounting avg
+
                                     }
                                 }
                             }, EndGameDelay[0]);
@@ -890,7 +983,7 @@ public class TwentyOneGame extends Fragment {
 
     }
 
-    private int GetValueOfCard(Card card) {
+    private int getValueOfCard(Card card) {
         switch (card.value) {
             case "6":
                 return 6;
@@ -917,9 +1010,8 @@ public class TwentyOneGame extends Fragment {
 
     public static void onGameStart(Context context, FragmentTwentyOneGameBinding binding, WindowManager windowManager) {
         AvailableBuff = available;
-        IsInGame = true;
         GameFragment.isInGame = true;
-        UiCreate(context, binding, windowManager);
+        uiCreate(context, binding, windowManager);
         binding.buttonBar.getChildAt(2).setEnabled(false);
         binding.buttonBar.getChildAt(3).setEnabled(false);
         binding.buttonBar.getChildAt(2).setFocusable(false);
@@ -1018,7 +1110,7 @@ public class TwentyOneGame extends Fragment {
         //triggers reading if bank_choose exists in database
     }
 
-    public static void SetBankSize(String size) {
+    public static void setBankSize(String size) {
         if (!size.equals("") && !(size.length() >= 6)) {
             if (parseInt(size) > 99 && parseInt(size) < 5001 && parseInt(size) <= available) {
                 Bank = parseInt(size);
@@ -1045,7 +1137,7 @@ public class TwentyOneGame extends Fragment {
         }
     }
 
-    public static void SetBetSize(String gotBet) {
+    public static void setBetSize(String gotBet) {
         if (!gotBet.equals("") && !(gotBet.length() >= 6)) {
             if (parseInt(gotBet) > 9 && parseInt(gotBet) <= Bank / (size[0] - 1) && parseInt(gotBet) <= available) {
                 bet = parseInt(gotBet);
@@ -1059,7 +1151,7 @@ public class TwentyOneGame extends Fragment {
         }
     }
 
-    public static void RecallOfDialogBetChooseFragment(Context context) {
+    public static void recallOfDialogBetChooseFragment(Context context) {
         fm.beginTransaction().remove(dialog).commit();
         handler.postDelayed(new Runnable() {
             @Override
@@ -1071,7 +1163,7 @@ public class TwentyOneGame extends Fragment {
         Toast.makeText(context, "you can't skip this dialog", Toast.LENGTH_SHORT).show();
     }
 
-    public static void RecallOfDialogSetBankSize(Context context) {
+    public static void recallOfDialogSetBankSize(Context context) {
         fm.beginTransaction().remove(Banker_dialog).commit();
         handler.postDelayed(new Runnable() {
             @Override
@@ -1084,7 +1176,7 @@ public class TwentyOneGame extends Fragment {
     }
 
     @SuppressLint("ResourceAsColor")
-    private static void UiCreate(Context context, FragmentTwentyOneGameBinding binding, WindowManager windowManager) {
+    private static void uiCreate(Context context, FragmentTwentyOneGameBinding binding, WindowManager windowManager) {
         LinearLayout.LayoutParams params = new LinearLayout.
                 LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
         params.setMargins(8, 8, 8, 8);
@@ -1129,11 +1221,11 @@ public class TwentyOneGame extends Fragment {
     }
 
     @SuppressLint("ResourceAsColor")
-    private void UiDestroy(Context context, FragmentTwentyOneGameBinding binding) {
-        if(dialog.isVisible()) {
+    private void uiDestroy(Context context, FragmentTwentyOneGameBinding binding) {
+        if (dialog.isVisible()) {
             fm.beginTransaction().remove(dialog).commit();
         }
-        if(Banker_dialog.isVisible()) {
+        if (Banker_dialog.isVisible()) {
             fm.beginTransaction().remove(Banker_dialog).commit();
         }
         binding.buttonBar.removeAllViews();
@@ -1159,19 +1251,20 @@ public class TwentyOneGame extends Fragment {
         });
     }
 
-    private void SetStatusToReady() {
+    private void setStatusToReady() {
         RoomRef.child(playerName).child("status").setValue("ready");
         binding.ready.setEnabled(false);
     }
+
     public static void notifyPlayer() {
-        if(GameFragment.viewPager2.getCurrentItem() != 1){
+        if (GameFragment.viewPager2.getCurrentItem() != 1) {
             handler.post(new Runnable() {
                 @SuppressLint("ResourceAsColor")
                 @Override
                 public void run() {
                     Snackbar snackbar = Snackbar.make(binding.scrollView2, "New message recived", Snackbar.LENGTH_LONG);
                     snackbar.setAnchorView(binding.linearLayout);
-                    snackbar.setAction("To the chat ->", new View.OnClickListener (){
+                    snackbar.setAction("To the chat ->", new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             GameFragment.viewPager2.setCurrentItem(1);

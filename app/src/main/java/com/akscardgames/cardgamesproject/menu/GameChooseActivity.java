@@ -5,8 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.Toast;
@@ -28,6 +30,7 @@ public class GameChooseActivity extends AppCompatActivity {
     private static FragmentManager fm;
     static FirebaseDatabase database = FirebaseDatabase.getInstance("https://cardgamesproject-6d467-default-rtdb.europe-west1.firebasedatabase.app/");
     String playerName = "";
+    int avg;
     DatabaseReference playerRef;
     private ActivityGameChooseBinding binding;
     private TabLayout tabLayout;
@@ -37,14 +40,26 @@ public class GameChooseActivity extends AppCompatActivity {
     private boolean shutDownFlag = false;
     private int backPressedCount = 0;
     Handler handler = new Handler();
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityGameChooseBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         playerName = getSharedPreferences("PREFS",0).getString("name","");
+        avg = getSharedPreferences("PREFS",0).getInt("avgProfit",0);
         playerRef = database.getReference("playerList/" + playerName);
         binding.name.setText("logged in as "+playerName);
+        if(avg > 0) {
+            binding.avg.setText("AVG:" + "+" + avg);
+            binding.avg.setTextColor(Color.GREEN);
+        } else if (avg < 0) {
+            binding.avg.setText("AVG:" + avg);
+            binding.avg.setTextColor(Color.RED);
+        } else{
+            binding.avg.setText("AVG:" + avg);
+            binding.avg.setTextColor(Color.WHITE);
+        }
         binding.logout.setOnClickListener(view -> LogOut());
         tabLayout = binding.tabLayout;
         viewPager2 = binding.FragmentsContainer;
@@ -87,13 +102,14 @@ public class GameChooseActivity extends AppCompatActivity {
 
     private void LogOut() {
         SharedPreferences prefs = getSharedPreferences("PREFS",0);
-        prefs.edit().remove("name").apply();
+        prefs.edit().clear().apply();
         playerRef.removeValue();
         startActivity(new Intent(this,StartActivity.class));
     }
 
     @Override
     protected void onResume() {
+        updateAvgProfit();
         super.onResume();
         if(shutDownFlag) {
             shutDownFlag = false;
@@ -142,5 +158,18 @@ public class GameChooseActivity extends AppCompatActivity {
                 backPressedCount = 0;
             }
         }, 1200);
+    }
+    public void updateAvgProfit(){
+        avg = getSharedPreferences("PREFS",0).getInt("avgProfit",0);
+        if(avg > 0) {
+            binding.avg.setText("AVG:" + "+" + avg);
+            binding.avg.setTextColor(Color.GREEN);
+        } else if (avg < 0) {
+            binding.avg.setText("AVG:" + avg);
+            binding.avg.setTextColor(Color.RED);
+        } else{
+            binding.avg.setText("AVG:" + avg);
+            binding.avg.setTextColor(Color.WHITE);
+        }
     }
 }

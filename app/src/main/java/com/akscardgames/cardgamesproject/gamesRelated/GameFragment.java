@@ -57,5 +57,6 @@ public class GameFragment extends Fragment {
             AppMethods.Disconnect(RoomRef, playerName, listener, ChatFragment.listener);
             GameChooseActivity.fragmentManager.beginTransaction().remove(this).commit();
         }
+        ((GameChooseActivity)getActivity()).updateAvgProfit();
     }
 }

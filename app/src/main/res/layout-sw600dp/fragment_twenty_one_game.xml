@@ -50,7 +50,7 @@
                     android:id="@+id/shownCard"
                     android:layout_width="171dp"
                     android:layout_height="228dp"
-                    app:shapeAppearanceOverlay="@style/roundedImageView" />
+                    app:shapeAppearanceOverlay="@style/roundedImageViewTablet"/>
             </LinearLayout>
 
         </LinearLayout>
@@ -63,6 +63,36 @@
             android:gravity="center"
             android:textSize="25dp" />
     </LinearLayout>
+    <androidx.cardview.widget.CardView
+        android:visibility="invisible"
+        android:id="@+id/endGameTable"
+        android:layout_margin="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:cardCornerRadius="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/DarkGrey">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="EndGameResults"
+                android:textColor="@color/white"
+                android:textSize="36sp"
+                android:gravity="center"/>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/endGameRecyclerView"
+                android:layout_margin="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
 
     <TextView
