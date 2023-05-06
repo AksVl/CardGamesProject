@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.akscardgames.cardgamesproject.menu.roomSearchFragments.FoolSearchFragment;
+import com.akscardgames.cardgamesproject.menu.roomSearchFragments.LiarSearchFragment;
 import com.akscardgames.cardgamesproject.menu.roomSearchFragments.TwentyOneSearchFragment;
 import com.example.cardgamesproject.databinding.FragmentPasswordRequestBinding;
 
@@ -18,6 +20,12 @@ public class PasswordRequestFragment extends DialogFragment {
     private FragmentPasswordRequestBinding binding;
     public String password;
     private String input;
+    private final String gameType;
+
+    public PasswordRequestFragment(String gameType) {
+        this.gameType = gameType;
+    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,7 +47,14 @@ public class PasswordRequestFragment extends DialogFragment {
             input = binding.password.getText().toString();
             if(!input.equals("")){
                 if(input.equals(password)){
-                    TwentyOneSearchFragment.connectPrivateRoom();
+                    switch (gameType){
+                        case "Fool":
+                            FoolSearchFragment.connectPrivateRoom();
+                        case "TwentyOne":
+                            TwentyOneSearchFragment.connectPrivateRoom();
+                        case "Liar":
+                            LiarSearchFragment.connectPrivateRoom();
+                    }
                     dismiss();
                 }else{
                     Toast.makeText(getContext(), "password is wrong", Toast.LENGTH_SHORT).show();

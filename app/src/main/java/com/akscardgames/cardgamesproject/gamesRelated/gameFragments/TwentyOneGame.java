@@ -168,7 +168,6 @@ public class TwentyOneGame extends Fragment {
                 dialog = new DialogBetChooseFragment();
                 binding.available.setText(String.valueOf(available));
                 fm = getParentFragmentManager();
-                //Intent inputIntent = getIntent();
                 RoomName = roomNameBuff;
                 SharedPreferences prefs = getActivity().getSharedPreferences("PREFS", 0);
                 playerName = prefs.getString("name", "");
@@ -303,7 +302,7 @@ public class TwentyOneGame extends Fragment {
                                 StartBank = Bank;
                                 StartBankReading = false;
                             }
-                            if (Bank == 0) {
+                            if (Bank <= 0) {
                                 RoomRef.child(playerName).child("status").setValue("ended");
                                 alreadyCounted = true;
                                 EndGame = true;
@@ -660,6 +659,7 @@ public class TwentyOneGame extends Fragment {
                                                     Return[0] = true;
                                                 }
                                             } else {
+                                                BackUpBank = Bank;
                                                 AddedCounter = 0;
                                                 OnceCheckFlag = true;
                                                 Return[0] = false;
@@ -1262,7 +1262,7 @@ public class TwentyOneGame extends Fragment {
                 @SuppressLint("ResourceAsColor")
                 @Override
                 public void run() {
-                    Snackbar snackbar = Snackbar.make(binding.scrollView2, "New message recived", Snackbar.LENGTH_LONG);
+                    Snackbar snackbar = Snackbar.make(binding.scrollView2, "New message received", Snackbar.LENGTH_LONG);
                     snackbar.setAnchorView(binding.linearLayout);
                     snackbar.setAction("To the chat ->", new View.OnClickListener() {
                         @Override

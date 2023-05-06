@@ -1,79 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context="com.akscardgames.cardgamesproject.menu.roomSearchFragments.FoolSearchFragment">
 
-    <ListView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1">
-    </ListView>
+        android:layout_marginVertical="8dp"
+        android:layout_weight="1" />
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="120sp"
         android:orientation="horizontal">
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:orientation="vertical"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:padding="8dp"
-            android:layout_height="match_parent">
-<!--            <LinearLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:layout_weight="3">-->
-<!--                <CheckBox-->
-<!--                    android:textSize="18sp"-->
-<!--                    android:textStyle="bold"-->
-<!--                    android:text="private"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:layout_weight="2"/>-->
-<!--                <EditText-->
-<!--                    android:textSize="18sp"-->
-<!--                    android:gravity="center"-->
-<!--                    android:hint="password"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:layout_weight="1"/>-->
-<!--            </LinearLayout>-->
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_weight="3">
+                <CheckBox
+                    android:layout_gravity="bottom"
+                    android:buttonTint="@color/DarkGrey"
+                    android:id="@+id/privateCheck"
+                    android:layout_width="wrap_content"
+                    android:layout_height="22dp"/>
+                <TextView
+                    android:layout_gravity="top"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textStyle="bold"
+                    android:text="private mode"
+                    android:textSize="22sp"/>
+            </LinearLayout>
             <Button
+                android:layout_margin="8dp"
                 android:id="@+id/create"
                 android:layout_width="match_parent"
-                android:layout_weight="2"
                 android:layout_height="match_parent"
-                android:text="Create Liar room"
+                android:layout_weight="1"
+                android:backgroundTint="@color/DarkGrey"
+                android:gravity="center"
+                android:text="Create liar room"
+                android:textColor="@color/buttonGrey"
                 android:textSize="24sp"
-                android:textColor="@color/black"
-                app:cornerRadius="@android:dimen/thumbnail_height"
-                android:gravity="center">
-            </Button>
+                app:cornerRadius="@android:dimen/thumbnail_height" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_weight="3"
             android:layout_height="match_parent"
+            android:layout_weight="3"
             android:orientation="vertical">
+
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="3"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="room size"
-                android:textStyle="bold"
-                android:textSize="18sp"/>
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
             <NumberPicker
-                style="@style/NumberPickerText"
                 android:id="@+id/sizePicker"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
                 android:gravity="start"
                 android:textColor="@color/black"
                 android:textSize="60sp" />

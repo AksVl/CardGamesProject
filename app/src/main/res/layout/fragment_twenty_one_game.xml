@@ -37,6 +37,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:visibility="invisible"
                     android:id="@+id/textBankersFirstCard"
                     android:layout_width="match_parent"
                     android:layout_height="36dp"
@@ -210,6 +211,7 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <Button
+            android:enabled="false"
             android:id="@+id/ready"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

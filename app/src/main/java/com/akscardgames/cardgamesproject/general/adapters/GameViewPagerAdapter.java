@@ -18,7 +18,7 @@ public class GameViewPagerAdapter extends FragmentStateAdapter {
 
     public GameViewPagerAdapter(@NonNull GameFragment fragment) {
         super(fragment);
-        chat = new ChatFragment();
+        chat = new ChatFragment(gameType);
     }
 
     @NonNull

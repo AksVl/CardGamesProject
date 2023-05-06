@@ -1,5 +1,6 @@
 package com.akscardgames.cardgamesproject.menu.roomSearchFragments;
 
+import static com.akscardgames.cardgamesproject.general.adapters.GameViewPagerAdapter.gameType;
 import static java.lang.Integer.parseInt;
 
 import android.content.SharedPreferences;
@@ -100,7 +101,7 @@ public class TwentyOneSearchFragment extends Fragment {
             });
         }else{
             RoomRef = database.getReference("TwentyOneRooms/" + RoomName);
-            CreatePasswordFragment dialog = new CreatePasswordFragment();
+            CreatePasswordFragment dialog = new CreatePasswordFragment("TwentyOne");
             FragmentManager fm = getParentFragmentManager();
             dialog.show(fm.beginTransaction().addToBackStack(null), null);
         }
@@ -158,7 +159,7 @@ public class TwentyOneSearchFragment extends Fragment {
                             } else {
                                 roomDataBuff = roomData;
                                 RoomRef = database.getReference("TwentyOneRooms/" + RoomName);
-                                PasswordRequestFragment dialog = new PasswordRequestFragment();
+                                PasswordRequestFragment dialog = new PasswordRequestFragment("TwentyOne");
                                 dialog.password = roomData.getAccess();
                                 FragmentManager fm = getParentFragmentManager();
                                 dialog.show(fm.beginTransaction().addToBackStack(null), null);

@@ -14,9 +14,13 @@ import android.os.Handler;
 import android.widget.Toast;
 
 import com.akscardgames.cardgamesproject.gamesRelated.GameFragment;
+import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.FoolGame;
+import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.LiarGame;
 import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.TwentyOneGame;
 import com.akscardgames.cardgamesproject.general.adapters.GameViewPagerAdapter;
 import com.akscardgames.cardgamesproject.general.adapters.TabLayoutAdapter;
+import com.akscardgames.cardgamesproject.menu.roomSearchFragments.FoolSearchFragment;
+import com.akscardgames.cardgamesproject.menu.roomSearchFragments.LiarSearchFragment;
 import com.akscardgames.cardgamesproject.menu.roomSearchFragments.TwentyOneSearchFragment;
 import com.example.cardgamesproject.databinding.ActivityGameChooseBinding;
 import com.google.android.material.tabs.TabLayout;
@@ -40,6 +44,8 @@ public class GameChooseActivity extends AppCompatActivity {
     private boolean shutDownFlag = false;
     private int backPressedCount = 0;
     Handler handler = new Handler();
+
+
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,15 +95,33 @@ public class GameChooseActivity extends AppCompatActivity {
             }
         });
     }
+    public static void launchFool(String roomName, String playerName) {
+        FoolGame.roomNameBuff = roomName;
+        GameFragment.playerName = playerName;
+        GameFragment.RoomRef = database.getReference("FoolRooms/" + roomName);
+        GameViewPagerAdapter.gameType = "Fool";
+        GameFragment fragment = new GameFragment();
+        fragmentManager.beginTransaction().addToBackStack(null).replace(android.R.id.content, fragment).commit();
+        FoolSearchFragment.binding.create.setEnabled(true);
+    }
     public static void launchTwentyOne(String roomName, String playerName){
         TwentyOneGame.roomNameBuff = roomName;
-        TwentyOneGame.playerNameBuff = playerName;
         GameFragment.playerName = playerName;
         GameFragment.RoomRef = database.getReference("TwentyOneRooms/" + roomName);
         GameViewPagerAdapter.gameType = "TwentyOne";
         GameFragment fragment = new GameFragment();
         fragmentManager.beginTransaction().addToBackStack(null).replace(android.R.id.content, fragment).commit();
         TwentyOneSearchFragment.binding.create.setEnabled(true);
+    }
+
+    public static void launchLiar(String roomName, String playerName) {
+        LiarGame.roomNameBuff = roomName;
+        GameFragment.playerName = playerName;
+        GameFragment.RoomRef = database.getReference("LiarRooms/" + roomName);
+        GameViewPagerAdapter.gameType = "Liar";
+        GameFragment fragment = new GameFragment();
+        fragmentManager.beginTransaction().addToBackStack(null).replace(android.R.id.content, fragment).commit();
+        LiarSearchFragment.binding.create.setEnabled(true);
     }
 
     private void LogOut() {

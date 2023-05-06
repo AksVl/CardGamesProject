@@ -101,7 +101,6 @@ public class AppMethods {
                     snapshot.getRef().removeValue();
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
@@ -147,6 +146,7 @@ public class AppMethods {
             }
             RoomRef.removeEventListener(listener);
             RoomRef.addValueEventListener(InGameListener);
+            GameFragment.listener = InGameListener;
             binding.gameStatus.setText("");
             TwentyOneGame.onGameStart(context, binding,windowManager);
         }
@@ -164,6 +164,7 @@ public class AppMethods {
             }
             roomRef.removeEventListener(listener);
             roomRef.addValueEventListener(InGameListener);
+            GameFragment.listener = InGameListener;
             FoolGame.onGameStart(context, binding, windowManager);
         }
     }

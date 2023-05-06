@@ -15,6 +15,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
+import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.FoolGame;
+import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.LiarGame;
 import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.TwentyOneGame;
 import com.akscardgames.cardgamesproject.general.Message;
 import com.akscardgames.cardgamesproject.general.adapters.ChatRecyclerViewAdapter;
@@ -35,6 +37,11 @@ public class ChatFragment extends Fragment {
     ChatRecyclerViewAdapter adapter;
     Handler handler = new Handler();
     private ArrayList<Message> chat = new ArrayList<>();
+    private final String gameType;
+
+    public ChatFragment(String gameType) {
+        this.gameType = gameType;
+    }
 
 
     @Override
@@ -113,10 +120,22 @@ public class ChatFragment extends Fragment {
                     }
                 });
                 adapter.notifyDataSetChanged();
-                recyclerView.scrollToPosition(adapter.getItemCount()-1);
-                if(snapshot.exists() && !TwentyOneGame.chatUpdatePermission) {
-                    TwentyOneGame.notifyPlayer();
+                recyclerView.scrollToPosition(adapter.getItemCount() - 1);
+                switch (gameType) {
+                    case "Fool":
+                        if (snapshot.exists()) {
+                            FoolGame.notifyPlayer();
+                        }
+                    case "TwentyOne":
+                        if (snapshot.exists() && !TwentyOneGame.chatUpdatePermission) {
+                            TwentyOneGame.notifyPlayer();
+                        }
+                    case "Liar":
+                        if (snapshot.exists()) {
+                            LiarGame.notifyPlayer();
+                        }
                 }
+
             }
 
             @Override
