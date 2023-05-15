@@ -20,27 +20,83 @@
     <LinearLayout
         android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="wrap_content"
         android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@+id/scrollView2"
         app:layout_constraintTop_toBottomOf="@+id/playersContainer">
-
         <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center">
+            android:gravity="center"
+            android:layout_weight="1">
+            <LinearLayout
+                android:id="@+id/valueLayout"
+                android:visibility="invisible"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="5">
+                <TextView
+                    android:layout_marginHorizontal="8dp"
+                    android:gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="stack value :"
+                    android:textSize="26sp"/>
+                <TextView
+                    android:id="@+id/chosenValue"
+                    android:layout_marginHorizontal="8dp"
+                    android:gravity="center"
+                    android:layout_width="42sp"
+                    android:layout_height="match_parent"
+                    android:text="A"
+                    android:textSize="32sp"/>
+            </LinearLayout>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:visibility="invisible"
+                android:id="@+id/stackLayout"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginVertical="20dp"
+                android:layout_width="120dp"
+                android:layout_height="160dp">
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/stackImageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/other_side"
+                    app:shapeAppearanceOverlay="@style/roundedImageView"/>
+                <TextView
+                    android:id="@+id/stackSize"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/white"
+                    android:textSize="52sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
 
             <TextView
+                android:layout_margin="8dp"
+                android:layout_gravity="center"
                 android:id="@+id/game_status"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:textSize="20dp" />
-
+                android:textSize="20sp" />
         </LinearLayout>
-
-
     </LinearLayout>
 
     <androidx.cardview.widget.CardView
@@ -54,23 +110,26 @@
         app:cardCornerRadius="12dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
         <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
+            android:layout_width="403dp"
             android:layout_height="match_parent"
-            android:background="@color/DarkGrey">
+            android:background="@color/DarkGrey"
+            android:orientation="vertical">
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:text="EndGameResults"
                 android:textColor="@color/white"
-                android:textSize="24sp"
-                android:gravity="center"/>
+                android:textSize="24sp" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/endGameRecyclerView"
-                android:layout_margin="8dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

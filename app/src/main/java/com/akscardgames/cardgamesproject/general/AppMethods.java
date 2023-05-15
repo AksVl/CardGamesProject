@@ -22,45 +22,42 @@ import java.util.ArrayList;
 
 public class AppMethods {
     //region cards objects
-    static Card h6 = new Card("6", 'h', R.drawable.h6);
-    static Card h7 = new Card("7", 'h', R.drawable.h7);
-    static Card h8 = new Card("8", 'h', R.drawable.h8);
-    static Card h9 = new Card("9", 'h', R.drawable.h9);
-    static Card h10 = new Card("10", 'h', R.drawable.h10);
-    static Card hj = new Card("j", 'h', R.drawable.hj);
-    static Card hd = new Card("d", 'h', R.drawable.hd);
-    static Card hk = new Card("k", 'h', R.drawable.hk);
-    static Card ha = new Card("a", 'h', R.drawable.ha);
-
-    static Card s6 = new Card("6", 's', R.drawable.s6);
-    static Card s7 = new Card("7", 's', R.drawable.s7);
-    static Card s8 = new Card("8", 's', R.drawable.s8);
-    static Card s9 = new Card("9", 's', R.drawable.s9);
-    static Card s10 = new Card("10", 's', R.drawable.s10);
-    static Card sj = new Card("j", 's', R.drawable.sj);
-    static Card sd = new Card("d", 's', R.drawable.sd);
-    static Card sk = new Card("k", 's', R.drawable.sk);
-    static Card sa = new Card("a", 's', R.drawable.sa);
-
-    static Card d6 = new Card("6", 'd', R.drawable.d6);
-    static Card d7 = new Card("7", 'd', R.drawable.d7);
-    static Card d8 = new Card("8", 'd', R.drawable.d8);
-    static Card d9 = new Card("9", 'd', R.drawable.d9);
-    static Card d10 = new Card("10", 'd', R.drawable.d10);
-    static Card dj = new Card("j", 'd', R.drawable.dj);
-    static Card dd = new Card("d", 'd', R.drawable.dd);
-    static Card dk = new Card("k", 'd', R.drawable.dk);
-    static Card da = new Card("a", 'd', R.drawable.da);
-
-    static Card c6 = new Card("6", 'c', R.drawable.c_six);
-    static Card c7 = new Card("7", 'c', R.drawable.c_seven);
-    static Card c8 = new Card("8", 'c', R.drawable.c_eight);
-    static Card c9 = new Card("9", 'c', R.drawable.c_nine);
-    static Card c10 = new Card("10", 'c', R.drawable.c_ten);
-    static Card cj = new Card("j", 'c', R.drawable.cj);
-    static Card cd = new Card("d", 'c', R.drawable.cd);
-    static Card ck = new Card("k", 'c', R.drawable.ck);
-    static Card ca = new Card("a", 'c', R.drawable.ca);
+    public static Card h6 = new Card("6", 'h', R.drawable.h6);
+    public static Card h7 = new Card("7", 'h', R.drawable.h7);
+    public static Card h8 = new Card("8", 'h', R.drawable.h8);
+    public static Card h9 = new Card("9", 'h', R.drawable.h9);
+    public static Card h10 = new Card("10", 'h', R.drawable.h10);
+    public static Card hj = new Card("j", 'h', R.drawable.hj);
+    public static Card hd = new Card("d", 'h', R.drawable.hd);
+    public static Card hk = new Card("k", 'h', R.drawable.hk);
+    public static Card ha = new Card("a", 'h', R.drawable.ha);
+    public static Card s6 = new Card("6", 's', R.drawable.s6);
+    public static Card s7 = new Card("7", 's', R.drawable.s7);
+    public static Card s8 = new Card("8", 's', R.drawable.s8);
+    public static Card s9 = new Card("9", 's', R.drawable.s9);
+    public static Card s10 = new Card("10", 's', R.drawable.s10);
+    public static Card sj = new Card("j", 's', R.drawable.sj);
+    public static Card sd = new Card("d", 's', R.drawable.sd);
+    public static Card sk = new Card("k", 's', R.drawable.sk);
+    public static Card sa = new Card("a", 's', R.drawable.sa);
+    public static Card d6 = new Card("6", 'd', R.drawable.d6);
+    public static Card d7 = new Card("7", 'd', R.drawable.d7);
+    public static Card d8 = new Card("8", 'd', R.drawable.d8);
+    public static Card d9 = new Card("9", 'd', R.drawable.d9);
+    public static Card d10 = new Card("10", 'd', R.drawable.d10);
+    public static Card dj = new Card("j", 'd', R.drawable.dj);
+    public static Card dd = new Card("d", 'd', R.drawable.dd);
+    public static Card dk = new Card("k", 'd', R.drawable.dk);
+    public static Card da = new Card("a", 'd', R.drawable.da);
+    public static Card c6 = new Card("6", 'c', R.drawable.c_six);
+    public static Card c7 = new Card("7", 'c', R.drawable.c_seven);
+    public static Card c8 = new Card("8", 'c', R.drawable.c_eight);
+    public static Card c9 = new Card("9", 'c', R.drawable.c_nine);
+    public static Card c10 = new Card("10", 'c', R.drawable.c_ten);
+    public static Card cj = new Card("j", 'c', R.drawable.cj);
+    public static Card cd = new Card("d", 'c', R.drawable.cd);
+    public static Card ck = new Card("k", 'c', R.drawable.ck);
+    public static Card ca = new Card("a", 'c', R.drawable.ca);
     //endregion cards objects
 
     public static Card[] raw_deck = {
@@ -93,7 +90,9 @@ public class AppMethods {
                     if(!element.equals("_size") && !element.equals("_ChoosingPlayer")
                     && !element.equals("_bank") && !element.equals("_bank_choosing")
                     && !element.equals("_offline") && !element.equals("_access")
-                            && !element.equals("_messages")){
+                            && !element.equals("_messages")  && !element.equals("_stack")
+                            && !element.equals("_chosenValue")  && !element.equals("_winnersPositions")
+                    && !element.equals("_lastThrown")){
                         PlayersAreInRoom = true;
                     }
                 }
@@ -108,7 +107,7 @@ public class AppMethods {
         });
     }
 
-    public static int getPosition(DataSnapshot snapshot, int size) {
+    public static int getAvailablePosition(DataSnapshot snapshot, int size) {
         ArrayList<Integer> PlayersPositions = new ArrayList<>();
         ArrayList<Integer> RoomPositions = new ArrayList<>();
         for (int j = 0; j < size; j++) {
@@ -185,7 +184,7 @@ public class AppMethods {
             LiarGame.onGameStart(context, binding, windowManager);
         }
     }
-    public static Card CardLink(String name) {
+    public static Card cardLink(String name) {
         switch (name) {
             case "c6": return raw_deck[0];
             case "c7": return raw_deck[1];
@@ -237,28 +236,42 @@ public class AppMethods {
         }
         return PlayerPos;
     }
+    public static int prevPlayer(int size, int playerPos) {
+        if(playerPos > 1){
+            playerPos--;
+        }
+        else{
+            playerPos = size;
+        }
+        return playerPos;
+    }
 
-    public static String findPlayerByPos(DatabaseReference roomRef, int i) {
-        final String[] player = {null};
+    public static void findPlayerByPos(DatabaseReference roomRef, int i, final OnPlayerFoundListener listener) {
         roomRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot node : snapshot.getChildren()){
+                String player = null;
+                for (DataSnapshot node : snapshot.getChildren()) {
                     String key = node.getKey();
-                    if(snapshot.child(key).child("position").exists()
-                            && Integer.parseInt(snapshot.child(key).child("position").getValue().toString())==i){
-                        player[0] = key;
+                    if (snapshot.child(key).child("position").exists()
+                            && Integer.parseInt(snapshot.child(key).child("position").getValue().toString()) == i) {
+                        player = key;
                         break;
                     }
                 }
+                listener.onPlayerFound(player);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                listener.onCancelled(error);
             }
         });
-        return player[0];
     }
 
+    public interface OnPlayerFoundListener {
+        void onPlayerFound(String player);
+
+        void onCancelled(DatabaseError error);
+    }
 }

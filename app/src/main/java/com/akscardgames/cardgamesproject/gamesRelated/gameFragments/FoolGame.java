@@ -37,6 +37,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 
 public class FoolGame extends Fragment {
@@ -137,10 +138,18 @@ public class FoolGame extends Fragment {
                         }
                         InRoomPlayers[0].clear();
                         for (DataSnapshot d : snapshot.getChildren()) {
-                            InRoomPlayers[0].add(d.getKey());
+                            if (!Objects.equals(d.getKey(), "_size")
+                                    && !Objects.equals(d.getKey(), "_messages")
+                                    && !Objects.equals(d.getKey(), "_access")) {
+                                InRoomPlayers[0].add(d.getKey());
+                            }
                         }
                         int pos;
-                        if (snapshot.getChildrenCount() - 2 == size[0] &&
+                        int noPlayersCount = 2;
+                        if (snapshot.child("_messages").exists()) {
+                            noPlayersCount = 3;
+                        }
+                        if (snapshot.getChildrenCount() - noPlayersCount == size[0] &&
                                 snapshot.child(playerName).child("status").exists() &&
                                 !snapshot.child(playerName).child("status").getValue().toString().equals("ready")) {
                             binding.ready.setEnabled(true);
@@ -148,14 +157,15 @@ public class FoolGame extends Fragment {
                             binding.ready.setEnabled(false);
                             if (snapshot.child(playerName).child("status").exists()
                                     && snapshot.child(playerName).child("status").getValue().toString().equals("ready")
-                                    && snapshot.getChildrenCount() - 2 != size[0]) {
+                                    && snapshot.getChildrenCount() - noPlayersCount != size[0]) {
                                 RoomRef.child(playerName).child("status").setValue("joined");
                             }
                         }
                         if (snapshot.child(playerName).child("position").exists()) {
                             my_pos = parseInt(snapshot.child(playerName).child("position").getValue().toString());
                             for (String player : InRoomPlayers[0]) {
-                                if (!snapshot.child(player).equals("_size") && !player.equals("_access") && snapshot.child(player).child("position").exists()) {
+                                if (!snapshot.child(player).equals("_size") && !player.equals("_access") && !player.equals("_messages")
+                                        && snapshot.child(player).child("position").exists()) {
                                     String gotStatus = snapshot.child(player).child("status").getValue().toString();
                                     if (!player.equals(playerName)) {
                                         pos = parseInt(snapshot.child(player).child("position").getValue().toString());

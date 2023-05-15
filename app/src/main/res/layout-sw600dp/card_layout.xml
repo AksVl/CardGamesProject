@@ -9,9 +9,10 @@
         android:layout_height="228dp"
         app:cardCornerRadius="23dp">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/image"
             android:layout_width="171dp"
-            android:layout_height="228dp" />
+            android:layout_height="228dp"
+            app:shapeAppearanceOverlay="@style/roundedImageViewTablet"/>
     </androidx.cardview.widget.CardView>
 </LinearLayout>

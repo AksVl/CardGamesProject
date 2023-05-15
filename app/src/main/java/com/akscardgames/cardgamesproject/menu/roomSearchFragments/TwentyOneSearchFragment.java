@@ -1,6 +1,5 @@
 package com.akscardgames.cardgamesproject.menu.roomSearchFragments;
 
-import static com.akscardgames.cardgamesproject.general.adapters.GameViewPagerAdapter.gameType;
 import static java.lang.Integer.parseInt;
 
 import android.content.SharedPreferences;
@@ -145,7 +144,7 @@ public class TwentyOneSearchFragment extends Fragment {
                                 RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        int AvailablePosition = AppMethods.getPosition(snapshot, size);
+                                        int AvailablePosition = AppMethods.getAvailablePosition(snapshot, size);
                                         GameChooseActivity.launchTwentyOne(RoomName, playerName);
                                         RoomRef.child(playerName).child("status").setValue("joined");
                                         RoomRef.child(playerName).child("position").setValue(AvailablePosition);
@@ -187,7 +186,7 @@ public class TwentyOneSearchFragment extends Fragment {
         RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                int AvailablePosition = AppMethods.getPosition(snapshot, size);
+                int AvailablePosition = AppMethods.getAvailablePosition(snapshot, size);
                 GameChooseActivity.launchTwentyOne(RoomName, playerName);
                 RoomRef.child(playerName).child("status").setValue("joined");
                 RoomRef.child(playerName).child("position").setValue(AvailablePosition);

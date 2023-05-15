@@ -178,7 +178,10 @@ public class TwentyOneGame extends Fragment {
                 final boolean[] OnceAnimated = {true};
                 final long[] EndGameDelay = {3000};
                 binding.ready.setOnClickListener(v ->
-                        setStatusToReady());
+                {
+                    RoomRef.child(playerName).child("status").setValue("ready");
+                    binding.ready.setEnabled(false);
+                });
                 // endregion onCreate init
                 RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -449,7 +452,7 @@ public class TwentyOneGame extends Fragment {
                             binding.shownCard.setImageDrawable(null);
                             if (snapshot.child(bankerName).child("hand").child(String.valueOf(0)).exists()) {
                                 String gotShownCard = snapshot.child(bankerName).child("hand").child(String.valueOf(0)).getValue().toString();
-                                Card shownCard = AppMethods.CardLink(gotShownCard);
+                                Card shownCard = AppMethods.cardLink(gotShownCard);
                                 if (shownCard != null) {
                                     binding.textBankersFirstCard.setVisibility(View.VISIBLE);
                                     binding.shownCard.setImageResource(shownCard.img_res);
@@ -500,17 +503,10 @@ public class TwentyOneGame extends Fragment {
                                             Collections.shuffle(deck);
                                             for (String player : InRoomPlayers[0]) {
                                                 if (!player.equals("_access") && !player.equals("_size") && !player.equals("_messages") && !player.equals("_bank")) {
-                                                    if (!player.equals(playerName)) {
-                                                        Card chosen = deck.get(0);
-                                                        deck.remove(chosen);
-                                                        RoomRef.child(player).child("hand").child(String.valueOf(0))
-                                                                .setValue(chosen.toString());
-                                                    } else {
-                                                        Card chosen = deck.get(0);
-                                                        deck.remove(chosen);
-                                                        RoomRef.child(player).child("hand").child(String.valueOf(0))
-                                                                .setValue(chosen.toString());
-                                                    }
+                                                    Card chosen = deck.get(0);
+                                                    deck.remove(chosen);
+                                                    RoomRef.child(player).child("hand").child(String.valueOf(0))
+                                                            .setValue(chosen.toString());
                                                 }
                                             }
                                             MainGameLoop = true;
@@ -703,7 +699,7 @@ public class TwentyOneGame extends Fragment {
                         }
                         Collections.reverse(Hand);
                         for (String got : Hand) {
-                            Card card = AppMethods.CardLink(got);
+                            Card card = AppMethods.cardLink(got);
                             total += getValueOfCard(card);
                             if (card != null && !EndGame) {
                                 CardLayoutBinding image = CardLayoutBinding.inflate(getLayoutInflater());
@@ -762,7 +758,7 @@ public class TwentyOneGame extends Fragment {
                                 }
                                 int bankerScore = 0;
                                 for (String got : BankerHand) {
-                                    Card card = AppMethods.CardLink(got);
+                                    Card card = AppMethods.cardLink(got);
                                     bankerScore += getValueOfCard(card);
                                 }
                                 if (snapshot.child(bankerName).child("status").getValue().toString().equals("Lost all")) {
@@ -952,9 +948,9 @@ public class TwentyOneGame extends Fragment {
                                                 fadeIn.setDuration(2400);
                                                 binding.endGameTable.startAnimation(fadeIn);
                                                 binding.endGameTable.setVisibility(View.VISIBLE);
+                                                //endregion endGameTable
                                             }
                                         }, 3000);
-                                        //endregion endGameTable
                                         //region recounting avg
                                         SharedPreferences prefs = getActivity().getSharedPreferences("PREFS", 0);
                                         int gamesCount = prefs.getInt("gamesCount", 0);
@@ -1249,11 +1245,6 @@ public class TwentyOneGame extends Fragment {
             assert getParentFragment() != null;
             GameChooseActivity.fragmentManager.beginTransaction().remove(getParentFragment()).commit();
         });
-    }
-
-    private void setStatusToReady() {
-        RoomRef.child(playerName).child("status").setValue("ready");
-        binding.ready.setEnabled(false);
     }
 
     public static void notifyPlayer() {

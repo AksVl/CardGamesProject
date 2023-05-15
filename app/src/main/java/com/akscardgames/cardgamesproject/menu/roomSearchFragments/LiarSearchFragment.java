@@ -144,7 +144,7 @@ public class LiarSearchFragment extends Fragment {
                                 RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        int AvailablePosition = AppMethods.getPosition(snapshot, size);
+                                        int AvailablePosition = AppMethods.getAvailablePosition(snapshot, size);
                                         GameChooseActivity.launchLiar(RoomName, playerName);
                                         RoomRef.child(playerName).child("status").setValue("joined");
                                         RoomRef.child(playerName).child("position").setValue(AvailablePosition);
@@ -186,7 +186,7 @@ public class LiarSearchFragment extends Fragment {
         RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                int AvailablePosition = AppMethods.getPosition(snapshot, size);
+                int AvailablePosition = AppMethods.getAvailablePosition(snapshot, size);
                 GameChooseActivity.launchLiar(RoomName, playerName);
                 RoomRef.child(playerName).child("status").setValue("joined");
                 RoomRef.child(playerName).child("position").setValue(AvailablePosition);
