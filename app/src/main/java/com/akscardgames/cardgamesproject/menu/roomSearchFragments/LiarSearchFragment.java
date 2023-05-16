@@ -76,6 +76,7 @@ public class LiarSearchFragment extends Fragment {
     }
 
     private void CreateNewRoom() {
+        RoomName = playerName + "_Room";
         if(!binding.privateCheck.isChecked()) {
             RoomRef = database.getReference("LiarRooms/" + RoomName);
             RoomRef.child("_size").setValue(binding.sizePicker.getValue());
@@ -180,45 +181,50 @@ public class LiarSearchFragment extends Fragment {
     }
 
     public static void connectPrivateRoom() {
-        RoomName = roomDataBuff.getName();
-        final int size = roomDataBuff.getSize();
-        final int count = roomDataBuff.getPlayerCount();
-        RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                int AvailablePosition = AppMethods.getAvailablePosition(snapshot, size);
-                GameChooseActivity.launchLiar(RoomName, playerName);
-                RoomRef.child(playerName).child("status").setValue("joined");
-                RoomRef.child(playerName).child("position").setValue(AvailablePosition);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-    public static void createPrivateRoom(String password){
-        RoomRef.child("_size").setValue(binding.sizePicker.getValue());
-        RoomRef.child("_access").setValue(password);
-        binding.create.setEnabled(false);
-        RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
+        if(roomDataBuff != null) {
+            RoomName = roomDataBuff.getName();
+            final int size = roomDataBuff.getSize();
+            final int count = roomDataBuff.getPlayerCount();
+            RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    int AvailablePosition = AppMethods.getAvailablePosition(snapshot, size);
                     GameChooseActivity.launchLiar(RoomName, playerName);
                     RoomRef.child(playerName).child("status").setValue("joined");
-                    RoomRef.child(playerName).child("position").setValue(1);
-                } else {
-                    binding.create.setEnabled(true);
+                    RoomRef.child(playerName).child("position").setValue(AvailablePosition);
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                //idk what to do here
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
+    }
+    public static void createPrivateRoom(String password) {
+        RoomName = playerName + "_Room";
+        if (RoomRef != null){
+            RoomRef.child("_size").setValue(binding.sizePicker.getValue());
+            RoomRef.child("_access").setValue(password);
+            binding.create.setEnabled(false);
+            RoomRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        GameChooseActivity.launchLiar(RoomName, playerName);
+                        RoomRef.child(playerName).child("status").setValue("joined");
+                        RoomRef.child(playerName).child("position").setValue(1);
+                    } else {
+                        binding.create.setEnabled(true);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    //idk what to do here
+                }
+            });
+        }
     }
 
     @Override

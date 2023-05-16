@@ -76,6 +76,7 @@ public class TwentyOneSearchFragment extends Fragment {
     }
 
     private void CreateNewRoom() {
+        RoomName = playerName + "_Room";
         if(!binding.privateCheck.isChecked()) {
             RoomRef = database.getReference("TwentyOneRooms/" + RoomName);
             RoomRef.child("_size").setValue(binding.sizePicker.getValue());
@@ -199,6 +200,7 @@ public class TwentyOneSearchFragment extends Fragment {
         });
     }
     public static void createPrivateRoom(String password){
+        RoomName = playerName + "_Room";
         RoomRef.child("_size").setValue(binding.sizePicker.getValue());
         RoomRef.child("_access").setValue(password);
         binding.create.setEnabled(false);

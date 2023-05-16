@@ -61,7 +61,7 @@ public class FoolSearchFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         recyclerView = binding.list;
-        binding.create.setEnabled(true);
+        binding.create.setEnabled(false);
         SharedPreferences prefs = Objects.requireNonNull(getActivity()).getSharedPreferences("PREFS", 0);
         playerName = prefs.getString("name", "");
         RoomName = playerName + "_Room";
@@ -89,7 +89,7 @@ public class FoolSearchFragment extends Fragment {
                         RoomRef.child(playerName).child("status").setValue("joined");
                         RoomRef.child(playerName).child("position").setValue(1);
                     } else {
-                        binding.create.setEnabled(true);
+                        //binding.create.setEnabled(true);
                     }
                 }
 
@@ -210,7 +210,7 @@ public class FoolSearchFragment extends Fragment {
                     RoomRef.child(playerName).child("status").setValue("joined");
                     RoomRef.child(playerName).child("position").setValue(1);
                 } else {
-                    binding.create.setEnabled(true);
+                    //binding.create.setEnabled(true);
                 }
             }
 
@@ -224,6 +224,6 @@ public class FoolSearchFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        binding.create.setEnabled(true);
+        //binding.create.setEnabled(true);
     }
 }
