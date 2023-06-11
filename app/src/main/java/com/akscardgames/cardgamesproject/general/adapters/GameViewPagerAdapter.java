@@ -11,14 +11,11 @@ import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.LiarGame;
 import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.TwentyOneGame;
 
 public class GameViewPagerAdapter extends FragmentStateAdapter {
-    Fragment game;
-    ChatFragment chat;
     public static String gameType;
 
 
     public GameViewPagerAdapter(@NonNull GameFragment fragment) {
         super(fragment);
-        chat = new ChatFragment(gameType);
     }
 
     @NonNull
@@ -34,7 +31,7 @@ public class GameViewPagerAdapter extends FragmentStateAdapter {
                     return new LiarGame();
             }
         }
-        return chat;
+        return new ChatFragment(gameType);
     }
 
     @Override

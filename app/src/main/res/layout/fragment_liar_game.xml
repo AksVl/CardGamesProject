@@ -42,7 +42,7 @@
                     android:gravity="center"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="stack value :"
+                    android:text="@string/stack_value"
                     android:textSize="26sp"/>
                 <TextView
                     android:id="@+id/chosenValue"
@@ -121,7 +121,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="EndGameResults"
+                android:text="@string/endgameresults"
                 android:textColor="@color/white"
                 android:textSize="24sp" />
 
@@ -141,7 +141,7 @@
         android:gravity="center"
         android:layout_marginStart="12dp"
         android:layout_marginTop="188dp"
-        android:text="Waiting for other players"
+        android:text="@string/waiting_for_other_players"
         android:textSize="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -184,7 +184,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginStart="8dp"
-                android:text="current bet:"
+                android:text="@string/current_bet"
                 android:textColor="@color/buttonGrey"
                 android:textSize="24dp" />
 
@@ -222,7 +222,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:textSize="20dp"
-            android:text="I'm ready"
+            android:text="@string/i_m_ready"
             app:cornerRadius="@android:dimen/thumbnail_height"
             android:textColor="@color/black" />
     </LinearLayout>

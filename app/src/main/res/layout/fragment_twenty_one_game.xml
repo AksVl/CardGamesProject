@@ -42,7 +42,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="36dp"
                     android:gravity="center"
-                    android:text="banker's first card :"
+                    android:text="@string/banker_s_first_card"
                     android:textSize="16dp" />
 
                 <com.google.android.material.imageview.ShapeableImageView
@@ -82,7 +82,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="EndGameResults"
+                android:text="@string/endgameresults"
                 android:textColor="@color/white"
                 android:textSize="24sp"
                 android:gravity="center"/>
@@ -102,7 +102,7 @@
         android:gravity="center"
         android:layout_marginStart="12dp"
         android:layout_marginTop="188dp"
-        android:text="Waiting for other players"
+        android:text="@string/waiting_for_other_players"
         android:textSize="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -157,7 +157,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginStart="8dp"
-                android:text="current bet:"
+                android:text="@string/current_bet"
                 android:textColor="@color/buttonGrey"
                 android:textSize="24dp" />
 
@@ -178,7 +178,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:text=" available:"
+                android:text="@string/available"
                 android:textColor="@color/buttonGrey"
                 android:textSize="24dp" />
 
@@ -216,7 +216,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:textSize="20dp"
-            android:text="I'm ready"
+            android:text="@string/i_m_ready"
             app:cornerRadius="@android:dimen/thumbnail_height"
             android:textColor="@color/black" />
     </LinearLayout>

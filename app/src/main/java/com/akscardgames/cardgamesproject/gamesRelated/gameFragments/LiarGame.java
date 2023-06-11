@@ -2,6 +2,7 @@ package com.akscardgames.cardgamesproject.gamesRelated.gameFragments;
 
 
 import static java.lang.Integer.parseInt;
+import static java.lang.Integer.signum;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -158,8 +159,8 @@ public class LiarGame extends Fragment {
                         for (int i = 0; i < binding.playersContainer.getChildCount(); i++) {
                             TextView name = binding.playersContainer.getChildAt(i).findViewById(R.id.name);
                             TextView status = binding.playersContainer.getChildAt(i).findViewById(R.id.status);
-                            status.setText("empty");
-                            name.setText("none");
+                            status.setText(getString(R.string.empty));
+                            name.setText(getString(R.string.none));
                         }
                         InRoomPlayers[0].clear();
                         for (DataSnapshot d : snapshot.getChildren()) {
@@ -201,7 +202,8 @@ public class LiarGame extends Fragment {
                                             TextView name = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])).findViewById(R.id.name);
                                             TextView status = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])).findViewById(R.id.status);
                                             name.setText(player);
-                                            status.setText(gotStatus);
+                                            String outputStatus = getOutputStatus(gotStatus);
+                                            status.setText(outputStatus);
                                             status.setTextColor(Color.WHITE);
                                             if (gotStatus.equals("ready")) {
                                                 status.setTextColor(Color.GREEN);
@@ -238,7 +240,7 @@ public class LiarGame extends Fragment {
                         if (snapshot.child(playerName).child("status").exists()
                                 && snapshot.child(playerName).child("status").getValue().toString().equals("Out")) {
                             //region win
-                            binding.message.setText("You have won!");
+                            binding.message.setText(getString(R.string.you_have_won));
                             AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
                             fadeIn.setDuration(800);
                             binding.message.startAnimation(fadeIn);
@@ -246,7 +248,7 @@ public class LiarGame extends Fragment {
                             roomRef.child("_winnersPositions").child(playerName).setValue(my_pos);
                             roomRef.child(playerName).child("profit").setValue(5000 / (size[0] - 1));
                             binding.ShowBet.setText("+" + (5000 / (size[0] - 1)));
-                            binding.betText.setText("profit");
+                            binding.betText.setText(getString(R.string.profit));
                             binding.ShowBet.setTextColor(Color.GREEN);
                             //region recounting avg
                             SharedPreferences prefs = getActivity().getSharedPreferences("PREFS", 0);
@@ -271,14 +273,14 @@ public class LiarGame extends Fragment {
                                     if (snapshot.child(playerName).child("status").exists()
                                             && !snapshot.child(playerName).child("status").getValue().toString().equals("Out")) {
                                         //region lose
-                                        binding.message.setText("You have lost!");
+                                        binding.message.setText(getString(R.string.you_have_lost));
                                         AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
                                         fadeIn.setDuration(800);
                                         binding.message.startAnimation(fadeIn);
                                         binding.message.setVisibility(View.VISIBLE);
                                         roomRef.child(playerName).child("profit").setValue(-5000);
                                         binding.ShowBet.setText("" + (-5000));
-                                        binding.betText.setText("profit");
+                                        binding.betText.setText(getString(R.string.profit));
                                         binding.ShowBet.setTextColor(Color.RED);
                                         //region recounting avg
                                         SharedPreferences prefs = getActivity().getSharedPreferences("PREFS", 0);
@@ -435,9 +437,9 @@ public class LiarGame extends Fragment {
                                             gameStatusUpdatePermission = false;
                                             someoneChecking[0] = true;
                                             if (lastCard.value.equals(requiredValue)) {
-                                                binding.gameStatus.setText("you have missed!");
+                                                binding.gameStatus.setText(getString(R.string.missed));
                                             } else {
-                                                binding.gameStatus.setText("you have caught the liar!");
+                                                binding.gameStatus.setText(getString(R.string.you_have_caught));
                                             }
                                             binding.stackImageView.setImageResource(lastCard.img_res);
                                             binding.stackSize.setVisibility(View.INVISIBLE);
@@ -446,9 +448,9 @@ public class LiarGame extends Fragment {
                                                 public void run() {
                                                     someoneChecking[0] = false;
                                                     gameStatusUpdatePermission = true;
+                                                    String lastThrown = snapshot.child("_lastThrown").getValue().toString();
                                                     if (snapshot.child("_stack").exists() && snapshot.child("_chosenValue").exists()
                                                             && snapshot.child("_lastThrown").exists()) {
-                                                        String lastThrown = snapshot.child("_lastThrown").getValue().toString();
                                                         binding.stackImageView.setImageResource(R.drawable.other_side);
                                                         binding.stackSize.setVisibility(View.VISIBLE);
                                                         String requiredValue = snapshot.child("_chosenValue").getValue().toString();
@@ -505,7 +507,8 @@ public class LiarGame extends Fragment {
                                         String gotCount = String.valueOf(snapshot.child(player).child("hand").getChildrenCount());
                                         String gotStatus = snapshot.child(player).child("status").getValue().toString();
                                         CardCount.setText(gotCount);
-                                        status.setText(gotStatus);
+                                        String outputStatus = getOutputStatus(gotStatus);
+                                        status.setText(outputStatus);
                                         status.setTextColor(Color.WHITE);
                                         if (gotStatus.equals("checking")
                                                 && binding.buttonBar.getChildAt(0) != null
@@ -526,9 +529,9 @@ public class LiarGame extends Fragment {
                                                 statusUpdatePermission = false;
                                                 binding.gameStatus.setVisibility(View.VISIBLE);
                                                 if (lastCard.value.equals(requiredValue)) {
-                                                    binding.gameStatus.setText("checked one wasn't the liar!");
+                                                    binding.gameStatus.setText(getString(R.string.checked_one_wasnt_the_liar));
                                                 } else {
-                                                    binding.gameStatus.setText("liar has been caught!");
+                                                    binding.gameStatus.setText(getString(R.string.liar_has_been_caught));
                                                 }
                                                 binding.stackImageView.setImageResource(lastCard.img_res);
                                             }
@@ -576,7 +579,7 @@ public class LiarGame extends Fragment {
                                                     imTheWinner = true;
                                                     GameFragment.isInGame = false;
                                                     //region win
-                                                    binding.message.setText("You have won!");
+                                                    binding.message.setText(getString(R.string.you_have_won));
                                                     AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
                                                     fadeIn.setDuration(800);
                                                     binding.message.startAnimation(fadeIn);
@@ -686,10 +689,10 @@ public class LiarGame extends Fragment {
                                 if (gameStatusUpdatePermission) {
                                     if (status.equals("starting")) {
                                         binding.gameStatus.setVisibility(View.VISIBLE);
-                                        binding.gameStatus.setText("choose a value and start a stack!");
+                                        binding.gameStatus.setText(getString(R.string.start_a_stack));
                                     } else if (status.equals("choosing")) {
                                         binding.gameStatus.setVisibility(View.VISIBLE);
-                                        binding.gameStatus.setText("your turn to lie!");
+                                        binding.gameStatus.setText(getString(R.string.your_turn_to_lie));
                                     } else if (someoneChecking[0]) {
                                         binding.gameStatus.setVisibility(View.VISIBLE);
                                     } else {
@@ -766,6 +769,56 @@ public class LiarGame extends Fragment {
             }
         });
     }
+    private String getOutputStatus(String gotStatus) {
+        switch (gotStatus) {
+            case "joined":
+                return getString(R.string.joined);
+            case "ready":
+                return getString(R.string.ready);
+            case "waiting":
+                return getString(R.string.waiting);
+            case "ended":
+                return getString(R.string.ended);
+            case "ending":
+                return getString(R.string.ending);
+            case "choosing":
+                return getString(R.string.choosing);
+            case "starting":
+                return getString(R.string.starting);
+            case "takes more":
+                return "-";
+            case "passed":
+                return getString(R.string.passed);
+            case "betting":
+                return getString(R.string.betting);
+            case "gets more":
+                return "-";
+            case "TwentyOne":
+                return getString(R.string.twenty_one);
+            case "Won":
+                return getString(R.string.won);
+            case "Won all":
+                return getString(R.string.won_all);
+            case "Lost":
+                return getString(R.string.lost);
+            case "Lost all":
+                return getString(R.string.lost_all);
+            case "out":
+                return getString(R.string.out);
+            case "finished":
+                return getString(R.string.finished);
+            case "Out":
+                return getString(R.string.out);
+            case "checking":
+                return getString(R.string.checking);
+            case "sets bank":
+                return getString(R.string.sets_bank);
+            case "sets a bank":
+                return "-";
+            default:
+                return null;
+        }
+    }
 
     private void setNextChoosingPlayerPos(int pos, DataSnapshot snapshot) {
         ArrayList<Integer> winnersPosition = new ArrayList<>();
@@ -793,7 +846,8 @@ public class LiarGame extends Fragment {
             @Override
             public void run() {
                 if (playerName.equals(adminName)) {
-                    roomRef.child("_ChoosingPlayer").setValue(1);
+                    choosingPlayerPos = (int) ((int) (Math.random() * (size[0] - 1 + 1)) + 1);
+                    roomRef.child("_ChoosingPlayer").setValue(choosingPlayerPos);
                     deck.clear();
                     deck.addAll(Arrays.asList(AppMethods.raw_deck));
                     Collections.shuffle(deck);
@@ -811,7 +865,7 @@ public class LiarGame extends Fragment {
                 }
             }
         }, 1700);
-        binding.message.setText("game has started!");
+        binding.message.setText(R.string.game_has_started);
         AlphaAnimation fadeOut = new AlphaAnimation(1.0f, 0.0f);
         fadeOut.setDuration(2400);
         binding.message.startAnimation(fadeOut);
@@ -832,13 +886,14 @@ public class LiarGame extends Fragment {
         check.setCornerRadius(9999);
         next.setCornerRadius(9999);
         back.setCornerRadius(9999);
-        check.setText("CHECK");
+        check.setText(context.getString(R.string.check));
         next.setText(">");
         back.setText("<");
         check.setTextColor(R.color.black);
         next.setTextColor(R.color.black);
         back.setTextColor(R.color.black);
-        String[] values = {"6", "7", "8", "9", "10", "J", "D", "K", "A"};
+        String[] values = {"6", "7", "8", "9", "10", "j", "d", "k", "a"};
+        String[] valuesUI = {"6", "7", "8", "9", "10", "j", "d", "k", "a"};
         DisplayMetrics metrics = new DisplayMetrics();
         windowManager.getDefaultDisplay().getMetrics(metrics);
         int widthPixels = metrics.widthPixels;
@@ -896,7 +951,7 @@ public class LiarGame extends Fragment {
         MaterialButton Disconnect = new MaterialButton(context);
         Disconnect.setCornerRadius((int) context.getResources().getDimension(android.R.dimen.thumbnail_height));
         Disconnect.setTextColor(R.color.black);
-        Disconnect.setText("Disconnect");
+        Disconnect.setText(R.string.disconnect);
         Disconnect.setTextSize(20);
         binding.buttonBar.addView(Disconnect, params);
         binding.buttonBar.getChildAt(0).setOnClickListener(view -> {

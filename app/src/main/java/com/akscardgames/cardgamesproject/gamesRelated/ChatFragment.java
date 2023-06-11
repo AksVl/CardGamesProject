@@ -126,14 +126,17 @@ public class ChatFragment extends Fragment {
                         if (snapshot.exists()) {
                             FoolGame.notifyPlayer();
                         }
+                        break;
                     case "TwentyOne":
                         if (snapshot.exists() && !TwentyOneGame.chatUpdatePermission) {
-                            TwentyOneGame.notifyPlayer();
+                            TwentyOneGame.notifyPlayer(getContext());
                         }
+                        break;
                     case "Liar":
                         if (snapshot.exists()) {
                             LiarGame.notifyPlayer();
                         }
+                        break;
                 }
 
             }

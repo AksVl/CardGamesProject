@@ -1,6 +1,7 @@
 package com.akscardgames.cardgamesproject.gamesRelated.gameFragments;
 
 
+import static com.akscardgames.cardgamesproject.gamesRelated.GameFragment.RoomRef;
 import static java.lang.Integer.parseInt;
 
 import androidx.annotation.NonNull;
@@ -25,6 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -38,7 +40,9 @@ import com.akscardgames.cardgamesproject.menu.GameChooseActivity;
 import com.example.cardgamesproject.R;
 import com.example.cardgamesproject.databinding.CardLayoutBinding;
 import com.example.cardgamesproject.databinding.FragmentFoolGameBinding;
+import com.example.cardgamesproject.databinding.NoimgPlayerItemBinding;
 import com.example.cardgamesproject.databinding.PlayerItemBinding;
+import com.example.cardgamesproject.databinding.SmallCardLayoutBinding;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.shape.ShapeAppearanceModel;
@@ -53,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Objects;
 
 
@@ -60,6 +65,7 @@ public class FoolGame extends Fragment {
     //region variables
     private static FragmentFoolGameBinding binding;
     private static FragmentManager fm;
+    private static SmallCardLayoutBinding lastCard;
     private final FirebaseDatabase database = FirebaseDatabase.getInstance("https://cardgamesproject-6d467-default-rtdb.europe-west1.firebasedatabase.app/");
     private static DatabaseReference roomRef;
     private static String roomName;
@@ -79,9 +85,18 @@ public class FoolGame extends Fragment {
     private boolean handUpdatePermission = true;
     private boolean statusUpdatePermission = true;
     private boolean someoneOffline = false;
-    private boolean gameStatusUpdatePermission = true;
-    private boolean[] someoneChecking = {false};
+    //private boolean gameStatusUpdatePermission = true;
     private boolean imTheWinner = false;
+    private int oldPairCount = 0;
+    private String oldAttackingPlayer = null;
+    private boolean tossPermission = false;
+    private ArrayList<String> usedValues = new ArrayList<>();
+    private boolean statusPaused = false;
+    private boolean onceTake = false;
+    private boolean okClicked = false;
+    private boolean onceHandOut = true;
+    private boolean onceLose = true;
+    private boolean secondOnceTake = true;
 
     //endregion variables
 
@@ -102,6 +117,24 @@ public class FoolGame extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         GameFragment.viewPager2.setCurrentItem(1);
+        adminName = null;
+        choosingPlayerPos = 0;
+        endGame = false;
+        gameStarted = false;
+        handUpdatePermission = true;
+        statusUpdatePermission = true;
+        someoneOffline = false;
+        imTheWinner = false;
+        oldPairCount = 0;
+        oldAttackingPlayer = null;
+        tossPermission = false;
+        statusPaused = false;
+        onceTake = false;
+        okClicked = false;
+        onceHandOut = true;
+        onceLose = true;
+        secondOnceTake = true;
+        usedValues.clear();
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -122,7 +155,7 @@ public class FoolGame extends Fragment {
                         if (snapshot.child("_size").exists()) {
                             size[0] = parseInt(snapshot.child("_size").getValue().toString());
                             for (int i = 0; size[0] - 1 > i; i++) {
-                                PlayerItemBinding playerItem = PlayerItemBinding.inflate(getLayoutInflater());
+                                NoimgPlayerItemBinding playerItem = NoimgPlayerItemBinding.inflate(getLayoutInflater());
                                 binding.playersContainer.addView(playerItem.getRoot(), params);
                                 binding.playersContainer.invalidate();
                             }
@@ -173,6 +206,9 @@ public class FoolGame extends Fragment {
                         }
                         if (snapshot.child(playerName).child("position").exists()) {
                             my_pos = parseInt(snapshot.child(playerName).child("position").getValue().toString());
+                            if (my_pos == 1) {
+                                adminName = playerName;
+                            }
                             for (String player : InRoomPlayers[0]) {
                                 if (!snapshot.child(player).equals("_size") && !player.equals("_access") && !player.equals("_messages")
                                         && snapshot.child(player).child("position").exists()) {
@@ -196,9 +232,9 @@ public class FoolGame extends Fragment {
                                 }
                             }
                         }
-                        /*AppMethods.foolReadyCheck(listener, InGameListener,
-                                InRoomPlayers[0], RoomRef, readyCount, size[0],
-                                binding, getContext(), getActivity().getWindowManager());*/
+                        AppMethods.foolReadyCheck(listener, inGameListener,
+                                InRoomPlayers[0], roomRef, readyCount, size[0],
+                                binding, getContext(), getActivity().getWindowManager());
                     }
 
                     @Override
@@ -206,91 +242,39 @@ public class FoolGame extends Fragment {
 
                     }
                 };
-                /*inGameListener = new ValueEventListener() {
+                inGameListener = new ValueEventListener() {
                     @SuppressLint("SetTextI18n")
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         int pos;
-                        View.OnDragListener dragListener1 = new View.OnDragListener() {
-                            @Override
-                            public boolean onDrag(View v, DragEvent event) {
-                                switch (event.getAction()) {
-                                    case DragEvent.ACTION_DRAG_STARTED:
-                                        return true;
-                                    case DragEvent.ACTION_DRAG_ENTERED:
-                                        return true;
-                                    case DragEvent.ACTION_DRAG_EXITED:
-                                        return true;
-                                    case DragEvent.ACTION_DRAG_LOCATION:
-                                        return true;
-                                    case DragEvent.ACTION_DROP:
-                                        handUpdatePermission = false;
-                                        String cardName = event.getClipData().getItemAt(0).getText().toString();
-                                        Card draggedCard = AppMethods.cardLink(cardName);
-                                        ArrayList<String> rearrangedHand = new ArrayList<>();
-                                        for (DataSnapshot cardSnapshot : snapshot.child(playerName).child("hand").getChildren()) {
-                                            if (!cardSnapshot.getValue().toString().equals(draggedCard.toString())) {
-                                                rearrangedHand.add(cardSnapshot.getValue().toString());
-                                            }
-                                        }
-                                        roomRef.child(playerName).child("hand").removeValue();
-                                        for (String card : rearrangedHand) {
-                                            roomRef.child(playerName).child("hand")
-                                                    .child(String.valueOf(rearrangedHand.indexOf(card))).setValue(card);
-                                        }
-                                        int count = 0;
-                                        if (snapshot.child("_stack").exists()) {
-                                            count = (int) snapshot.child("_stack").getChildrenCount();
-                                        } else {
-                                            String value = ((TextView) binding.buttonBar.getChildAt(2)).getText().toString();
-                                            roomRef.child("_chosenValue").setValue(value);
-                                        }
-                                        roomRef.child("_stack").child("" + count).setValue(draggedCard.toString());
-                                        roomRef.child("_lastThrown").setValue(playerName);
-                                        choosingPlayerPos = AppMethods.nextPlayer(size[0], choosingPlayerPos);
-                                        roomRef.child("_ChoosingPlayer").setValue(choosingPlayerPos);
-                                        binding.linearLayout3.setOnDragListener(null);
-                                        handUpdatePermission = true;
-                                        return true;
-                                    default:
-                                        break;
+                        if (!snapshot.child("_encounter").exists()) {
+                            usedValues.clear();
+                            statusUpdatePermission = true;
+                            okClicked = false;
+                            if (onceTake) {
+                                onceTake = false;
+                                //region takeFromStack
+                                int handCount = 0;
+                                if (snapshot.child(playerName).child("hand").exists()) {
+                                    handCount = (int) snapshot.child(playerName).child("hand").getChildrenCount();
                                 }
-                                return false;
+                                if (handCount < 6) {
+                                    roomRef.child("_takers").child(playerName).setValue(my_pos);
+                                }
+                                //endregion takeFromStack
                             }
-                        };
+                        }
                         //region choosingPlayer reading
                         if (snapshot.child("_ChoosingPlayer").exists()) {
-                            choosingPlayerPos = parseInt(snapshot.child("_ChoosingPlayer").getValue().toString());
+                            int currentChoosingPlayer = parseInt(snapshot.child("_ChoosingPlayer").getValue().toString());
+                            if (currentChoosingPlayer != choosingPlayerPos) {
+                                choosingPlayerPos = parseInt(snapshot.child("_ChoosingPlayer").getValue().toString());
+                                if (choosingPlayerPos != my_pos && choosingPlayerPos != AppMethods.nextPlayer(size[0], my_pos)) {
+                                    roomRef.child(playerName).child("status").setValue("waiting");
+                                }
+                            }
                         }
                         //endregion choosingPlayer reading
-                        //region if player wins without checking
-                        if (snapshot.child(playerName).child("status").exists()
-                                && snapshot.child(playerName).child("status").getValue().toString().equals("Out")) {
-                            //region win
-                            binding.message.setText("You have won!");
-                            AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
-                            fadeIn.setDuration(800);
-                            binding.message.startAnimation(fadeIn);
-                            binding.message.setVisibility(View.VISIBLE);
-                            roomRef.child("_winnersPositions").child(playerName).setValue(my_pos);
-                            roomRef.child(playerName).child("profit").setValue(5000 / (size[0] - 1));
-                            binding.ShowBet.setText("+" + (5000 / (size[0] - 1)));
-                            binding.betText.setText("profit");
-                            binding.ShowBet.setTextColor(Color.GREEN);
-                            //region recounting avg
-                            SharedPreferences prefs = getActivity().getSharedPreferences("PREFS", 0);
-                            int gamesCount = prefs.getInt("gamesCount", 0);
-                            int avgProfit = prefs.getInt("avgProfit", 0);
-                            int profit = 5000 / (size[0] - 1);
-                            avgProfit = (avgProfit * gamesCount + profit) / (gamesCount + 1);
-                            gamesCount++;
-                            prefs.edit().putInt("gamesCount", gamesCount).apply();
-                            prefs.edit().putInt("avgProfit", avgProfit).apply();
-                            //endregion recounting avg
-                            uiDestroy(getContext(), binding);
-                            //endregion win
-                        }
-                        //endregion if player wins without checking
                         //region if only one is left in the game
                         if (snapshot.child("_winnersPositions").exists()
                                 && snapshot.child("_winnersPositions").getChildrenCount() == (size[0] - 1)) {
@@ -336,94 +320,435 @@ public class FoolGame extends Fragment {
                             uiDestroy(getContext(), binding);
                         }
                         //endregion if someone offline
-                        if (!endGame) {
-                            //region UI access managing
-                            if (snapshot.child(playerName).child("status").exists()) {
-                                if (my_pos == choosingPlayerPos) {
-                                    roomRef.child(playerName).child("status").setValue("attacking");
-                                    final int[] pairCount = {0};
-                                    if (snapshot.child("_encounter").exists()) {
-                                        pairCount[0] = (int) snapshot.child("_encounter").getChildrenCount();
+                        //region handing out from stack
+                        //region takingPlayer init
+                        if (snapshot.child("_encounter").exists()) {
+                            onceHandOut = true;
+                        } else {
+                            onceLose = true;
+                        }
+                        if (snapshot.child("_takers").exists() && my_pos == choosingPlayerPos) {
+                            if (onceHandOut) {
+                                onceHandOut = false;
+                                int min = 999999;
+                                for (DataSnapshot taker : snapshot.child("_takers").getChildren()) {
+                                    int got = parseInt(taker.getValue().toString());
+                                    if (got < min) {
+                                        min = got;
                                     }
-                                    if (pairCount[0] < 6) {
-                                        binding.linearLayout3.setOnDragListener(new View.OnDragListener() {
+                                }
+                                if (snapshot.child("_stack").exists()) {
+                                    roomRef.child("_takingPlayer").setValue(min);
+                                }
+                            }
+                        }
+                        //endregion takingPlayer init
+                        //region taking from stack by takingPlayer
+                        if (snapshot.child("_takingPlayer").exists()) {
+                            int takingPlayerPos = parseInt(snapshot.child("_takingPlayer").getValue().toString());
+                            if (my_pos == takingPlayerPos) {
+                                int handCount = (int) snapshot.child(playerName).child("hand").getChildrenCount();
+                                if (handCount < 6 && secondOnceTake) {
+                                    secondOnceTake = false;
+                                    int required = 6 - handCount;
+                                    for (int i = 0; i < required; i++) {
+                                        roomRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
-                                            public boolean onDrag(View v, DragEvent event) {
-                                                switch (event.getAction()) {
-                                                    case DragEvent.ACTION_DRAG_STARTED:
-                                                        return true;
-                                                    case DragEvent.ACTION_DRAG_ENTERED:
-                                                        return true;
-                                                    case DragEvent.ACTION_DRAG_EXITED:
-                                                        return true;
-                                                    case DragEvent.ACTION_DRAG_LOCATION:
-                                                        return true;
-                                                    case DragEvent.ACTION_DROP:
-                                                        handUpdatePermission = false;
-                                                        String cardName = event.getClipData().getItemAt(0).getText().toString();
-                                                        Card draggedCard = AppMethods.cardLink(cardName);
-                                                        ArrayList<String> rearrangedHand = new ArrayList<>();
-                                                        for (DataSnapshot cardSnapshot : snapshot.child(playerName).child("hand").getChildren()) {
-                                                            if (!cardSnapshot.getValue().toString().equals(draggedCard.toString())) {
-                                                                rearrangedHand.add(cardSnapshot.getValue().toString());
-                                                            }
-                                                        }
-                                                        roomRef.child(playerName).child("hand").removeValue();
-                                                        for (String card : rearrangedHand) {
-                                                            roomRef.child(playerName).child("hand")
-                                                                    .child(String.valueOf(rearrangedHand.indexOf(card))).setValue(card);
-                                                        }
-                                                        roomRef.child("_encounter").child("" + pairCount[0])
-                                                                .child("attacking").setValue(draggedCard.toString());
-                                                        handUpdatePermission = true;
-                                                        return true;
-                                                    default:
-                                                        break;
-                                                }
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                int handCount = (int) snapshot.child(playerName).child("hand").getChildrenCount();
+                                                int stackCount = ((int) snapshot.child("_stack").getChildrenCount()) - 1;
+                                                String card = snapshot.child("_stack").child("" + stackCount).getValue().toString();
+                                                roomRef.child("_stack").child("" + stackCount).removeValue();
+                                                roomRef.child(playerName).child("hand").child("" + handCount).setValue(card);
+                                            }
 
-                                                return false;
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
 
                                             }
                                         });
+                                    }
+                                    roomRef.child("_takers").child(playerName).removeValue();
+                                    roomRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            int min = 999999;
+                                            for (DataSnapshot taker : snapshot.child("_takers").getChildren()) {
+                                                int got = parseInt(taker.getValue().toString());
+                                                if (got < min) {
+                                                    min = got;
+                                                }
+                                            }
+                                            if (snapshot.child("_stack").exists()) {
+                                                roomRef.child("_takingPlayer").setValue(min);
+                                            }
+                                            if (min == 999999) {
+                                                roomRef.child("_takingPlayer").removeValue();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                        //endregion taking from stack by takingPlayer
+                        //endregion handing out from stack
+                        if (!endGame && !snapshot.child("_takers").exists()) {
+                            //region UI access managing
+                            if (snapshot.child(playerName).child("status").exists()) {
+                                //region if you are attacking
+                                if (my_pos == choosingPlayerPos) {
+                                    final int[] pairCount = {0};
+                                    if (statusUpdatePermission) {
+                                        statusUpdatePermission = false;
+                                        statusPaused = true;
+                                        handler.postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if (!okClicked) {
+                                                    roomRef.child(playerName).child("status").setValue("attacking");
+                                                }
+                                                statusPaused = false;
+                                            }
+                                        }, 2200);
+                                    }
+                                    if (snapshot.child("_encounter").exists()) {
+                                        int attackingCounter = 0;
+                                        int defendingCounter = 0;
+                                        int pairs = (int) snapshot.child("_encounter").getChildrenCount();
+                                        for (int i = 0; i < pairs; i++) {
+                                            if (snapshot.child("_encounter").child("" + i).child("attacking").exists()) {
+                                                attackingCounter++;
+                                            }
+                                            if (snapshot.child("_encounter").child("" + i).child("defending").exists()) {
+                                                defendingCounter++;
+                                            }
+                                        }
+                                        boolean allDefended = attackingCounter == defendingCounter;
+                                        if (allDefended) {
+                                            if (binding.buttonBar.getChildAt(1) != null) {
+                                                binding.buttonBar.getChildAt(1).setEnabled(true);
+                                                binding.buttonBar.getChildAt(1).setOnClickListener(v -> {
+                                                    binding.buttonBar.getChildAt(1).setEnabled(false);
+                                                    statusUpdatePermission = false;
+                                                    roomRef.child(playerName).child("status").setValue("ok");
+                                                });
+                                            }
+                                        } else {
+                                            if (binding.buttonBar.getChildAt(1) != null) {
+                                                binding.buttonBar.getChildAt(1).setEnabled(false);
+                                            }
+                                        }
+                                    } else {
+                                        if (binding.buttonBar.getChildAt(1) != null) {
+                                            binding.buttonBar.getChildAt(1).setEnabled(false);
+                                        }
+                                    }
+                                    pairCount[0] = (int) snapshot.child("_encounter").getChildrenCount();
+                                    if (snapshot.child(playerName).child("status").getValue().toString().equals("ok")) {
+                                        if (pairCount[0] != oldPairCount && !statusPaused) {
+                                            roomRef.child(playerName).child("status").setValue("tossing up");
+                                            okClicked = true;
+                                        }
+                                    }
+                                    oldPairCount = (int) snapshot.child("_encounter").getChildrenCount();
+                                    if (!snapshot.child(playerName).child("status").getValue().toString().equals("ok")) {
+                                        if (pairCount[0] < 6) {
+                                            binding.linearLayout3.setOnDragListener(new View.OnDragListener() {
+                                                @Override
+                                                public boolean onDrag(View v, DragEvent event) {
+                                                    switch (event.getAction()) {
+                                                        case DragEvent.ACTION_DRAG_STARTED:
+                                                            return true;
+                                                        case DragEvent.ACTION_DRAG_ENTERED:
+                                                            return true;
+                                                        case DragEvent.ACTION_DRAG_EXITED:
+                                                            return true;
+                                                        case DragEvent.ACTION_DRAG_LOCATION:
+                                                            return true;
+                                                        case DragEvent.ACTION_DROP:
+                                                            handUpdatePermission = false;
+                                                            String cardName = event.getClipData().getItemAt(0).getText().toString();
+                                                            Card draggedCard = AppMethods.cardLink(cardName);
+                                                            if (usedValues.size() == 0 || usedValues.contains(draggedCard.value)) {
+                                                                ArrayList<String> rearrangedHand = new ArrayList<>();
+                                                                for (DataSnapshot cardSnapshot : snapshot.child(playerName).child("hand").getChildren()) {
+                                                                    if (!cardSnapshot.getValue().toString().equals(draggedCard.toString())) {
+                                                                        rearrangedHand.add(cardSnapshot.getValue().toString());
+                                                                    }
+                                                                }
+                                                                roomRef.child(playerName).child("hand").removeValue();
+                                                                for (String card : rearrangedHand) {
+                                                                    roomRef.child(playerName).child("hand")
+                                                                            .child(String.valueOf(rearrangedHand.indexOf(card))).setValue(card);
+                                                                }
+                                                                roomRef.child("_encounter").child("" + pairCount[0])
+                                                                        .child("attacking").setValue(draggedCard.toString());
+                                                                handUpdatePermission = true;
+                                                                return true;
+                                                            } else {
+                                                                return false;
+                                                            }
+                                                        default:
+                                                            break;
+                                                    }
+                                                    return false;
+                                                }
+                                            });
+                                            if (binding.buttonBar.getChildAt(1) != null) {
+                                                binding.buttonBar.getChildAt(1).setOnClickListener(v -> {
+                                                    binding.buttonBar.getChildAt(1).setEnabled(false);
+                                                    statusUpdatePermission = false;
+                                                    roomRef.child(playerName).child("status").setValue("ok");
+                                                    handler.postDelayed(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            statusUpdatePermission = true;
+                                                        }
+                                                    }, 2000);
+                                                });
+                                            }
+                                        }
                                     } else {
                                         binding.linearLayout3.setOnDragListener(null);
                                     }
-                                } else if (my_pos == nextPlayerPos(my_pos, snapshot)) {
-                                    roomRef.child(playerName).child("status").setValue("defending");
+                                    binding.buttonBar.getChildAt(0).setEnabled(false);
+                                }
+                                //endregion if you are attacking
+                                //region if you are defending
+                                else if (my_pos == nextPlayerPos(choosingPlayerPos, snapshot)) {
+                                    if (binding.buttonBar.getChildAt(1) != null) {
+                                        binding.buttonBar.getChildAt(1).setEnabled(false);
+                                    }
+                                    if (statusUpdatePermission) {
+                                        handler.postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                roomRef.child(playerName).child("status").setValue("defending");
+                                            }
+                                        }, 2000);
+                                    }
+                                    statusUpdatePermission = false;
                                     if (snapshot.child("_encounter").exists()) {
+                                        binding.buttonBar.getChildAt(0).setEnabled(true);
+                                        binding.buttonBar.getChildAt(0).setOnClickListener(v -> {
+                                            binding.buttonBar.getChildAt(0).setEnabled(false);
+                                            statusUpdatePermission = false;
+                                            roomRef.child(playerName).child("status").setValue("taking");
+                                        });
+                                        if (snapshot.child(playerName).child("status").getValue().toString().equals("taking")) {
+                                            binding.buttonBar.getChildAt(0).setEnabled(false);
+                                            boolean allOked = true;
+                                            for (String player : InRoomPlayers[0]) {
+                                                if (snapshot.child(player).child("status").exists()
+                                                        && !(snapshot.child(player).child("status").getValue().toString().equals("taking")
+                                                        || snapshot.child(player).child("status").getValue().toString().equals("ok"))) {
+                                                    allOked = false;
+                                                }
+                                            }
+                                            if (allOked && onceLose) {
+                                                statusUpdatePermission = true;
+                                                onceLose = false;
+                                                for (DataSnapshot pair : snapshot.child("_encounter").getChildren()) {
+                                                    long count = snapshot.child(playerName).child("hand").getChildrenCount();
+                                                    String attacking = pair.child("attacking").getValue().toString();
+                                                    roomRef.child(playerName).child("hand").child(count + "").setValue(attacking);
+                                                    if (pair.child("defending").exists()) {
+                                                        count++;
+                                                        String defending = pair.child("defending").getValue().toString();
+                                                        roomRef.child(playerName).child("hand").child(count + "").setValue(defending);
+                                                    }
+                                                }
+                                                choosingPlayerPos = nextPlayerPos(my_pos, snapshot);
+                                                roomRef.child("_ChoosingPlayer").setValue(choosingPlayerPos);
+                                                roomRef.child(playerName).child("status").setValue("waiting");
+                                                roomRef.child("_encounter").removeValue();
+                                                statusUpdatePermission = true;
+
+                                            }
+                                        }
+                                        boolean allDefended = true;
                                         int pairs = (int) snapshot.child("_encounter").getChildrenCount();
                                         for (int i = 0; i < pairs; i++) {
                                             Card attackingCard = AppMethods.cardLink(snapshot.child("_encounter").child(i + "")
                                                     .child("attacking").getValue().toString());
                                             View.OnDragListener listener = getDefendDragListener(attackingCard, i, snapshot);
-                                            switch (i){
+                                            switch (i) {
                                                 case 0:
-                                                    binding.pair1.setOnDragListener(listener);
+                                                    if (!snapshot.child("_encounter").child("" + i).child("defending").exists()) {
+                                                        binding.pair1.setOnDragListener(listener);
+                                                        allDefended = false;
+                                                    }
                                                     break;
                                                 case 1:
-                                                    binding.pair2.setOnDragListener(listener);
+                                                    if (!snapshot.child("_encounter").child("" + i).child("defending").exists()) {
+                                                        binding.pair2.setOnDragListener(listener);
+                                                        allDefended = false;
+                                                    }
                                                     break;
                                                 case 2:
-                                                    binding.pair3.setOnDragListener(listener);
+                                                    if (!snapshot.child("_encounter").child("" + i).child("defending").exists()) {
+                                                        binding.pair3.setOnDragListener(listener);
+                                                        allDefended = false;
+                                                    }
                                                     break;
                                                 case 3:
-                                                    binding.pair4.setOnDragListener(listener);
+                                                    if (!snapshot.child("_encounter").child("" + i).child("defending").exists()) {
+                                                        binding.pair4.setOnDragListener(listener);
+                                                        allDefended = false;
+                                                    }
                                                     break;
                                                 case 4:
-                                                    binding.pair5.setOnDragListener(listener);
+                                                    if (!snapshot.child("_encounter").child("" + i).child("defending").exists()) {
+                                                        binding.pair5.setOnDragListener(listener);
+                                                        allDefended = false;
+                                                    }
                                                     break;
                                                 case 5:
-                                                    binding.pair6.setOnDragListener(listener);
+                                                    if (!snapshot.child("_encounter").child("" + i).child("defending").exists()) {
+                                                        binding.pair6.setOnDragListener(listener);
+                                                        allDefended = false;
+                                                    }
+                                                    break;
+                                                default:
                                                     break;
                                             }
+                                            if (allDefended) {
+                                                binding.buttonBar.getChildAt(0).setEnabled(false);
+                                            } else {
+                                                binding.buttonBar.getChildAt(0).setEnabled(true);
+                                            }
+                                        }
+                                        boolean allOked = true;
+                                        for (String player : InRoomPlayers[0]) {
+                                            if (snapshot.child(player).child("status").exists()
+                                                    && !(snapshot.child(player).child("status").getValue().toString().equals("ok")
+                                                    || snapshot.child(player).child("status").getValue().toString().equals("defending"))) {
+                                                allOked = false;
+                                            }
+                                        }
+                                        if (allOked && allDefended) {
+                                            statusUpdatePermission = true;
+                                            handler.postDelayed(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    choosingPlayerPos = nextPlayerPos(choosingPlayerPos, snapshot);
+                                                    roomRef.child("_ChoosingPlayer").setValue(choosingPlayerPos);
+                                                    roomRef.child(playerName).child("status").setValue("waiting");
+                                                }
+                                            }, 1000);
+                                            roomRef.child("_encounter").removeValue();
+
+                                        }
+                                    } else {
+                                        if (binding.buttonBar.getChildAt(0) != null) {
+                                            binding.buttonBar.getChildAt(0).setEnabled(false);
+                                        }
+                                        if (statusUpdatePermission) {
+                                            roomRef.child(playerName).child("status").setValue("waiting");
                                         }
                                     }
-                                } else {
-                                    roomRef.child(playerName).child("status").setValue("waiting");
                                 }
+                                //endregion if you are defending
+                                //region if you are neither attacking or defending
+                                else {
+                                    AppMethods.findPlayerByPos(roomRef, choosingPlayerPos, new AppMethods.OnPlayerFoundListener() {
+                                        @Override
+                                        public void onPlayerFound(String player) {
+                                            if (oldAttackingPlayer != null) {
+                                                if (!oldAttackingPlayer.equals(player)) {
+                                                    tossPermission = false;
+                                                }
+                                                final int[] pairCount = {0};
+                                                if (snapshot.child("_encounter").exists()) {
+                                                    pairCount[0] = (int) snapshot.child("_encounter").getChildrenCount();
+                                                    if (snapshot.child(playerName).child("status").getValue().toString().equals("ok")) {
+                                                        if (pairCount[0] != oldPairCount && !statusPaused) {
+                                                            roomRef.child(playerName).child("status").setValue("tossing up");
+                                                        }
+                                                    }
+                                                    oldPairCount = (int) snapshot.child("_encounter").getChildrenCount();
+                                                } else {
+                                                    roomRef.child(playerName).child("status").setValue("waiting");
+                                                }
+                                                if (snapshot.child(player).child("status").getValue().toString().equals("ok")) {
+                                                    tossPermission = true;
+                                                }
+                                                if (!statusPaused && tossPermission && !snapshot.child(playerName).child("status").getValue().toString().equals("ok")) {
+                                                    roomRef.child(playerName).child("status").setValue("tossing up");
+                                                    if (pairCount[0] < 6) {
+                                                        binding.linearLayout3.setOnDragListener(new View.OnDragListener() {
+                                                            @Override
+                                                            public boolean onDrag(View v, DragEvent event) {
+                                                                switch (event.getAction()) {
+                                                                    case DragEvent.ACTION_DRAG_STARTED:
+                                                                        return true;
+                                                                    case DragEvent.ACTION_DRAG_ENTERED:
+                                                                        return true;
+                                                                    case DragEvent.ACTION_DRAG_EXITED:
+                                                                        return true;
+                                                                    case DragEvent.ACTION_DRAG_LOCATION:
+                                                                        return true;
+                                                                    case DragEvent.ACTION_DROP:
+                                                                        handUpdatePermission = false;
+                                                                        String cardName = event.getClipData().getItemAt(0).getText().toString();
+                                                                        Card draggedCard = AppMethods.cardLink(cardName);
+                                                                        ArrayList<String> rearrangedHand = new ArrayList<>();
+                                                                        for (DataSnapshot cardSnapshot : snapshot.child(playerName).child("hand").getChildren()) {
+                                                                            if (!cardSnapshot.getValue().toString().equals(draggedCard.toString())) {
+                                                                                rearrangedHand.add(cardSnapshot.getValue().toString());
+                                                                            }
+                                                                        }
+                                                                        roomRef.child(playerName).child("hand").removeValue();
+                                                                        for (String card : rearrangedHand) {
+                                                                            roomRef.child(playerName).child("hand")
+                                                                                    .child(String.valueOf(rearrangedHand.indexOf(card))).setValue(card);
+                                                                        }
+                                                                        roomRef.child("_encounter").child("" + pairCount[0])
+                                                                                .child("attacking").setValue(draggedCard.toString());
+                                                                        handUpdatePermission = true;
+                                                                        return true;
+                                                                    default:
+                                                                        break;
+                                                                }
+
+                                                                return false;
+
+                                                            }
+                                                        });
+                                                    } else {
+                                                        binding.linearLayout3.setOnDragListener(null);
+                                                    }
+                                                    binding.buttonBar.getChildAt(1).setOnClickListener(v -> {
+                                                        statusUpdatePermission = false;
+                                                        roomRef.child(playerName).child("status").setValue("ok");
+                                                        binding.buttonBar.getChildAt(1).setEnabled(false);
+                                                        handler.postDelayed(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                statusUpdatePermission = true;
+                                                            }
+                                                        }, 2000);
+                                                    });
+                                                }
+                                            }
+                                            oldAttackingPlayer = player;
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError error) {
+
+                                        }
+                                    });
+                                }
+                                //endregion if you are neither attacking or defending
                             }
+                            //endregion UI access managing
                         }
-                        //endregion UI access managing
                         for (String player : InRoomPlayers[0]) {
                             if (!player.equals("_size") && !player.equals("_access") && !player.equals("_messages")
                                     && snapshot.child(player).child("position").exists()) {
@@ -439,21 +764,25 @@ public class FoolGame extends Fragment {
                                     CardCount.setText(gotCount);
                                     status.setText(gotStatus);
                                     status.setTextColor(Color.WHITE);
-                                    if (gotStatus.equals("checking")
-                                            && binding.buttonBar.getChildAt(0) != null
-                                            && binding.buttonBar.getChildAt(1) != null
-                                            && binding.buttonBar.getChildAt(2) != null
-                                            && binding.buttonBar.getChildAt(3) != null) {
-                                        someoneChecking[0] = true;
-                                        binding.buttonBar.getChildAt(0).setEnabled(false);
-                                        binding.buttonBar.getChildAt(1).setEnabled(false);
-                                        ((TextView) binding.buttonBar.getChildAt(2)).setText("-");
-                                        binding.buttonBar.getChildAt(3).setEnabled(false);
-                                        if (gotStatus.equals("Out")) {
-                                            status.setTextColor(Color.GREEN);
-                                        } else if (gotStatus.equals("Lost")) {
-                                            status.setTextColor(Color.RED);
+                                    if (gotStatus.equals("taking")) {
+                                        if (binding.buttonBar.getChildAt(1) != null) {
+                                            binding.buttonBar.getChildAt(1).setEnabled(true);
+                                            binding.buttonBar.getChildAt(1).setOnClickListener(v -> {
+                                                statusUpdatePermission = false;
+                                                roomRef.child(playerName).child("status").setValue("ok");
+                                                handler.postDelayed(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        statusUpdatePermission = true;
+                                                    }
+                                                }, 2000);
+                                            });
                                         }
+                                    }
+                                    if (gotStatus.equals("Out")) {
+                                        status.setTextColor(Color.GREEN);
+                                    } else if (gotStatus.equals("Lost")) {
+                                        status.setTextColor(Color.RED);
                                     }
                                 }
                                 //endregion player's status update
@@ -519,14 +848,31 @@ public class FoolGame extends Fragment {
                                                     hand.sort(new Comparator<String>() {
                                                         @Override
                                                         public int compare(String o1, String o2) {
+                                                            char chosenSuit = 's';
+                                                            if (snapshot.child("_chosenLast").exists()) {
+                                                                Card chosenCard = AppMethods.cardLink(snapshot.child("_chosenLast").getValue().toString());
+                                                                if (chosenCard != null) {
+                                                                    chosenSuit = chosenCard.suit;
+                                                                }
+                                                            }
                                                             Card c1 = AppMethods.cardLink(o1);
                                                             Card c2 = AppMethods.cardLink(o2);
-                                                            int[] real_value = {6, 7, 8, 9, 10, 11, 12, 13, 14};
-                                                            String[] string_value = {"6", "7", "8", "9", "10", "j", "d", "k", "a"};
-                                                            int index1 = Arrays.asList(string_value).indexOf(c1.value);
-                                                            int index2 = Arrays.asList(string_value).indexOf(c2.value);
-                                                            return real_value[index1] - real_value[index2];
+                                                            char[] suits = {'d', 'c', 'h', 's'};
+                                                            ArrayList<Character> suit_value = new ArrayList<Character>();
+                                                            for (char suit : suits) {
+                                                                if (suit != chosenSuit) {
+                                                                    suit_value.add(suit);
+                                                                }
+                                                            }
+                                                            suit_value.add(chosenSuit);
+                                                            if (suit_value.indexOf(c1.suit) - suit_value.indexOf(c2.suit) != 0) {
+                                                                return suit_value.indexOf(c1.suit) - suit_value.indexOf(c2.suit);
+                                                            } else {
+                                                                return getValueOfCard(c1) - getValueOfCard(c2);
+                                                            }
                                                         }
+
+                                                        ;
                                                     });
                                                     for (String got : hand) {
                                                         Card card = AppMethods.cardLink(got);
@@ -538,21 +884,17 @@ public class FoolGame extends Fragment {
                                                                     , ViewGroup.LayoutParams.MATCH_PARENT);
                                                             binding.hand.invalidate();
                                                             viewForCard.setTag(card.toString());
-                                                            if (my_pos == choosingPlayerPos) {
-                                                                viewForCard.setOnLongClickListener(new View.OnLongClickListener() {
-                                                                    @Override
-                                                                    public boolean onLongClick(View v) {
-                                                                        ClipData.Item item = new ClipData.Item((CharSequence) v.getTag());
-                                                                        String[] mimeTypes = {ClipDescription.MIMETYPE_TEXT_PLAIN};
-                                                                        ClipData dragData = new ClipData(v.getTag().toString(), mimeTypes, item);
-                                                                        View.DragShadowBuilder myShadow = new View.DragShadowBuilder(v);
-                                                                        v.startDragAndDrop(dragData, myShadow, null, 0);
-                                                                        return true;
-                                                                    }
-                                                                });
-                                                            } else {
-                                                                viewForCard.setOnLongClickListener(null);
-                                                            }
+                                                            viewForCard.setOnLongClickListener(new View.OnLongClickListener() {
+                                                                @Override
+                                                                public boolean onLongClick(View v) {
+                                                                    ClipData.Item item = new ClipData.Item((CharSequence) v.getTag());
+                                                                    String[] mimeTypes = {ClipDescription.MIMETYPE_TEXT_PLAIN};
+                                                                    ClipData dragData = new ClipData(v.getTag().toString(), mimeTypes, item);
+                                                                    View.DragShadowBuilder myShadow = new View.DragShadowBuilder(v);
+                                                                    v.startDragAndDrop(dragData, myShadow, null, 0);
+                                                                    return true;
+                                                                }
+                                                            });
                                                         }
                                                     }
                                                 }
@@ -568,6 +910,157 @@ public class FoolGame extends Fragment {
                             }
                             //endregion player's hand
                         }
+                        //region encounter UI
+                        if (snapshot.child("_encounter").exists()) {
+                            onceTake = true;
+                            secondOnceTake = true;
+                            long pairCount = snapshot.child("_encounter").getChildrenCount();
+                            for (int i = 0; i < pairCount; i++) {
+                                switch (i) {
+                                    case 0:
+                                        if (snapshot.child("_encounter").child("" + i).child("attacking").exists()) {
+                                            Card attacking = AppMethods.cardLink(snapshot.child("_encounter").child("" + i)
+                                                    .child("attacking").getValue().toString());
+                                            if (!usedValues.contains(attacking.value)) {
+                                                usedValues.add(attacking.value);
+                                            }
+                                            binding.card11.setImageResource(attacking.img_res);
+                                        }
+                                        if (snapshot.child("_encounter").child("" + i).child("defending").exists()) {
+                                            Card defending = AppMethods.cardLink(snapshot.child("_encounter").child("" + i)
+                                                    .child("defending").getValue().toString());
+                                            if (!usedValues.contains(defending.value)) {
+                                                usedValues.add(defending.value);
+                                            }
+                                            binding.card12.setImageResource(defending.img_res);
+                                        }
+                                        break;
+                                    case 1:
+                                        if (snapshot.child("_encounter").child("" + i).child("attacking").exists()) {
+                                            Card attacking = AppMethods.cardLink(snapshot.child("_encounter").child("" + i)
+                                                    .child("attacking").getValue().toString());
+                                            if (!usedValues.contains(attacking.value)) {
+                                                usedValues.add(attacking.value);
+                                            }
+                                            binding.card21.setImageResource(attacking.img_res);
+                                        }
+                                        if (snapshot.child("_encounter").child("" + i).child("defending").exists()) {
+                                            Card defending = AppMethods.cardLink(snapshot.child("_encounter").child("" + i)
+                                                    .child("defending").getValue().toString());
+                                            if (!usedValues.contains(defending.value)) {
+                                                usedValues.add(defending.value);
+                                            }
+                                            binding.card22.setImageResource(defending.img_res);
+                                        }
+                                        break;
+                                    case 2:
+                                        if (snapshot.child("_encounter").child("" + i).child("attacking").exists()) {
+                                            Card attacking = AppMethods.cardLink(snapshot.child("_encounter").child("" + i)
+                                                    .child("attacking").getValue().toString());
+                                            if (!usedValues.contains(attacking.value)) {
+                                                usedValues.add(attacking.value);
+                                            }
+                                            binding.card31.setImageResource(attacking.img_res);
+                                        }
+                                        if (snapshot.child("_encounter").child("" + i).child("defending").exists()) {
+                                            Card defending = AppMethods.cardLink(snapshot.child("_encounter").child("" + i)
+                                                    .child("defending").getValue().toString());
+                                            if (!usedValues.contains(defending.value)) {
+                                                usedValues.add(defending.value);
+                                            }
+                                            binding.card32.setImageResource(defending.img_res);
+                                        }
+                                        break;
+                                    case 3:
+                                        if (snapshot.child("_encounter").child("" + i).child("attacking").exists()) {
+                                            Card attacking = AppMethods.cardLink(snapshot.child("_encounter").child("" + i)
+                                                    .child("attacking").getValue().toString());
+                                            if (!usedValues.contains(attacking.value)) {
+                                                usedValues.add(attacking.value);
+                                            }
+                                            binding.card41.setImageResource(attacking.img_res);
+                                        }
+                                        if (snapshot.child("_encounter").child("" + i).child("defending").exists()) {
+                                            Card defending = AppMethods.cardLink(snapshot.child("_encounter").child("" + i)
+                                                    .child("defending").getValue().toString());
+                                            if (!usedValues.contains(defending.value)) {
+                                                usedValues.add(defending.value);
+                                            }
+                                            binding.card42.setImageResource(defending.img_res);
+                                        }
+                                        break;
+                                    case 4:
+                                        if (snapshot.child("_encounter").child("" + i).child("attacking").exists()) {
+                                            Card attacking = AppMethods.cardLink(snapshot.child("_encounter").child("" + i)
+                                                    .child("attacking").getValue().toString());
+                                            if (!usedValues.contains(attacking.value)) {
+                                                usedValues.add(attacking.value);
+                                            }
+                                            binding.card51.setImageResource(attacking.img_res);
+                                        }
+                                        if (snapshot.child("_encounter").child("" + i).child("defending").exists()) {
+                                            Card defending = AppMethods.cardLink(snapshot.child("_encounter").child("" + i)
+                                                    .child("defending").getValue().toString());
+                                            if (!usedValues.contains(defending.value)) {
+                                                usedValues.add(defending.value);
+                                            }
+                                            binding.card52.setImageResource(defending.img_res);
+                                        }
+                                        break;
+                                    case 5:
+                                        if (snapshot.child("_encounter").child("" + i).child("attacking").exists()) {
+                                            Card attacking = AppMethods.cardLink(snapshot.child("_encounter").child("" + i)
+                                                    .child("attacking").getValue().toString());
+                                            if (!usedValues.contains(attacking.value)) {
+                                                usedValues.add(attacking.value);
+                                            }
+                                            binding.card61.setImageResource(attacking.img_res);
+                                        }
+                                        if (snapshot.child("_encounter").child("" + i).child("defending").exists()) {
+                                            Card defending = AppMethods.cardLink(snapshot.child("_encounter").child("" + i)
+                                                    .child("defending").getValue().toString());
+                                            if (!usedValues.contains(defending.value)) {
+                                                usedValues.add(defending.value);
+                                            }
+                                            binding.card62.setImageResource(defending.img_res);
+                                        }
+                                        break;
+                                }
+                            }
+                        } else {
+                            binding.card11.setImageDrawable(null);
+                            binding.card12.setImageDrawable(null);
+                            binding.card21.setImageDrawable(null);
+                            binding.card22.setImageDrawable(null);
+                            binding.card31.setImageDrawable(null);
+                            binding.card32.setImageDrawable(null);
+                            binding.card41.setImageDrawable(null);
+                            binding.card42.setImageDrawable(null);
+                            binding.card51.setImageDrawable(null);
+                            binding.card52.setImageDrawable(null);
+                            binding.card61.setImageDrawable(null);
+                            binding.card62.setImageDrawable(null);
+                        }
+                        //endregion encounter UI
+                        //region lastChosen UI
+                        if (snapshot.child("_chosenLast").exists()) {
+                            Card lastChosen = AppMethods.cardLink(snapshot.child("_chosenLast").getValue().toString());
+                            View view = binding.buttonBar.getChildAt(2);
+                            if (view instanceof ViewGroup) {
+                                ImageView imageView = ((ViewGroup) view).findViewById(R.id.image);
+                                if (imageView != null) {
+                                    imageView.setImageResource(lastChosen.img_res);
+                                }
+                            }
+
+                        }
+                        //endregion lastChosen UI
+                        //region leftInStack UI
+                        if (snapshot.child("_stack").exists()) {
+                            long count = snapshot.child("_stack").getChildrenCount();
+                            binding.leftInStack.setText("" + count);
+                        }
+                        //endregion leftInStack UI
                         //region endGame, Loser
                         if (endGame) {
                             boolean allEnded = true;
@@ -631,9 +1124,7 @@ public class FoolGame extends Fragment {
                     public void onCancelled(@NonNull DatabaseError error) {
 
                     }
-                }*/
-
-                ;
+                };
             }
         });
     }
@@ -720,7 +1211,7 @@ public class FoolGame extends Fragment {
             @Override
             public void run() {
                 if (playerName.equals(adminName)) {
-                    roomRef.child("_ChoosingPlayer").setValue(1);
+                    roomRef.child("_ChoosingPlayer").setValue((int) (Math.random() * (size[0] - 1 + 1)) + 1);
                     deck.clear();
                     deck.addAll(Arrays.asList(AppMethods.raw_deck));
                     Collections.shuffle(deck);
@@ -734,7 +1225,7 @@ public class FoolGame extends Fragment {
                             }
                         }
                     }
-                    Card chosenLast = deck.get(deck.size() - 1);
+                    Card chosenLast = deck.get(0);
                     roomRef.child("_chosenLast").setValue(chosenLast.toString());
                     int count = 0;
                     for (Card card : deck) {
@@ -742,8 +1233,15 @@ public class FoolGame extends Fragment {
                         count++;
                     }
                 }
+                binding.leftInStackText.setVisibility(View.VISIBLE);
             }
         }, 1700);
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                gameStarted = true;
+            }
+        }, 3500);
         binding.message.setText("game has started!");
         AlphaAnimation fadeOut = new AlphaAnimation(1.0f, 0.0f);
         fadeOut.setDuration(2400);
@@ -759,11 +1257,7 @@ public class FoolGame extends Fragment {
         binding.buttonBar.removeAllViews();
         MaterialButton take = new MaterialButton(context);
         MaterialButton ok = new MaterialButton(context);
-        ShapeableImageView lastCard = new ShapeableImageView(context);
-        ShapeAppearanceModel shapeAppearanceModel = ShapeAppearanceModel.builder()
-                .setAllCornerSizes(8)
-                .build();
-        lastCard.setShapeAppearanceModel(shapeAppearanceModel);
+        lastCard = SmallCardLayoutBinding.inflate(LayoutInflater.from(context));
         take.setCornerRadius(9999);
         ok.setCornerRadius(9999);
         take.setText("TAKE");
@@ -787,7 +1281,7 @@ public class FoolGame extends Fragment {
         take.setEnabled(false);
         binding.buttonBar.addView(take, 0, params);
         binding.buttonBar.addView(ok, 1, params);
-        binding.buttonBar.addView(lastCard, 1, new LinearLayout.LayoutParams((int) (60 * density), (int) (80 * density), 1.0f));
+        binding.buttonBar.addView(lastCard.getRoot(), 2, params);
         binding.ShowBet.setText("" + 5000);
     }
 
@@ -803,6 +1297,13 @@ public class FoolGame extends Fragment {
         Disconnect.setText("Disconnect");
         Disconnect.setTextSize(20);
         binding.buttonBar.addView(Disconnect, params);
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                binding.buttonBar.getChildAt(0).setEnabled(true);
+            }
+        }, 1500);
+        roomRef.child(playerName).child("status").setValue("ended");
         binding.buttonBar.getChildAt(0).setOnClickListener(view -> {
             AppMethods.Disconnect(roomRef, playerName, inGameListener, ChatFragment.listener);
             assert getParentFragment() != null;

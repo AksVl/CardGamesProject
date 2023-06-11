@@ -12,18 +12,17 @@
     <LinearLayout
         android:id="@+id/playersContainer"
         android:layout_width="match_parent"
-        android:layout_height="195dp"
+        android:layout_height="130dp"
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!--<LinearLayout
+    <LinearLayout
         android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
         android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/scrollView2"
@@ -42,23 +41,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="180dp"
                 android:layout_margin="6dp"
-                android:layout_weight="1"
-                android:visibility="invisible">
+                android:layout_weight="1">
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/card1"
+                    android:id="@+id/card11"
                     android:layout_width="105dp"
                     android:layout_height="140dp"
-                    android:src="@drawable/other_side"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:shapeAppearanceOverlay="@style/roundedImageView" />
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/card2"
+                    android:id="@+id/card12"
                     android:layout_width="105dp"
                     android:layout_height="140dp"
-                    android:src="@drawable/other_side"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:shapeAppearanceOverlay="@style/roundedImageView" />
@@ -70,24 +66,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="180dp"
                 android:layout_margin="6dp"
-                android:layout_weight="1"
-                android:visibility="invisible">
+                android:layout_weight="1">
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/card1"
+                    android:id="@+id/card21"
                     android:layout_width="105dp"
                     android:layout_height="140dp"
-                    android:src="@drawable/other_side"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:shapeAppearanceOverlay="@style/roundedImageView"
-                    tools:ignore="DuplicateIds" />
+                    app:shapeAppearanceOverlay="@style/roundedImageView" />
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/card2"
+                    android:id="@+id/card22"
                     android:layout_width="105dp"
                     android:layout_height="140dp"
-                    android:src="@drawable/other_side"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:shapeAppearanceOverlay="@style/roundedImageView"
@@ -100,24 +92,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="180dp"
                 android:layout_margin="6dp"
-                android:layout_weight="1"
-                android:visibility="invisible">
+                android:layout_weight="1">
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/card1"
+                    android:id="@+id/card31"
                     android:layout_width="105dp"
                     android:layout_height="140dp"
-                    android:src="@drawable/other_side"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:shapeAppearanceOverlay="@style/roundedImageView"
                     tools:ignore="DuplicateIds" />
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/card2"
+                    android:id="@+id/card32"
                     android:layout_width="105dp"
                     android:layout_height="140dp"
-                    android:src="@drawable/other_side"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:shapeAppearanceOverlay="@style/roundedImageView"
@@ -139,23 +128,21 @@
                 android:layout_height="180dp"
                 android:layout_margin="6dp"
                 android:layout_weight="1"
-                android:visibility="invisible">
+                >
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/card1"
+                    android:id="@+id/card41"
                     android:layout_width="105dp"
                     android:layout_height="140dp"
-                    android:src="@drawable/other_side"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:shapeAppearanceOverlay="@style/roundedImageView"
                     tools:ignore="DuplicateIds" />
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/card2"
+                    android:id="@+id/card42"
                     android:layout_width="105dp"
                     android:layout_height="140dp"
-                    android:src="@drawable/other_side"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:shapeAppearanceOverlay="@style/roundedImageView"
@@ -168,24 +155,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="180dp"
                 android:layout_margin="6dp"
-                android:layout_weight="1"
-                android:visibility="invisible">
+                android:layout_weight="1">
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/card1"
+                    android:id="@+id/card51"
                     android:layout_width="105dp"
                     android:layout_height="140dp"
-                    android:src="@drawable/other_side"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:shapeAppearanceOverlay="@style/roundedImageView"
                     tools:ignore="DuplicateIds" />
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/card2"
+                    android:id="@+id/card52"
                     android:layout_width="105dp"
                     android:layout_height="140dp"
-                    android:src="@drawable/other_side"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:shapeAppearanceOverlay="@style/roundedImageView"
@@ -198,31 +182,28 @@
                 android:layout_width="match_parent"
                 android:layout_height="180dp"
                 android:layout_margin="6dp"
-                android:layout_weight="1"
-                android:visibility="invisible">
+                android:layout_weight="1">
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/card1"
+                    android:id="@+id/card61"
                     android:layout_width="105dp"
                     android:layout_height="140dp"
-                    android:src="@drawable/other_side"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:shapeAppearanceOverlay="@style/roundedImageView"
                     tools:ignore="DuplicateIds" />
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/card2"
+                    android:id="@+id/card62"
                     android:layout_width="105dp"
                     android:layout_height="140dp"
-                    android:src="@drawable/other_side"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:shapeAppearanceOverlay="@style/roundedImageView"
                     tools:ignore="DuplicateIds" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
-    </LinearLayout>-->
+    </LinearLayout>
     <androidx.cardview.widget.CardView
         android:visibility="invisible"
         android:id="@+id/endGameTable"

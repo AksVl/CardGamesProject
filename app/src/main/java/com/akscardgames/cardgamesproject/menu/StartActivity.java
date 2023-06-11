@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.example.cardgamesproject.R;
 import com.example.cardgamesproject.databinding.ActivityMainBinding;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -41,7 +42,7 @@ public class StartActivity extends AppCompatActivity {
             if (!playerName.equals("")) {
                 prefs.edit().putString("name", playerName).apply();
                 binding.btnLogin.setEnabled(false);
-                binding.btnLogin.setText("Please Wait...");
+                binding.btnLogin.setText(getString(R.string.please_wait));
                 playerRef = database.getReference("playerList/" + playerName);
                 AddEventListener();
             }
@@ -59,25 +60,25 @@ public class StartActivity extends AppCompatActivity {
                         prefs.edit().putString("name", playerName).apply();
                         startActivity(new Intent(StartActivity.this, GameChooseActivity.class));
                     } else{
-                        binding.btnLogin.setText("Log in");
+                        binding.btnLogin.setText(getString(R.string.log_in));
                         binding.btnLogin.setEnabled(true);
-                        Toast.makeText(StartActivity.this, "This player already exists", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(StartActivity.this, getString(R.string.already_exists), Toast.LENGTH_SHORT).show();
                     }
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                binding.btnLogin.setText("Log in");
+                binding.btnLogin.setText(getString(R.string.log_in));
                 binding.btnLogin.setEnabled(true);
-                Toast.makeText(StartActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+                Toast.makeText(StartActivity.this, getString(R.string.smth_went_wrong), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     @Override
     protected void onResume() {
-        binding.btnLogin.setText("Log in");
+        binding.btnLogin.setText(getString(R.string.log_in));
         binding.btnLogin.setEnabled(true);
         super.onResume();
     }

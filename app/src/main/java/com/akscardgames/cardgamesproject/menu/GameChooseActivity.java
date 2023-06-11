@@ -22,6 +22,7 @@ import com.akscardgames.cardgamesproject.general.adapters.TabLayoutAdapter;
 import com.akscardgames.cardgamesproject.menu.roomSearchFragments.FoolSearchFragment;
 import com.akscardgames.cardgamesproject.menu.roomSearchFragments.LiarSearchFragment;
 import com.akscardgames.cardgamesproject.menu.roomSearchFragments.TwentyOneSearchFragment;
+import com.example.cardgamesproject.R;
 import com.example.cardgamesproject.databinding.ActivityGameChooseBinding;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.database.DataSnapshot;
@@ -55,7 +56,7 @@ public class GameChooseActivity extends AppCompatActivity {
         playerName = getSharedPreferences("PREFS",0).getString("name","");
         avg = getSharedPreferences("PREFS",0).getInt("avgProfit",0);
         playerRef = database.getReference("playerList/" + playerName);
-        binding.name.setText("logged in as "+playerName);
+        binding.name.setText(getString(R.string.logged_in_as)+playerName);
         if(avg > 0) {
             binding.avg.setText("AVG:" + "+" + avg);
             binding.avg.setTextColor(Color.GREEN);
@@ -172,7 +173,7 @@ public class GameChooseActivity extends AppCompatActivity {
     public void onBackPressed() {
         backPressedCount += 1;
         if(backPressedCount == 1){
-            Toast.makeText(this, "press again to leave", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.press_again), Toast.LENGTH_SHORT).show();
         } else if (backPressedCount == 2) {
             super.onBackPressed();
         }

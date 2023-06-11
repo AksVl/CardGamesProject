@@ -40,7 +40,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:textStyle="bold"
-                    android:text="private mode"
+                    android:text="@string/private_mode"
                     android:textSize="22sp"/>
             </LinearLayout>
             <Button
@@ -51,7 +51,7 @@
                 android:layout_weight="1"
                 android:backgroundTint="@color/DarkGrey"
                 android:gravity="center"
-                android:text="Create liar room"
+                android:text="@string/create_liar_room"
                 android:textColor="@color/buttonGrey"
                 android:textSize="24sp"
                 app:cornerRadius="@android:dimen/thumbnail_height" />
@@ -67,7 +67,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="room size"
+                android:text="@string/room_size"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 

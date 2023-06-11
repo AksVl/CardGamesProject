@@ -92,7 +92,7 @@ public class AppMethods {
                     && !element.equals("_offline") && !element.equals("_access")
                             && !element.equals("_messages")  && !element.equals("_stack")
                             && !element.equals("_chosenValue")  && !element.equals("_winnersPositions")
-                    && !element.equals("_lastThrown")){
+                    && !element.equals("_lastThrown") && !element.equals("_chosenLast")){
                         PlayersAreInRoom = true;
                     }
                 }

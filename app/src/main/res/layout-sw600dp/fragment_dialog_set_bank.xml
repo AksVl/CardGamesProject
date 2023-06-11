@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
-        android:text="Set a bank size"
+        android:text="@string/set_a_bank_size"
         android:textSize="32dp"/>
     <EditText
         android:id="@+id/size"
@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:inputType="number"
         android:textSize="36dp"
-        android:hint="from 100 to 5000"/>
+        android:hint="@string/from_100_to_5000"/>
     <Button
         android:id="@+id/set"
         android:layout_width="match_parent"
@@ -33,5 +33,5 @@
         android:textColor="@color/black"
         android:textSize="32dp"
         app:cornerRadius="@android:dimen/thumbnail_height"
-        android:text="SET"/>
+        android:text="@string/set"/>
 </LinearLayout>

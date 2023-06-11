@@ -54,7 +54,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="log out"
+                android:text="@string/log_out"
                 android:textColor="@color/black"
                 android:textSize="14sp"
                 app:cornerRadius="@android:dimen/thumbnail_height" />
@@ -80,17 +80,17 @@
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Fool" />
+                    android:text="@string/fool" />
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="21" />
+                    android:text="@string/_21" />
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Liar" />
+                    android:text="@string/liar" />
             </com.google.android.material.tabs.TabLayout>
 
         </androidx.cardview.widget.CardView>

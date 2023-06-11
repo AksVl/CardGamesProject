@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
-        android:text="Choose a bet size"
+        android:text="@string/choose_a_bet_size"
         android:textSize="32dp"/>
     <EditText
         android:id="@+id/size"
@@ -25,13 +25,13 @@
         android:layout_height="wrap_content"
         android:inputType="number"
         android:textSize="36dp"
-        android:hint="from 10 to bank"/>
+        android:hint="@string/from_10_to_bank"/>
 
     <Button
         android:id="@+id/bet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="BET"
+        android:text="@string/bet"
         android:textColor="@color/black"
         app:cornerRadius="@android:dimen/thumbnail_height"
         android:textSize="32dp" />

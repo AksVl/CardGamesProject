@@ -213,8 +213,8 @@ public class TwentyOneGame extends Fragment {
                         for (int i = 0; i < binding.playersContainer.getChildCount(); i++) {
                             TextView name = binding.playersContainer.getChildAt(i).findViewById(R.id.name);
                             TextView status = binding.playersContainer.getChildAt(i).findViewById(R.id.status);
-                            status.setText("empty");
-                            name.setText("none");
+                            status.setText(R.string.empty);
+                            name.setText(R.string.none);
                         }
                         InRoomPlayers[0].clear();
                         for (DataSnapshot d : snapshot.getChildren()) {
@@ -253,7 +253,8 @@ public class TwentyOneGame extends Fragment {
                                             TextView name = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])).findViewById(R.id.name);
                                             TextView status = binding.playersContainer.getChildAt(AppMethods.getUiPosition(my_pos, pos, size[0])).findViewById(R.id.status);
                                             name.setText(player);
-                                            status.setText(gotStatus);
+                                            String outputStatus = getOutputStatus(gotStatus);
+                                            status.setText(outputStatus);
                                             status.setTextColor(Color.WHITE);
                                             if (gotStatus.equals("ready")) {
                                                 status.setTextColor(Color.GREEN);
@@ -293,7 +294,7 @@ public class TwentyOneGame extends Fragment {
                             available = AvailableBuff;
                             binding.available.setText(String.valueOf(available));
                             RoomRef.removeEventListener(InGameListener);
-                            binding.message.setText(offlinePlayerName + " went offline, all bets were returned");
+                            binding.message.setText(offlinePlayerName + getString(R.string.went_offline_bets_return));
                             binding.message.setVisibility(View.VISIBLE);
                             uiDestroy(getContext(), binding);
                         }
@@ -313,13 +314,13 @@ public class TwentyOneGame extends Fragment {
                                 HandOutStart = false;
                                 bet_flag = false;
                                 EndGameDelay[0] = 0;
-                                binding.message.setText("Bank has no money!");
+                                binding.message.setText(getString(R.string.bank_has_no_money));
                                 binding.message.setVisibility(View.VISIBLE);
                             } else if (StartBank * 3 <= Bank) {
                                 KnockKnock = true;
                                 if (OnceAnimated[0]) {
                                     OnceAnimated[0] = false;
-                                    binding.message.setText("knock - knock!");
+                                    binding.message.setText(getString(R.string.knock_knock));
                                     binding.message.setVisibility(View.VISIBLE);
                                     AlphaAnimation fadeOut = new AlphaAnimation(1.0f, 0.0f);
                                     fadeOut.setDuration(2400);
@@ -578,7 +579,8 @@ public class TwentyOneGame extends Fragment {
                                         String gotCount = String.valueOf(snapshot.child(player).child("hand").getChildrenCount());
                                         String gotStatus = snapshot.child(player).child("status").getValue().toString();
                                         CardCount.setText(gotCount);
-                                        status.setText(gotStatus);
+                                        String outputStatus = getOutputStatus(gotStatus);
+                                        status.setText(outputStatus);
                                         status.setTextColor(Color.WHITE);
                                         if (gotStatus.equals("TwentyOne") || gotStatus.equals("Won")) {
                                             status.setTextColor(Color.GREEN);
@@ -593,7 +595,7 @@ public class TwentyOneGame extends Fragment {
                                             Bank = parseInt(snapshot.child("_bank").getValue().toString());
                                             if (!playerName.equals(bankerName)) {
                                                 Bank = parseInt(snapshot.child("_bank").getValue().toString());
-                                                GameStatus = "bank : " + Bank + "\n";
+                                                GameStatus = getString(R.string.bank) + Bank + "\n";
                                             }
                                             binding.gameStatus.setText(GameStatus);
                                         }
@@ -602,7 +604,7 @@ public class TwentyOneGame extends Fragment {
                                         if (snapshot.child(player).child("currentBet").exists()) {
                                             PlayerBet = parseInt(snapshot.child(player).child("currentBet").getValue().toString());
                                             if (!LoopEnding) {
-                                                GameStatus += player + "'s bet : " + PlayerBet + "\n";
+                                                GameStatus += player + getString(R.string.s_bet1) + PlayerBet + "\n";
                                                 binding.gameStatus.setText(GameStatus);
                                             }
                                             if (LoopEnding) {
@@ -610,9 +612,9 @@ public class TwentyOneGame extends Fragment {
                                                     if (snapshot.child(player).child("status").exists()) {
                                                         if (snapshot.child(player).child("status").getValue().toString().equals("Won")
                                                                 || snapshot.child(player).child("status").getValue().toString().equals("TwentyOne")) {
-                                                            GameStatus += player + " has won " + PlayerBet + "!\n";
+                                                            GameStatus += player + getString(R.string.has_won) + PlayerBet + "!\n";
                                                         } else if (snapshot.child(player).child("status").getValue().toString().equals("Lost")) {
-                                                            GameStatus += player + " has lost " + PlayerBet + "!\n";
+                                                            GameStatus += player + getString(R.string.has_lost) + PlayerBet + "!\n";
                                                         }
                                                         binding.gameStatus.setText(GameStatus);
                                                     }
@@ -620,9 +622,11 @@ public class TwentyOneGame extends Fragment {
                                                     if (snapshot.child(player).child("status").exists()) {
                                                         if (snapshot.child(player).child("status").getValue().toString().equals("Won")
                                                                 || snapshot.child(player).child("status").getValue().toString().equals("TwentyOne")) {
-                                                            GameStatus += "You have lost " + PlayerBet + " as " + player + "'s bet" + "!\n";
+                                                            GameStatus += getString(R.string.you_have_lost) + PlayerBet + getString(R.string.as)
+                                                                    + player + getString(R.string.s_bet1) + "!\n";
                                                         } else if (snapshot.child(player).child("status").getValue().toString().equals("Lost")) {
-                                                            GameStatus += "You have won " + PlayerBet + " as " + player + "'s bet" + "!\n";
+                                                            GameStatus += getString(R.string.you_have_won) + PlayerBet + getString(R.string.as)
+                                                                    + player + getString(R.string.s_bet1) + "!\n";
                                                         }
                                                         binding.gameStatus.setText(GameStatus);
                                                     }
@@ -676,9 +680,9 @@ public class TwentyOneGame extends Fragment {
                             if (snapshot.child(playerName).child("status").exists()) {
                                 if (snapshot.child(playerName).child("status").getValue().toString().equals("Won")
                                         || snapshot.child(playerName).child("status").getValue().toString().equals("TwentyOne")) {
-                                    GameStatus += "You have won " + bet + "!\n";
+                                    GameStatus += getString(R.string.you_have_won) + bet + "!\n";
                                 } else if (snapshot.child(playerName).child("status").getValue().toString().equals("Lost")) {
-                                    GameStatus += "You have lost " + bet + "!\n";
+                                    GameStatus += getString(R.string.you_have_lost) + bet + "!\n";
                                 }
                                 binding.gameStatus.setText(GameStatus);
                             }
@@ -806,7 +810,7 @@ public class TwentyOneGame extends Fragment {
                                 EndGame = true;
                                 bet_flag = false;
                                 EndGameDelay[0] = 0;
-                                binding.message.setText("You have run out of money!");
+                                binding.message.setText(getString(R.string.you_have_run_out_of_money));
                                 binding.message.setVisibility(View.VISIBLE);
                             }
                             for (String player : InRoomPlayers[0]) {
@@ -816,7 +820,7 @@ public class TwentyOneGame extends Fragment {
                                     EndGame = true;
                                     bet_flag = false;
                                     EndGameDelay[0] = 0;
-                                    binding.message.setText(player + " has run out of money!");
+                                    binding.message.setText(player + getString(R.string.has_run_out_of_money));
                                     binding.message.setVisibility(View.VISIBLE);
                                     break;
                                 }
@@ -866,7 +870,7 @@ public class TwentyOneGame extends Fragment {
                         }
                         // region endgame
                         if (EndGame) {
-                            uiDestroy(getContext(),binding);
+                            uiDestroy(getContext(), binding);
                             LoopEnding = false;
                             Return[0] = false;
                             bet_flag = false;
@@ -888,7 +892,7 @@ public class TwentyOneGame extends Fragment {
                             if (AllEnded[0] && !playerName.equals(bankerName)) {
                                 if ((status.equals("Won") || status.equals("TwentyOne")) && OnceAddProfit) {
                                     OnceAddProfit = false;
-                                    if(!alreadyCounted) {
+                                    if (!alreadyCounted) {
                                         available = AvailableBuff + bet;
                                     }
                                 }
@@ -979,6 +983,49 @@ public class TwentyOneGame extends Fragment {
 
     }
 
+    private String getOutputStatus(String gotStatus) {
+        switch (gotStatus) {
+            case "joined":
+                return getString(R.string.joined);
+            case "ready":
+                return getString(R.string.ready);
+            case "waiting":
+                return getString(R.string.waiting);
+            case "ended":
+                return getString(R.string.ended);
+            case "ending":
+                return getString(R.string.ending);
+            case "choosing":
+                return getString(R.string.choosing);
+            case "takes more":
+                return "-";
+            case "passed":
+                return getString(R.string.passed);
+            case "betting":
+                return getString(R.string.betting);
+            case "gets more":
+                return "-";
+            case "TwentyOne":
+                return getString(R.string.twenty_one);
+            case "Won":
+                return getString(R.string.won);
+            case "Won all":
+                return getString(R.string.won_all);
+            case "Lost":
+                return getString(R.string.lost);
+            case "Lost all":
+                return getString(R.string.lost_all);
+            case "out":
+                return getString(R.string.out);
+            case "sets bank":
+                return getString(R.string.sets_bank);
+            case "sets a bank":
+                return "-";
+            default:
+                return null;
+        }
+    }
+
     private int getValueOfCard(Card card) {
         switch (card.value) {
             case "6":
@@ -1024,7 +1071,7 @@ public class TwentyOneGame extends Fragment {
                             if (parseInt(snapshot.child(player).child("position").getValue().toString()) == Bank_chosen[0]
                                     && !player.equals(playerName)) {
                                 int pos = parseInt(snapshot.child(player).child("position").getValue().toString());
-                                binding.message.setText(player + " is a banker");
+                                binding.message.setText(player + context.getString(R.string.is_a_banker));
                                 bankerName = player;
                                 if (playerName.equals(adminName)) {
                                     RoomRef.child(player).child("role").setValue("banker");
@@ -1035,8 +1082,8 @@ public class TwentyOneGame extends Fragment {
                                 crown.setImageResource(R.drawable.crown);
                             } else if (parseInt(snapshot.child(player).child("position").getValue().toString()) == Bank_chosen[0]
                                     && player.equals(playerName)) {
-                                binding.betText.setText("bank:");
-                                binding.message.setText("You are a banker");
+                                binding.betText.setText(context.getString(R.string.bank));
+                                binding.message.setText(context.getString(R.string.you_are_a_banker));
                                 bankerName = player;
                                 if (playerName.equals(adminName)) {
                                     RoomRef.child(player).child("role").setValue("banker");
@@ -1179,13 +1226,13 @@ public class TwentyOneGame extends Fragment {
         MaterialButton OneMore = new MaterialButton(context);
         MaterialButton Pass = new MaterialButton(context);
         TextView text = new TextView(context);
-        OneMore.setText("More");
-        Pass.setText("Pass");
+        OneMore.setText(context.getString(R.string.more));
+        Pass.setText(context.getString(R.string.pass));
         OneMore.setCornerRadius((int) context.getResources().getDimension(android.R.dimen.thumbnail_height));
         Pass.setCornerRadius((int) context.getResources().getDimension(android.R.dimen.thumbnail_height));
         OneMore.setTextColor(R.color.black);
         Pass.setTextColor(R.color.black);
-        text.setText("TOTAL :");
+        text.setText(context.getString(R.string.total));
         TextView total = new TextView(context);
         total.setText("0");
         total.setGravity(Gravity.CENTER);
@@ -1237,7 +1284,7 @@ public class TwentyOneGame extends Fragment {
         MaterialButton Disconnect = new MaterialButton(context);
         Disconnect.setCornerRadius((int) context.getResources().getDimension(android.R.dimen.thumbnail_height));
         Disconnect.setTextColor(R.color.black);
-        Disconnect.setText("Disconnect");
+        Disconnect.setText(getString(R.string.disconnect));
         Disconnect.setTextSize(20);
         binding.buttonBar.addView(Disconnect, params);
         binding.buttonBar.getChildAt(0).setOnClickListener(view -> {
@@ -1247,7 +1294,7 @@ public class TwentyOneGame extends Fragment {
         });
     }
 
-    public static void notifyPlayer() {
+    public static void notifyPlayer(Context context) {
         if (GameFragment.viewPager2.getCurrentItem() != 1) {
             handler.post(new Runnable() {
                 @SuppressLint("ResourceAsColor")
@@ -1255,7 +1302,7 @@ public class TwentyOneGame extends Fragment {
                 public void run() {
                     Snackbar snackbar = Snackbar.make(binding.scrollView2, "New message received", Snackbar.LENGTH_LONG);
                     snackbar.setAnchorView(binding.linearLayout);
-                    snackbar.setAction("To the chat ->", new View.OnClickListener() {
+                    snackbar.setAction(context.getString(R.string.chat_link), new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             GameFragment.viewPager2.setCurrentItem(1);
