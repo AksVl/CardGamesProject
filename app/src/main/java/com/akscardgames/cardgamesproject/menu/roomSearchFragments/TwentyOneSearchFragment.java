@@ -2,6 +2,7 @@ package com.akscardgames.cardgamesproject.menu.roomSearchFragments;
 
 import static java.lang.Integer.parseInt;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,7 +25,9 @@ import com.akscardgames.cardgamesproject.menu.GameChooseActivity;
 import com.akscardgames.cardgamesproject.general.adapters.SearchRecyclerViewAdapter;
 import com.akscardgames.cardgamesproject.menu.dialogFragments.CreatePasswordFragment;
 import com.akscardgames.cardgamesproject.menu.dialogFragments.PasswordRequestFragment;
+import com.example.cardgamesproject.R;
 import com.example.cardgamesproject.databinding.FragmentTwentyOneSearchBinding;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -47,6 +50,7 @@ public class TwentyOneSearchFragment extends Fragment {
 
     public static FragmentTwentyOneSearchBinding binding;
     public static RoomData roomDataBuff;
+
 
     @Nullable
     @Override
@@ -73,6 +77,15 @@ public class TwentyOneSearchFragment extends Fragment {
             binding.sizePicker.setTextSize(px);
         }
         binding.create.setOnClickListener(v -> CreateNewRoom());
+        //region bestScore
+        int bestScore = prefs.getInt("bestScore",-5001);
+        if(bestScore == -5001) {
+            binding.bestScore.setText(getString(R.string.best) + "-");
+        } else{
+            binding.bestScore.setText(getString(R.string.best) + bestScore);
+        }
+        //endregion bestScore
+
     }
 
     private void CreateNewRoom() {
@@ -96,7 +109,7 @@ public class TwentyOneSearchFragment extends Fragment {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    //idk what to do here
+
                 }
             });
         }else{
@@ -175,7 +188,7 @@ public class TwentyOneSearchFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                //idk what to do here
+
             }
         });
     }
@@ -218,9 +231,19 @@ public class TwentyOneSearchFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                //idk what to do here
+
             }
         });
+    }
+
+    public static void updateBestScore(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences("PREFS", 0);
+        int bestScore = prefs.getInt("bestScore",-5001);
+        if(bestScore == -5001) {
+            binding.bestScore.setText(context.getString(R.string.best) + "-");
+        } else{
+            binding.bestScore.setText(context.getString(R.string.best) + bestScore);
+        }
     }
 
     @Override

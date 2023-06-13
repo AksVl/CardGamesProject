@@ -96,7 +96,7 @@ public class LiarSearchFragment extends Fragment {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    //idk what to do here
+
                 }
             });
         }else{
@@ -175,7 +175,7 @@ public class LiarSearchFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                //idk what to do here
+
             }
         });
     }
@@ -221,7 +221,7 @@ public class LiarSearchFragment extends Fragment {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    //idk what to do here
+
                 }
             });
         }

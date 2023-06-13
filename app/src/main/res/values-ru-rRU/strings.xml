@@ -86,4 +86,5 @@
     <string name="already_exists">Такой игрок уже существует</string>
     <string name="smth_went_wrong">Что-то пошло не так</string>
     <string name="press_again">Нажмите еще раз для выхода</string>
+    <string name="best">"лучший : "</string>
 </resources>

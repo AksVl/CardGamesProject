@@ -5,14 +5,40 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.akscardgames.cardgamesproject.menu.roomSearchFragments.FoolSearchFragment">
-
+    tools:context="com.akscardgames.cardgamesproject.menu.roomSearchFragments.TwentyOneSearchFragment">
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginVertical="8dp"
+    android:layout_weight="1">
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginVertical="8dp"
         android:layout_weight="1" />
+    <androidx.cardview.widget.CardView
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="8dp"
+        android:layout_width="150dp"
+        android:layout_height="30dp"
+        app:cardCornerRadius="500dp"
+        android:layout_weight="1">
+        <LinearLayout
+            android:background="@color/DarkGrey"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/bestScore"
+                android:gravity="center"
+                android:textSize="14sp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textColor="@color/buttonGrey"
+                android:text="BEST : +5000"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="120sp"

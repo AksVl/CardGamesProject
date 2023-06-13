@@ -38,6 +38,7 @@ import com.akscardgames.cardgamesproject.gamesRelated.dialogFragments.DialogBetC
 import com.akscardgames.cardgamesproject.gamesRelated.dialogFragments.DialogSetBankSize;
 import com.akscardgames.cardgamesproject.general.adapters.EndResultRecyclerViewAdapter;
 import com.akscardgames.cardgamesproject.menu.GameChooseActivity;
+import com.akscardgames.cardgamesproject.menu.roomSearchFragments.TwentyOneSearchFragment;
 import com.example.cardgamesproject.R;
 import com.example.cardgamesproject.databinding.CardLayoutBinding;
 import com.example.cardgamesproject.databinding.FragmentTwentyOneGameBinding;
@@ -973,9 +974,14 @@ public class TwentyOneGame extends Fragment {
                                         SharedPreferences prefs = getActivity().getSharedPreferences("PREFS", 0);
                                         int gamesCount = prefs.getInt("gamesCount", 0);
                                         int avgProfit = prefs.getInt("avgProfit", 0);
+                                        int bestScore = prefs.getInt("bestScore",-5001);
                                         int profit = available - 5000;
                                         avgProfit = (avgProfit * gamesCount + profit) / (gamesCount + 1);
                                         gamesCount++;
+                                        if(profit > bestScore){
+                                            prefs.edit().putInt("bestScore",profit).apply();
+                                            TwentyOneSearchFragment.updateBestScore(getContext());
+                                        }
                                         prefs.edit().putInt("gamesCount", gamesCount).apply();
                                         prefs.edit().putInt("avgProfit", avgProfit).apply();
                                         //endregion recounting avg
