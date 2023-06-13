@@ -10,8 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
-import com.akscardgames.cardgamesproject.menu.roomSearchFragments.FoolSearchFragment;
 import com.akscardgames.cardgamesproject.menu.roomSearchFragments.LiarSearchFragment;
 import com.akscardgames.cardgamesproject.menu.roomSearchFragments.TwentyOneSearchFragment;
 import com.example.cardgamesproject.databinding.FragmentCreatePasswordBinding;
@@ -44,8 +42,6 @@ public class CreatePasswordFragment extends DialogFragment {
             input = binding.password.getText().toString();
             if(!input.equals("")){
                 switch (gameType){
-                    case "Fool":
-                        FoolSearchFragment.createPrivateRoom(input);
                     case "TwentyOne":
                         TwentyOneSearchFragment.createPrivateRoom(input);
                     case "Liar":

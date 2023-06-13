@@ -6,7 +6,6 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.akscardgames.cardgamesproject.gamesRelated.ChatFragment;
 import com.akscardgames.cardgamesproject.gamesRelated.GameFragment;
-import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.FoolGame;
 import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.LiarGame;
 import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.TwentyOneGame;
 
@@ -25,8 +24,6 @@ public class GameViewPagerAdapter extends FragmentStateAdapter {
             switch (gameType){
                 case "TwentyOne":
                     return new TwentyOneGame();
-                case "Fool":
-                    return new FoolGame();
                 case "Liar":
                     return new LiarGame();
             }

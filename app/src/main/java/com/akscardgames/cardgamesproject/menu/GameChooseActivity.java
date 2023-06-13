@@ -14,12 +14,10 @@ import android.os.Handler;
 import android.widget.Toast;
 
 import com.akscardgames.cardgamesproject.gamesRelated.GameFragment;
-import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.FoolGame;
 import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.LiarGame;
 import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.TwentyOneGame;
 import com.akscardgames.cardgamesproject.general.adapters.GameViewPagerAdapter;
 import com.akscardgames.cardgamesproject.general.adapters.TabLayoutAdapter;
-import com.akscardgames.cardgamesproject.menu.roomSearchFragments.FoolSearchFragment;
 import com.akscardgames.cardgamesproject.menu.roomSearchFragments.LiarSearchFragment;
 import com.akscardgames.cardgamesproject.menu.roomSearchFragments.TwentyOneSearchFragment;
 import com.example.cardgamesproject.R;
@@ -53,17 +51,17 @@ public class GameChooseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityGameChooseBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        playerName = getSharedPreferences("PREFS",0).getString("name","");
-        avg = getSharedPreferences("PREFS",0).getInt("avgProfit",0);
+        playerName = getSharedPreferences("PREFS", 0).getString("name", "");
+        avg = getSharedPreferences("PREFS", 0).getInt("avgProfit", 0);
         playerRef = database.getReference("playerList/" + playerName);
-        binding.name.setText(getString(R.string.logged_in_as)+playerName);
-        if(avg > 0) {
+        binding.name.setText(getString(R.string.logged_in_as) + playerName);
+        if (avg > 0) {
             binding.avg.setText("AVG:" + "+" + avg);
             binding.avg.setTextColor(Color.GREEN);
         } else if (avg < 0) {
             binding.avg.setText("AVG:" + avg);
             binding.avg.setTextColor(Color.RED);
-        } else{
+        } else {
             binding.avg.setText("AVG:" + avg);
             binding.avg.setTextColor(Color.WHITE);
         }
@@ -71,7 +69,7 @@ public class GameChooseActivity extends AppCompatActivity {
         tabLayout = binding.tabLayout;
         viewPager2 = binding.FragmentsContainer;
         fragmentManager = getSupportFragmentManager();
-        adapter = new TabLayoutAdapter(fragmentManager,getLifecycle());
+        adapter = new TabLayoutAdapter(fragmentManager, getLifecycle());
         viewPager2.setAdapter(adapter);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -95,15 +93,6 @@ public class GameChooseActivity extends AppCompatActivity {
                 tabLayout.selectTab(tabLayout.getTabAt(position));
             }
         });
-    }
-    public static void launchFool(String roomName, String playerName) {
-        FoolGame.roomNameBuff = roomName;
-        GameFragment.playerName = playerName;
-        GameFragment.RoomRef = database.getReference("FoolRooms/" + roomName);
-        GameViewPagerAdapter.gameType = "Fool";
-        GameFragment fragment = new GameFragment();
-        fragmentManager.beginTransaction().addToBackStack(null).replace(android.R.id.content, fragment).commit();
-        FoolSearchFragment.binding.create.setEnabled(true);
     }
     public static void launchTwentyOne(String roomName, String playerName){
         TwentyOneGame.roomNameBuff = roomName;

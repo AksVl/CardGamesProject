@@ -6,11 +6,9 @@ import android.view.WindowManager;
 import androidx.annotation.NonNull;
 
 import com.akscardgames.cardgamesproject.gamesRelated.GameFragment;
-import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.FoolGame;
 import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.LiarGame;
 import com.example.cardgamesproject.R;
 import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.TwentyOneGame;
-import com.example.cardgamesproject.databinding.FragmentFoolGameBinding;
 import com.example.cardgamesproject.databinding.FragmentLiarGameBinding;
 import com.example.cardgamesproject.databinding.FragmentTwentyOneGameBinding;
 import com.google.firebase.database.DataSnapshot;
@@ -148,23 +146,6 @@ public class AppMethods {
             GameFragment.listener = InGameListener;
             binding.gameStatus.setText("");
             TwentyOneGame.onGameStart(context, binding,windowManager);
-        }
-    }
-    public static void foolReadyCheck(ValueEventListener listener,
-                                      ValueEventListener InGameListener, ArrayList<String> inRoomPlayers,
-                                      DatabaseReference roomRef, int readyCount, int size,
-                                      FragmentFoolGameBinding binding, Context context, WindowManager windowManager) {
-        if (readyCount >= size) {
-            binding.buttonBar.removeAllViews();
-            for (String player : inRoomPlayers) {
-                if (!player.equals("_size") && !player.equals("_access") && !player.equals("_messages")) {
-                    roomRef.child(player).child("status").setValue("waiting");
-                }
-            }
-            roomRef.removeEventListener(listener);
-            roomRef.addValueEventListener(InGameListener);
-            GameFragment.listener = InGameListener;
-            FoolGame.onGameStart(context, binding, windowManager);
         }
     }
     public static void liarReadyCheck(ValueEventListener listener,

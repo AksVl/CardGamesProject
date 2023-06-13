@@ -14,8 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-
-import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.FoolGame;
 import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.LiarGame;
 import com.akscardgames.cardgamesproject.gamesRelated.gameFragments.TwentyOneGame;
 import com.akscardgames.cardgamesproject.general.Message;
@@ -122,11 +120,6 @@ public class ChatFragment extends Fragment {
                 adapter.notifyDataSetChanged();
                 recyclerView.scrollToPosition(adapter.getItemCount() - 1);
                 switch (gameType) {
-                    case "Fool":
-                        if (snapshot.exists()) {
-                            FoolGame.notifyPlayer();
-                        }
-                        break;
                     case "TwentyOne":
                         if (snapshot.exists() && !TwentyOneGame.chatUpdatePermission) {
                             TwentyOneGame.notifyPlayer(getContext());

@@ -5,8 +5,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
-
-import com.akscardgames.cardgamesproject.menu.roomSearchFragments.FoolSearchFragment;
 import com.akscardgames.cardgamesproject.menu.roomSearchFragments.LiarSearchFragment;
 import com.akscardgames.cardgamesproject.menu.roomSearchFragments.TwentyOneSearchFragment;
 
@@ -20,8 +18,6 @@ public class TabLayoutAdapter extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
         if(position == 0){
-            return new FoolSearchFragment();
-        } else if (position == 1) {
             return new TwentyOneSearchFragment();
         }
         return new LiarSearchFragment();
@@ -29,6 +25,6 @@ public class TabLayoutAdapter extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-        return 3;
+        return 2;
     }
 }

@@ -54,6 +54,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
 
@@ -309,6 +310,7 @@ public class TwentyOneGame extends Fragment {
                             if (Bank <= 0) {
                                 RoomRef.child(playerName).child("status").setValue("ended");
                                 alreadyCounted = true;
+                                AvailableBuff = available;
                                 EndGame = true;
                                 RoomRef.child(playerName).child("hand").removeValue();
                                 HandOutStart = false;
@@ -604,7 +606,7 @@ public class TwentyOneGame extends Fragment {
                                         if (snapshot.child(player).child("currentBet").exists()) {
                                             PlayerBet = parseInt(snapshot.child(player).child("currentBet").getValue().toString());
                                             if (!LoopEnding) {
-                                                GameStatus += player + getString(R.string.s_bet1) + PlayerBet + "\n";
+                                                GameStatus += player + getString(R.string.s_bet) + PlayerBet + "\n";
                                                 binding.gameStatus.setText(GameStatus);
                                             }
                                             if (LoopEnding) {
@@ -622,11 +624,21 @@ public class TwentyOneGame extends Fragment {
                                                     if (snapshot.child(player).child("status").exists()) {
                                                         if (snapshot.child(player).child("status").getValue().toString().equals("Won")
                                                                 || snapshot.child(player).child("status").getValue().toString().equals("TwentyOne")) {
-                                                            GameStatus += getString(R.string.you_have_lost) + PlayerBet + getString(R.string.as)
-                                                                    + player + getString(R.string.s_bet1) + "!\n";
+                                                            if(getResources().getConfiguration().locale.getLanguage().equals("ru")){
+                                                                GameStatus += getString(R.string.you_have_lost) + PlayerBet + getString(R.string.as)
+                                                                         + getString(R.string.s_bet1) + player + "!\n";
+                                                            } else {
+                                                                GameStatus += getString(R.string.you_have_lost) + PlayerBet + getString(R.string.as)
+                                                                        + player + getString(R.string.s_bet1) + "!\n";
+                                                            }
                                                         } else if (snapshot.child(player).child("status").getValue().toString().equals("Lost")) {
-                                                            GameStatus += getString(R.string.you_have_won) + PlayerBet + getString(R.string.as)
-                                                                    + player + getString(R.string.s_bet1) + "!\n";
+                                                            if(getResources().getConfiguration().locale.getLanguage().equals("ru")){
+                                                                GameStatus += getString(R.string.you_have_won) + PlayerBet + getString(R.string.as)
+                                                                        + getString(R.string.s_bet1) + player + "!\n";
+                                                            } else{
+                                                                GameStatus += getString(R.string.you_have_won) + PlayerBet + getString(R.string.as)
+                                                                        + player + getString(R.string.s_bet1) + "!\n";
+                                                            }
                                                         }
                                                         binding.gameStatus.setText(GameStatus);
                                                     }
@@ -729,7 +741,9 @@ public class TwentyOneGame extends Fragment {
                                 Return[0] = true;
                             }
                         } else if (total > 21) {
-                            ((TextView) (binding.buttonBar.getChildAt(1))).setTextColor(Color.RED);
+                            if(binding.buttonBar.getChildAt(1) != null){
+                                ((TextView) (binding.buttonBar.getChildAt(1))).setTextColor(Color.RED);
+                            }
                             if (!playerName.equals(bankerName)) {
                                 if (snapshot.child(bankerName).child("status").exists()
                                         && !snapshot.child(bankerName).child("status").getValue().toString().equals("Lost all")) {
@@ -906,7 +920,7 @@ public class TwentyOneGame extends Fragment {
                                     if (OnceEndBank && playerName.equals(bankerName)) {
                                         OnceEndBank = false;
                                         Bank = BackUpBank;
-                                        available = BackUpBank;
+                                        available = available + BackUpBank;
                                         RoomRef.child(playerName).child("profit").setValue(available - 5000);
                                     }
                                     if (AllEnded[0]) {

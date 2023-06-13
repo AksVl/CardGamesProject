@@ -41,7 +41,7 @@
     <string name="you_have_won">"Вы выиграли "</string>
     <string name="has_won">" выиграл "</string>
     <string name="has_lost">" проиграл "</string>
-    <string name="s_bet">" ставка "</string>
+    <string name="s_bet">" поставил "</string>
     <string name="bank">"банк : "</string>
     <string name="joined">вошел</string>
     <string name="ready">готов</string>
@@ -67,7 +67,7 @@
     <string name="empty">пусто</string>
     <string name="none">пусто</string>
     <string name="bank_has_no_money">в банке закончились деньги!</string>
-    <string name="s_bet1">" ставка "</string>
+    <string name="s_bet1">" ставку "</string>
     <string name="went_offline_bets_return">" отключился, ставки возвращены"</string>
     <string name="out">вышел</string>
     <string name="starting">начинает</string>
