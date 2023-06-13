@@ -961,15 +961,15 @@ public class LiarGame extends Fragment {
         });
     }
 
-    public static void notifyPlayer() {
+    public static void notifyPlayer(Context context) {
         if (GameFragment.viewPager2.getCurrentItem() != 1) {
             handler.post(new Runnable() {
                 @SuppressLint("ResourceAsColor")
                 @Override
                 public void run() {
-                    Snackbar snackbar = Snackbar.make(binding.scrollView2, "New message received", Snackbar.LENGTH_LONG);
+                    Snackbar snackbar = Snackbar.make(binding.scrollView2, context.getString(R.string.new_message_received), Snackbar.LENGTH_LONG);
                     snackbar.setAnchorView(binding.linearLayout);
-                    snackbar.setAction("To the chat ->", new View.OnClickListener() {
+                    snackbar.setAction(context.getString(R.string.chat_link), new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             GameFragment.viewPager2.setCurrentItem(1);

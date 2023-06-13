@@ -1314,7 +1314,7 @@ public class TwentyOneGame extends Fragment {
                 @SuppressLint("ResourceAsColor")
                 @Override
                 public void run() {
-                    Snackbar snackbar = Snackbar.make(binding.scrollView2, "New message received", Snackbar.LENGTH_LONG);
+                    Snackbar snackbar = Snackbar.make(binding.scrollView2,context.getString(R.string.new_message_received), Snackbar.LENGTH_LONG);
                     snackbar.setAnchorView(binding.linearLayout);
                     snackbar.setAction(context.getString(R.string.chat_link), new View.OnClickListener() {
                         @Override

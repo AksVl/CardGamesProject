@@ -127,7 +127,7 @@ public class ChatFragment extends Fragment {
                         break;
                     case "Liar":
                         if (snapshot.exists()) {
-                            LiarGame.notifyPlayer();
+                            LiarGame.notifyPlayer(getContext());
                         }
                         break;
                 }
